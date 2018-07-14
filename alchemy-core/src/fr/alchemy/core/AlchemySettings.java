@@ -7,7 +7,7 @@ import java.util.HashMap;
  * 
  * @author GnosticOccultist
  */
-public class AlchemySettings extends HashMap<String, Object> {
+public final class AlchemySettings extends HashMap<String, Object> {
 	
 	private static final long serialVersionUID = -8759245099782840800L;
 	

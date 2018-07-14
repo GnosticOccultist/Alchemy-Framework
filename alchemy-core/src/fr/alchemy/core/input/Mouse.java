@@ -9,7 +9,7 @@ import javafx.scene.input.MouseEvent;
  * 
  * @author GnosticOccultist
  */
-public class Mouse {
+public final class Mouse {
 	/**
 	 * The mouse X and Y position on screen.
 	 */

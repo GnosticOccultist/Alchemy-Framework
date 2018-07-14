@@ -1,22 +1,28 @@
 package fr.alchemy.core;
 
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.alchemy.core.annotation.FXThread;
 import fr.alchemy.core.entity.Entity;
-import fr.alchemy.core.input.Mouse;
+import fr.alchemy.core.input.InputManager;
 import fr.alchemy.core.listener.ExitListener;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -31,10 +37,21 @@ import javafx.stage.Stage;
  */
 public abstract class AlchemyApplication extends Application {
 	
+	/**
+	 * The logger.
+	 */
 	private Logger logger = LoggerFactory.getLogger("alchemy.app");
-	
+	/**
+	 * The application settings.
+	 */
 	private AlchemySettings settings = new AlchemySettings(true);
-	
+	/**
+	 * A second in nanoseconds.
+	 */
+	public static final long SECOND = 1_000_000_000;
+	/**
+	 * 
+	 */
 	private Pane mainRoot, appRoot, uiRoot;
 	/**
 	 * The application window.
@@ -44,73 +61,106 @@ public abstract class AlchemyApplication extends Application {
 	 * The application scene.
 	 */
 	protected Scene mainScene;
-	
+	/**
+	 * The main loop timer.
+	 */
 	private AnimationTimer timer;
+	/**
+	 * The input manager.
+	 */
+	protected final InputManager inputManager = new InputManager(this);
+	/**
+	 * FPS counter to approximate FPS values.
+	 */
+	private FPSCounter fpsCounter = new FPSCounter();
+	private FPSCounter fpsPerformanceCounter = new FPSCounter();
+	/**
+	 * Average render FPS.
+	 */
+	protected int fps = 0;
+	/**
+	 * Average performance FPS.
+	 */
+	protected int fpsPerformance = 0;
 	/**
 	 * The current time in nanoseconds.
 	 */
 	protected long currentTime = 0; 
-	/**
-	 * Holds the mouse informations.
-	 */
-	protected Mouse mouse = new Mouse(); 
-	private Map<KeyCode, Boolean> keys = new HashMap<>(); 
-	private Map<KeyCode, Runnable> keyPressActions = new HashMap<>(); 
-	private Map<KeyCode, Runnable> keyTypedActions = new HashMap<>(); 
 	
 	private List<ExitListener> listeners = new ArrayList<>();
 
 	@Override
 	@FXThread
 	public void start(Stage primaryStage) throws Exception {
+		logger().info("Starting " + getClass().getSimpleName());
+		
 		initializeSettings(settings);
 		
 		this.mainStage = primaryStage;
+		primaryStage.setTitle(settings.getTitle() + " " + settings.getVersion());
+		primaryStage.setResizable(false);
 		
 		this.appRoot = new Pane();
 		this.uiRoot = new Pane();
 		this.mainRoot = new Pane(appRoot, uiRoot);
 		this.mainRoot.setPrefSize(settings.getWidth(), settings.getHeight());
 		
-		initialize(appRoot, uiRoot);
-		
 		mainScene = new Scene(mainRoot);
-		mainScene.setOnKeyPressed(event -> {
-			if(!isPressed(event.getCode()) && keyTypedActions.containsKey(event.getCode())) {
-				keys.put(event.getCode(), true);
-				keyTypedActions.get(event.getCode()).run();
-			} else {
-				keys.put(event.getCode(), true);
-			}
-		});
-		mainScene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
-		mainScene.setOnMousePressed(mouse::update);
-		mainScene.setOnMouseReleased(mouse::update);
-		mainScene.setOnMouseDragged(mouse::update);
-		mainScene.setOnMouseMoved(mouse::update);
 		
+		inputManager.initialize(mainScene);
+		
+		initialize(appRoot, uiRoot);
+
 		primaryStage.setScene(mainScene);
-		primaryStage.setWidth(settings.getWidth() + 6);
-		primaryStage.setHeight(settings.getHeight() + 29);
-		primaryStage.setTitle(settings.getTitle() + " " + settings.getVersion());
-		primaryStage.setResizable(false);
-		primaryStage.setOnCloseRequest(event -> {
-			exit();
-		});
+		primaryStage.sizeToScene();
+		
+		primaryStage.setOnCloseRequest(event -> exit());
 		primaryStage.show();
 		
 		timer = new AnimationTimer() {
 			
 			@Override
 			public void handle(long now) {
-				currentTime = now;
-				processInput();
-				
-				update(now);
-				appRoot.getChildren().stream().map(node -> (Entity) node).forEach(entity -> entity.update(now));
+				try {
+					internalUpdate(now);
+				} catch (Throwable t) {
+					logger().error("A fatal error has occured !", t);
+					exit();
+				}
 			}
 		};
+		
 		postInitialize();
+		timer.start();
+	}
+	
+	@FXThread
+	private void internalUpdate(final long now) {
+		long startNanos = System.nanoTime();
+		long realFPS = now - currentTime;
+		
+		currentTime = now;
+		
+		inputManager.update(now);
+		
+		update(now);
+		appRoot.getChildren().stream().map(node -> (Entity) node).forEach(entity -> entity.update(now));
+		
+		fpsPerformance = Math.round(fpsPerformanceCounter.count(SECOND / (System.nanoTime() - startNanos)));
+		fps = Math.round(fpsCounter.count(SECOND / realFPS));
+	}
+	
+	/**
+	 * Pauses the <code>AlchemyApplication</code>.
+	 */
+	protected final void pause() {
+		timer.stop();
+	}
+	
+	/**
+	 * Resumes the <code>AlchemyApplication</code>.
+	 */
+	protected final void resume() {
 		timer.start();
 	}
 	
@@ -135,16 +185,27 @@ public abstract class AlchemyApplication extends Application {
 	public void registerListener(final ExitListener listener) {
 		this.listeners.add(listener);
 	}
-
-	private void processInput() { 
-		keyPressActions.forEach((key, action) -> {if (isPressed(key)) action.run();}); 
-	} 
 	
 	/**
-	 * @return Whether the specified key is currently pressed.
+	 * Saves a screenshot of the <code>AlchemyApplication</code> into a '.png' file.
+	 * 
+	 * @return Whether the screenshot has been correctly saved.
 	 */
-	private boolean isPressed(KeyCode key) {
-		return keys.getOrDefault(key, false);
+	protected boolean screenshot() {
+		Image image = mainScene.snapshot(null);
+		BufferedImage img = SwingFXUtils.fromFXImage(image, null);
+		
+		String fileName = "./" + settings.getTitle() + settings.getVersion()
+				+ LocalDateTime.now() + ".png";
+		fileName = fileName.replace(':', '_');
+		
+		try (OutputStream os = Files.newOutputStream(Paths.get(fileName))) {
+			return ImageIO.write(img, "png", os);
+		} catch (Exception e) {
+			logger().error("Exception occured during screenshot - " + e.getMessage());
+		}
+		
+		return false;
 	}
 
 	/**
