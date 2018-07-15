@@ -19,19 +19,30 @@ import javafx.scene.input.MouseEvent;
  */
 public final class InputManager {
 	
+	/**
+	 * The application.
+	 */
 	private AlchemyApplication application;
+	/**
+	 * The main scene.
+	 */
 	private Scene mainScene;
-	
 	/**
 	 * Holds the mouse informations.
 	 */
 	protected Mouse mouse = new Mouse(); 
+	/**
+	 * Whether the input manager is enabled.
+	 */
+	private boolean enabled;
+	
 	private Map<KeyCode, Boolean> keys = new HashMap<>(); 
 	private Map<KeyCode, Runnable> keyPressActions = new HashMap<>(); 
 	private Map<KeyCode, Runnable> keyTypedActions = new HashMap<>(); 
 	
 	public InputManager(final AlchemyApplication application) {
 		this.application = application;
+		this.enabled = true;
 	}
 	
 	public void initialize(final Scene mainScene) {
@@ -60,7 +71,9 @@ public final class InputManager {
 	 * @param now The current time.
 	 */
 	public void update(final long now) { 
-		keyPressActions.forEach((key, action) -> {if (isPressed(key)) action.run();}); 
+		if(enabled) {
+			keyPressActions.forEach((key, action) -> {if (isPressed(key)) action.run();}); 
+		}
 	} 
 	
 	/**
@@ -75,6 +88,16 @@ public final class InputManager {
 	}
 	
 	/**
+	 * Removes an action which is executed constantly <strong>WHILE</strong> the key
+	 * is physically pressed.
+	 * 
+	 * @param key	 The key to be pressed.
+	 */
+	public void removeKeyPressBinding(final KeyCode key) {
+		keyPressActions.remove(key);
+	}
+	
+	/**
 	 * Adds an action which is executed only <strong>ONCE</strong> per single
 	 * physical key press.
 	 * 
@@ -86,6 +109,16 @@ public final class InputManager {
 	}
 	
 	/**
+	 * Removes an action which is executed constantly <strong>WHILE</strong> the key
+	 * is physically pressed.
+	 * 
+	 * @param key	 The key to be pressed.
+	 */
+	public void removeKeyTypedBinding(final KeyCode key) {
+		keyTypedActions.remove(key);
+	}
+	
+	/**
 	 * Adds an action which is executed only <strong>ONCE</strong> per single click of
 	 * the provided mouse button.
 	 * 
@@ -94,7 +127,7 @@ public final class InputManager {
 	 */
 	public void addMouseClickedBinding(final MouseButton button, final Runnable action) {
 		mainScene.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-			if(event.getButton() == button) {
+			if(event.getButton() == button && enabled) {
 				action.run();
 			}
 		});

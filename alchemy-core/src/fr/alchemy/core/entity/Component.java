@@ -1,5 +1,8 @@
 package fr.alchemy.core.entity;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 /**
  * <code>Component</code> is an attribute that can be bound to an <code>Entity</code>,
  * to describe specific behaviors.
@@ -14,7 +17,7 @@ public abstract class Component {
 	/**
 	 * Whether the component is enabled.
 	 */
-	private boolean enabled;
+	private final BooleanProperty enabled = new SimpleBooleanProperty(false);
 	
 	/**
 	 * Updates the component. The function is called when the entity updates itself, if
@@ -35,7 +38,7 @@ public abstract class Component {
 	 */
 	public void onAttached(final Entity entity) {
 		setOwner(entity);
-		setEnabled(true);
+		enable();
 	}
 	
 	/**
@@ -49,7 +52,7 @@ public abstract class Component {
 	 */
 	public void onDetached(final Entity entity) {
 		setOwner(null);
-		setEnabled(false);
+		disable();
 	}
 	
 	/**
@@ -78,15 +81,20 @@ public abstract class Component {
 	 * @return Whether the component is enabled.
 	 */
 	public boolean isEnabled() {
-		return enabled;
+		return enabled.get();
 	}
 
 	/**
-	 * Sets whether the component should be enabled.
-	 * 
-	 * @param enabled Whether the component is enabled.
+	 * Enables the component.
 	 */
-	public void setEnabled(final boolean enabled) {
-		this.enabled = enabled;
+	public void enable() {
+		this.enabled.set(true);
+	}
+	
+	/**
+	 * Disables the component.
+	 */
+	public void disable() {
+		this.enabled.set(false);
 	}
 }

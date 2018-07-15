@@ -3,6 +3,8 @@ package fr.alchemy.core.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 
@@ -18,6 +20,10 @@ public class Entity extends Parent {
 	 * The list of components defining the entity.
 	 */
 	private List<Component> components = new ArrayList<>();
+	/**
+	 * Whether the entity is enabled.
+	 */
+	private BooleanProperty enabled = new SimpleBooleanProperty(true);
 	
 	/**
 	 * This method is called automatically every loop cycle by the <code>AlchemyApplication</code>
@@ -26,6 +32,9 @@ public class Entity extends Parent {
 	 * @param now The current time.
 	 */
 	public final void update(final long now) {
+		if(!isEnabled()) {
+			return;
+		}
 		components.stream().filter(Component::isEnabled).forEach(component -> component.update(now));
 	}
 	
@@ -86,6 +95,16 @@ public class Entity extends Parent {
 	/**
 	 * Sets the entity position from the parent's origin.
 	 * 
+	 * @param position The position vector.
+	 * @return		   The translated entity.
+	 */
+	public Entity setPosition(final Point2D position) {
+		return setPosition(position.getX(), position.getY());
+	}
+	
+	/**
+	 * Sets the entity position from the parent's origin.
+	 * 
 	 * @param x The X position vector.
 	 * @param y The Y position vector.
 	 * @return	The translated entity.
@@ -108,9 +127,32 @@ public class Entity extends Parent {
 	}
 	
 	/**
-	 * Deletes the <code>Entity</code> by deleting all of its components.
+	 * @return Whether the <code>Entity</code> is enabled.
+	 */
+	public boolean isEnabled() {
+		return enabled.get();
+	}
+	
+	/**
+	 * Sets whether the <code>Entity</code> should be enabled.
+	 * It also enable/disable all of its components.
+	 * 
+	 * @param enabled Whether the entity is enabled.
+	 */
+	public void setEnabled(final boolean enabled) {
+		this.enabled.set(enabled);
+		if(enabled)
+			components.stream().forEach(Component::enable);
+		else
+			components.stream().forEach(Component::disable);
+	}
+	
+	/**
+	 * Deletes the <code>Entity</code> by deleting all of its components and children.
 	 */
 	public final void cleanup() {
 		components.stream().forEach(component -> component.cleanup());
+		components.clear();
+		getChildren().clear();
 	}
 }
