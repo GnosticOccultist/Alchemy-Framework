@@ -3,7 +3,7 @@ package fr.alchemy.core;
 import java.util.Arrays;
 
 /**
- * Convenience class that buffers FPS values and calculates 
+ * <code>FPSCounter</code> buffers FPS values and calculates 
  * the arithmetic mean to approximate FPS value as it 
  * varies from frame to frame.
  * 
@@ -25,12 +25,12 @@ final class FPSCounter {
 	 * Calculates the average FPS and buffers given value
 	 * for future corrections to the FPS value.
 	 * 
-	 * @param tpf The time that took the last frame.
+	 * @param ttlf The time that took the last frame.
 	 */
-	public float count(float tpf) {
+	public float count(float ttlf) {
 		sum -= values[index];
-		sum += tpf;
-		values[index] = tpf;
+		sum += ttlf;
+		values[index] = ttlf;
 		if(++index == values.length) {
 			index = 0;
 		}

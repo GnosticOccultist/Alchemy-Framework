@@ -21,9 +21,13 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -42,29 +46,50 @@ public abstract class AlchemyApplication extends Application {
 	 */
 	private Logger logger = LoggerFactory.getLogger("alchemy.app");
 	/**
-	 * The application settings.
-	 */
-	private AlchemySettings settings = new AlchemySettings(true);
-	/**
 	 * A second in nanoseconds.
 	 */
 	public static final long SECOND = 1_000_000_000;
 	/**
-	 * 
+	 * The timer per single frame in nanoseconds.
 	 */
-	private Pane mainRoot, appRoot, uiRoot;
+	public static final long TIME_PER_FRAME = SECOND / 60;
+	/**
+	 * The root for all the entities.
+	 */
+	private Pane appRoot = new Pane(); 
+	/**
+	 * The overlay root above {@link #appRoot}. Contains all the UI elements, native JavaFX nodes.
+	 * May also contain some entities. The UI root isn't affected by viewport movement.
+	 */
+	private Pane uiRoot = new Pane();
+	/**
+	 * The root of the {@link #mainScene}. 
+	 * Contains {@link #appRoot} and {@link #uiRoot} in this order.
+	 */
+	private Pane mainRoot = new Pane(appRoot, uiRoot);
 	/**
 	 * The application window.
 	 */
-	protected Stage mainStage;
+	private Window window;
 	/**
 	 * The application scene.
 	 */
-	protected Scene mainScene;
+	protected Scene mainScene = new Scene(mainRoot);
 	/**
 	 * The main loop timer.
 	 */
-	private AnimationTimer timer;
+	private AnimationTimer timer = new AnimationTimer() {
+		
+		@Override
+		public void handle(long internalTime) {
+			try {
+				internalUpdate(internalTime);
+			} catch (Throwable t) {
+				logger().error("A fatal error has occured !", t);
+				exit();
+			}
+		}
+	};
 	/**
 	 * The input manager.
 	 */
@@ -83,9 +108,14 @@ public abstract class AlchemyApplication extends Application {
 	 */
 	protected int fpsPerformance = 0;
 	/**
-	 * The current time in nanoseconds.
+	 * Used as delta from internal JavaFX time-stamp to calculate renderFPS.
 	 */
-	protected long currentTime = 0; 
+	protected long fpsTime = 0; 
+	/**
+	 * The current time this tick in nanoseconds. Also time elapsed
+	 * from the start of the app. This time doesn't change while the app is paused.
+	 */
+	protected long currentTime;
 	
 	private List<ExitListener> listeners = new ArrayList<>();
 
@@ -94,60 +124,55 @@ public abstract class AlchemyApplication extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		logger().info("Starting " + getClass().getSimpleName());
 		
+		final AlchemySettings settings = AlchemySettings.settings();
+		
 		initializeSettings(settings);
 		
-		this.mainStage = primaryStage;
-		primaryStage.setTitle(settings.getTitle() + " " + settings.getVersion());
-		primaryStage.setResizable(false);
-		
-		this.appRoot = new Pane();
-		this.uiRoot = new Pane();
-		this.mainRoot = new Pane(appRoot, uiRoot);
+		this.mainRoot.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
 		this.mainRoot.setPrefSize(settings.getWidth(), settings.getHeight());
 		
-		mainScene = new Scene(mainRoot);
+		this.window = new Window(this);
+		this.window.initialize(primaryStage, mainScene);
 		
-		inputManager.initialize(mainScene);
+		this.inputManager.initialize(mainScene);
 		
 		initialize(appRoot, uiRoot);
-
-		primaryStage.setScene(mainScene);
-		primaryStage.sizeToScene();
-		
-		primaryStage.setOnCloseRequest(event -> exit());
-		primaryStage.show();
-		
-		timer = new AnimationTimer() {
-			
-			@Override
-			public void handle(long now) {
-				try {
-					internalUpdate(now);
-				} catch (Throwable t) {
-					logger().error("A fatal error has occured !", t);
-					exit();
-				}
-			}
-		};
 		
 		postInitialize();
+		
+		window.show();
 		timer.start();
 	}
 	
+	/**
+	 * This method is the internal <code>AlchemyApplication</code> update tick.
+	 * It's executed 60 times a second ~ every 0.166 (6) seconds.
+	 * 
+	 * @param internalTime The time-stamp of the current frame given in nanoseconds (from JavaFX).
+	 */
 	@FXThread
-	private void internalUpdate(final long now) {
+	private void internalUpdate(final long internalTime) {
 		long startNanos = System.nanoTime();
-		long realFPS = now - currentTime;
+		long realFPS = internalTime - fpsTime;
+		fpsTime = internalTime;
 		
-		currentTime = now;
+		inputManager.update(currentTime);
 		
-		inputManager.update(now);
+		update();
 		
-		update(now);
-		appRoot.getChildren().stream().map(node -> (Entity) node).forEach(entity -> entity.update(now));
+		appRoot.getChildren().stream().map(node -> (Entity) node).forEach(entity -> entity.update(currentTime));
 		
 		fpsPerformance = Math.round(fpsPerformanceCounter.count(SECOND / (System.nanoTime() - startNanos)));
 		fps = Math.round(fpsCounter.count(SECOND / realFPS));
+		
+		currentTime += TIME_PER_FRAME;
+	}
+	
+	/**
+	 * @return The viewport origin in the top-left corner.
+	 */
+	public Point2D getViewportOrigin() {
+		return new Point2D(-appRoot.getLayoutX(), -appRoot.getLayoutY());
 	}
 	
 	/**
@@ -192,6 +217,8 @@ public abstract class AlchemyApplication extends Application {
 	 * @return Whether the screenshot has been correctly saved.
 	 */
 	protected boolean screenshot() {
+		AlchemySettings settings = AlchemySettings.settings();
+		
 		Image image = mainScene.snapshot(null);
 		BufferedImage img = SwingFXUtils.fromFXImage(image, null);
 		
@@ -232,10 +259,8 @@ public abstract class AlchemyApplication extends Application {
 	
 	/**
 	 * Updates the <code>AlchemyApplication</code>.
-	 * 
-	 * @param now The current time.
 	 */
-	protected abstract void update(long now);
+	protected abstract void update();
 	
 	/**
 	 * @return The logger of the <code>AlchemyApplication</code>.

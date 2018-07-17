@@ -15,18 +15,38 @@ public final class AlchemySettings extends HashMap<String, Object> {
 	 * The default settings instance.
 	 */
 	private static final AlchemySettings DEFAULT_SETTINGS = new AlchemySettings(false);
+	/**
+	 * The settings instance.
+	 */
+	private static AlchemySettings SETTINGS_INSTANCE;
+	/**
+	 * @return The application settings instance.
+	 */
+	public static AlchemySettings settings() {
+		if(SETTINGS_INSTANCE == null) {
+			SETTINGS_INSTANCE = new AlchemySettings(true);
+		}
+		return SETTINGS_INSTANCE;
+	}
 	
 	static {
 		DEFAULT_SETTINGS.put("Title", "Alchemy Application");
 		DEFAULT_SETTINGS.put("Version", "0.1");
 		DEFAULT_SETTINGS.put("Width", 800);
 		DEFAULT_SETTINGS.put("Height", 600);
+		DEFAULT_SETTINGS.put("Resizable", false);
+		DEFAULT_SETTINGS.put("Fullscreen", false);
 	}
 	
-	public AlchemySettings(boolean loadDefault) {
+	private AlchemySettings(boolean loadDefault) {
 		if(loadDefault) {
 			putAll(DEFAULT_SETTINGS);
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T value(final Object key) {
+		return (T) super.get(key);
 	}
 	
 	/**
