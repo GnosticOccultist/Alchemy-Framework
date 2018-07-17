@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.alchemy.core.AlchemyApplication;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -30,7 +31,7 @@ public final class InputManager {
 	/**
 	 * Holds the mouse informations.
 	 */
-	protected Mouse mouse = new Mouse(); 
+	protected Mouse mouse; 
 	/**
 	 * Whether the input manager is enabled.
 	 */
@@ -41,6 +42,7 @@ public final class InputManager {
 	private Map<KeyCode, Runnable> keyTypedActions = new HashMap<>(); 
 	
 	public InputManager(final AlchemyApplication application) {
+		this.mouse = new Mouse(this);
 		this.application = application;
 		this.enabled = true;
 	}
@@ -72,8 +74,12 @@ public final class InputManager {
 	 */
 	public void update(final long now) { 
 		if(enabled) {
-			keyPressActions.forEach((key, action) -> {if (isPressed(key)) action.run();}); 
+			keyPressActions.forEach((key, action) -> { if (isPressed(key)) action.run(); }); 
 		}
+		
+		final Point2D origin = application.getViewportOrigin();
+		mouse.x = mouse.screenX + origin.getX();
+		mouse.y = mouse.screenY + origin.getY();
 	} 
 	
 	/**

@@ -1,5 +1,6 @@
 package fr.alchemy.core.input;
 
+import javafx.geometry.Point2D;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -10,18 +11,32 @@ import javafx.scene.input.MouseEvent;
  * @author GnosticOccultist
  */
 public final class Mouse {
+	
 	/**
-	 * The mouse X and Y position on screen.
+	 * The input manager managing the mouse.
+	 */
+	private InputManager inputManager;
+	/**
+	 * The mouse X and Y position within the application with 
+	 * viewport's origin translation.
 	 */
 	public double x, y;
+	/**
+	 * The mouse X and Y position within the screen coordinate system.
+	 */
+	public double screenX, screenY;
 	/**
 	 * Whether the mouse buttons are pressed.
 	 */
 	public boolean leftPressed, rightPressed;
 	/**
-	 * The mouse event currently invoked.
+	 * The last mouse event invoked.
 	 */
 	private MouseEvent event;
+	
+	public Mouse(final InputManager inputManager) {
+		this.inputManager = inputManager;
+	}
 	
 	/**
 	 * Update the mouse position and buttons state.
@@ -30,8 +45,12 @@ public final class Mouse {
 	 */
 	public void update(MouseEvent event) {
 		this.event = event;
-		this.x = event.getSceneX();
-		this.y = event.getSceneY();
+		this.screenX = event.getSceneX();
+		this.screenY = event.getSceneY();
+		
+		Point2D origin = inputManager.getApplication().getViewportOrigin();
+		this.x = screenX + origin.getX();
+		this.y = screenY + origin.getY();
 		
 		if(leftPressed) {
 			if(event.getButton() == MouseButton.PRIMARY && isReleased(event)) {
