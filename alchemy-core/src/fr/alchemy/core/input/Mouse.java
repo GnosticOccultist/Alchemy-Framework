@@ -43,14 +43,15 @@ public final class Mouse {
 	 * 
 	 * @param event The mouse event currently invoked.
 	 */
-	public void update(MouseEvent event) {
+	public void update(final MouseEvent event) {
 		this.event = event;
 		this.screenX = event.getSceneX();
 		this.screenY = event.getSceneY();
 		
-		Point2D origin = inputManager.getApplication().getViewportOrigin();
-		this.x = screenX + origin.getX();
-		this.y = screenY + origin.getY();
+		final Point2D origin = inputManager.getApplication().getScene().getViewportOrigin();
+		final double sizeRatio = inputManager.getApplication().getScene().getSizeRatio();
+		this.x = screenX / sizeRatio + origin.getX();
+		this.y = screenY / sizeRatio + origin.getY();
 		
 		if(leftPressed) {
 			if(event.getButton() == MouseButton.PRIMARY && isReleased(event)) {

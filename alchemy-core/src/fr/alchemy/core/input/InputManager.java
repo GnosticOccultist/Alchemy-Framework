@@ -40,6 +40,7 @@ public final class InputManager {
 	private Map<KeyCode, Boolean> keys = new HashMap<>(); 
 	private Map<KeyCode, Runnable> keyPressActions = new HashMap<>(); 
 	private Map<KeyCode, Runnable> keyTypedActions = new HashMap<>(); 
+	private Map<KeyCode, Runnable> keyReleasedActions = new HashMap<>(); 
 	
 	public InputManager(final AlchemyApplication application) {
 		this.mouse = new Mouse(this);
@@ -58,7 +59,12 @@ public final class InputManager {
 			}
 		});
 		
-		mainScene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
+		mainScene.setOnKeyReleased(event -> {
+			keys.put(event.getCode(), false);
+			if(keyReleasedActions.containsKey(event.getCode())) {
+				keyReleasedActions.get(event.getCode()).run();
+			}
+		});
 		
 		mainScene.setOnMousePressed(mouse::update);
 		mainScene.setOnMouseReleased(mouse::update);
@@ -77,9 +83,9 @@ public final class InputManager {
 			keyPressActions.forEach((key, action) -> { if (isPressed(key)) action.run(); }); 
 		}
 		
-		final Point2D origin = application.getViewportOrigin();
-		mouse.x = mouse.screenX + origin.getX();
-		mouse.y = mouse.screenY + origin.getY();
+		final Point2D origin = application.getScene().getViewportOrigin();
+		mouse.x = mouse.screenX / application.getScene().getSizeRatio() + origin.getX();
+		mouse.y = mouse.screenY / application.getScene().getSizeRatio() + origin.getY();
 	} 
 	
 	/**
@@ -94,10 +100,9 @@ public final class InputManager {
 	}
 	
 	/**
-	 * Removes an action which is executed constantly <strong>WHILE</strong> the key
-	 * is physically pressed.
+	 * Removes an action bound to the given key.
 	 * 
-	 * @param key	 The key to be pressed.
+	 * @param key The key to be pressed.
 	 */
 	public void removeKeyPressBinding(final KeyCode key) {
 		keyPressActions.remove(key);
@@ -115,13 +120,32 @@ public final class InputManager {
 	}
 	
 	/**
-	 * Removes an action which is executed constantly <strong>WHILE</strong> the key
-	 * is physically pressed.
+	 * Removes an action bound to the given key.
 	 * 
-	 * @param key	 The key to be pressed.
+	 * @param key The key to be pressed.
 	 */
 	public void removeKeyTypedBinding(final KeyCode key) {
 		keyTypedActions.remove(key);
+	}
+	
+	/**
+	 * Adds an action that is executed <strong>ONCE</strong>, when the key
+	 * is released.
+	 * 
+	 * @param key	 The key to be released.
+	 * @param action The action to be executed.
+	 */
+	public void addKeyReleasedBinding(final KeyCode key, final Runnable action) {
+		keyReleasedActions.put(key, action);
+	}
+	
+	/**
+	 * Removes an action bound to the given key.
+	 * 
+	 * @param key The key to be released.
+	 */
+	public void removeKeyReleasedBinding(final KeyCode key) {
+		keyReleasedActions.remove(key);
 	}
 	
 	/**
@@ -168,5 +192,15 @@ public final class InputManager {
 	 */
 	public AlchemyApplication getApplication() {
 		return application;
+	}
+	
+	/**
+	 * Sets whether the key/mouse actions can run, however the input
+	 * events will still continue to be registered.
+	 * 
+	 * @param enabled Whether to enable key/mouse action processing.
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }

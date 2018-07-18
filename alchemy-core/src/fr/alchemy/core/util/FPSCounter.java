@@ -1,4 +1,4 @@
-package fr.alchemy.core;
+package fr.alchemy.core.util;
 
 import java.util.Arrays;
 
@@ -9,7 +9,7 @@ import java.util.Arrays;
  * 
  * @author GnosticOccultist
  */
-final class FPSCounter {
+public final class FPSCounter {
 	
 	private static final int MAX_SAMPLES = 100;
 	

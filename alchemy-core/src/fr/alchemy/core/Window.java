@@ -24,7 +24,7 @@ public class Window {
 	 * @param stage		The stage representing the window.
 	 * @param mainScene The main scene.
 	 */
-	public void initialize(final Stage stage, final Scene mainScene) {
+	public void initialize(final Stage stage, final Scene scene) {
 		this.mainStage = stage;
 		
 		final AlchemySettings settings = AlchemySettings.settings();
@@ -33,11 +33,11 @@ public class Window {
 		mainStage.setResizable(settings.value("Resizable"));
 		
 		if((boolean) settings.value("Fullscreen")) {
-			mainStage.setFullScreen(settings.value(true));
+			mainStage.setFullScreen(true);
 			mainStage.setFullScreenExitHint("");
 		}
 		
-		mainStage.setScene(mainScene);
+		mainStage.setScene(scene);
 		mainStage.sizeToScene();
 		
 		mainStage.setOnCloseRequest(event -> application.exit());

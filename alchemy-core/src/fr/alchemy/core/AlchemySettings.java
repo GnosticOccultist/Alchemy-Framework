@@ -36,6 +36,7 @@ public final class AlchemySettings extends HashMap<String, Object> {
 		DEFAULT_SETTINGS.put("Height", 600);
 		DEFAULT_SETTINGS.put("Resizable", false);
 		DEFAULT_SETTINGS.put("Fullscreen", false);
+		DEFAULT_SETTINGS.put("ShowFPS", false);
 	}
 	
 	private AlchemySettings(boolean loadDefault) {
@@ -44,9 +45,19 @@ public final class AlchemySettings extends HashMap<String, Object> {
 		}
 	}
 	
+	/**
+	 * @return The value of the specified key.
+	 */
 	@SuppressWarnings("unchecked")
-	public <T> T value(final Object key) {
+	public <T> T value(final String key) {
 		return (T) super.get(key);
+	}
+	
+	/**
+	 * @return The value of the specified key as a boolean.
+	 */
+	public boolean boolValue(final String key) {
+		return value(key);
 	}
 	
 	/**
