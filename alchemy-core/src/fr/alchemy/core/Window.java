@@ -29,12 +29,22 @@ public class Window {
 		
 		final AlchemySettings settings = AlchemySettings.settings();
 		
+		// Sets the title and resizable if needed.
 		mainStage.setTitle(settings.getTitle() + " " + settings.getVersion());
-		mainStage.setResizable(settings.value("Resizable"));
+		mainStage.setResizable(settings.boolValue("Resizable"));
 		
-		if((boolean) settings.value("Fullscreen")) {
+		// Enters fullscreen mode if needed.
+		if(settings.boolValue("Fullscreen")) {
 			mainStage.setFullScreen(true);
 			mainStage.setFullScreenExitHint("");
+		}
+		
+		// Loads the icons for the window.
+		final String[] iconPaths = settings.getIconPaths();
+		for(String iconPath : iconPaths) {
+			if(iconPath != null && !iconPath.isEmpty()) {
+				mainStage.getIcons().add(application.getAssetManager().loadImage(iconPath));
+			}
 		}
 		
 		mainStage.setScene(scene);

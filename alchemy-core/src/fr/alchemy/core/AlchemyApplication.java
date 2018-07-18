@@ -197,6 +197,13 @@ public abstract class AlchemyApplication extends Application {
 	}
 	
 	/**
+	 * @return The asset manager of the <code>AlchemyApplication</code>.
+	 */
+	public AssetManager getAssetManager() {
+		return assetManager;
+	}
+	
+	/**
 	 * @return The logger of the <code>AlchemyApplication</code>.
 	 */
 	protected Logger logger() {

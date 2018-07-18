@@ -50,6 +50,26 @@ public class AssetManager {
 	}
 	
 	/**
+	 * Loads a <code>Image</code> from the specified file name.
+	 * It will search the asset internally and in every specified root folders.
+	 * If the asset isn't found it will return null.
+	 * 
+	 * @param name The name of the image file.
+	 * @return	   The image object or null if not found.
+	 */
+	public Image loadImage(final String name) {
+		try {
+			final InputStream is = openStream(name);
+			if(is != null) {
+				return new Image(is);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * Registers a new root directory for the <code>AssetManager</code>
 	 * to look for asset to load.
 	 * 

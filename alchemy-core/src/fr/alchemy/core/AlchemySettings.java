@@ -37,6 +37,7 @@ public final class AlchemySettings extends HashMap<String, Object> {
 		DEFAULT_SETTINGS.put("Resizable", false);
 		DEFAULT_SETTINGS.put("Fullscreen", false);
 		DEFAULT_SETTINGS.put("ShowFPS", false);
+		DEFAULT_SETTINGS.put("IconPaths", new String[] {"resources/icons/logo_colored_x32.png"});
 	}
 	
 	private AlchemySettings(boolean loadDefault) {
@@ -64,27 +65,34 @@ public final class AlchemySettings extends HashMap<String, Object> {
 	 * @return The width of the application.
 	 */
 	public int getWidth() {
-		return (int) get("Width");
+		return value("Width");
 	}
 	
 	/**
 	 * @return The height of the application.
 	 */
 	public int getHeight() {
-		return (int) get("Height");
+		return value("Height");
 	}
 	
 	/**
 	 * @return The title of the application.
 	 */
 	public String getTitle() {
-		return (String) get("Title");
+		return value("Title");
 	}
 	
 	/**
 	 * @return The version of the application.
 	 */
 	public String getVersion() {
-		return (String) get("Version");
+		return value("Version");
+	}
+	
+	/**
+	 * @return The icon paths of the application window.
+	 */
+	public String[] getIconPaths() {
+		return value("IconPaths");
 	}
 }
