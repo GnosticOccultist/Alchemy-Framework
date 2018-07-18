@@ -1,6 +1,6 @@
 package fr.alchemy.core.asset;
 
-import fr.alchemy.core.entity.Entity;
+import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 

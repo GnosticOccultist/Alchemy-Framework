@@ -1,4 +1,4 @@
-package fr.alchemy.core;
+package fr.alchemy.core.scene;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
@@ -13,12 +13,14 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.alchemy.core.entity.Entity;
-import fr.alchemy.core.util.NanoTimer;
+import fr.alchemy.core.AlchemyApplication;
+import fr.alchemy.core.AlchemySettings;
+import fr.alchemy.core.scene.entity.Entity;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -42,6 +44,10 @@ public class AlchemyScene {
 	 * The scene logger.
 	 */
 	private Logger logger = LoggerFactory.getLogger("alchemy.scene");
+	/**
+	 * The application.
+	 */
+	private AlchemyApplication application;
 	/**
 	 * The root for all the entities.
 	 */
@@ -69,7 +75,9 @@ public class AlchemyScene {
 	 */
 	public List<Entity> entities = new ArrayList<>();
 	
-	public void initialize(final double width, final double height, final NanoTimer timer) {
+	public void initialize(final AlchemyApplication application, final double width, final double height) {
+		this.application = application;
+		
 		setPrefSize(width, height);
 		setBackgroundColor(Color.BLACK);
 		mainScene.setRoot(mainRoot);
@@ -80,12 +88,18 @@ public class AlchemyScene {
 	        fpsText.setFill(Color.AZURE);
 	        fpsText.setFont(Font.font(24));
 	        fpsText.setTranslateY(settings.getHeight() - 40);
-	        fpsText.textProperty().bind(timer.fpsProperty().asString("FPS: [%d]\n")
-	                .concat(timer.performanceFPSProperty().asString("Performance: [%d]")));
+	        fpsText.textProperty().bind(application.getTimer().fpsProperty().asString("FPS: [%d]\n")
+	                .concat(application.getTimer().performanceFPSProperty().asString("Performance: [%d]")));
 	        uiRoot.getChildren().add(fpsText);
 		}
 	}
 	
+	/**
+	 * Sets the preferred size for the <code>AlchemyScene</code>.
+	 * 
+	 * @param width  The width.
+	 * @param height The height.
+	 */
 	public void setPrefSize(final double width, final double height) {
 		final AlchemySettings settings = AlchemySettings.settings();
 		
@@ -114,6 +128,17 @@ public class AlchemyScene {
 	public void addEntity(final Entity entity) {
 		this.entities.add(entity);
 		this.appRoot.getChildren().add(entity);
+	}
+	
+	/**
+	 * Sets the cursor image for the scene.
+	 * 
+	 * @param name	  The image file.
+	 * @param hotSpot The location where the pointer ends on the image.
+	 */
+	public void setCursor(final String name, final Point2D hotSpot) {
+		getFXScene().setCursor(new ImageCursor(application.getAssetManager().loadImage(name),
+				hotSpot.getX(), hotSpot.getY()));
 	}
 	
 	/**

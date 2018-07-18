@@ -1,12 +1,17 @@
-package fr.alchemy.core.entity;
+package fr.alchemy.core.scene.entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.alchemy.core.scene.component.Component;
+import fr.alchemy.core.scene.component.Transform;
+import fr.alchemy.core.util.VoidAction;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 /**
  * <code>Entity</code> represents a scene object defined by one, multiple or no {@link Component components}.
@@ -25,6 +30,11 @@ public class Entity extends Parent {
 	 */
 	private BooleanProperty enabled = new SimpleBooleanProperty(true);
 	
+	public Entity() {
+		getChildren().add(new Rectangle(50, 50, Color.RED));
+		components.add(new Transform());
+	}
+	
 	/**
 	 * This method is called automatically every loop cycle by the <code>AlchemyApplication</code>
 	 * to update the <code>Entity</code> state.
@@ -35,6 +45,7 @@ public class Entity extends Parent {
 		if(!isEnabled()) {
 			return;
 		}
+		
 		components.stream().filter(Component::isEnabled).forEach(component -> component.update(now));
 	}
 	
@@ -44,7 +55,7 @@ public class Entity extends Parent {
 	 * @param component The component to attach.
 	 * @return			The entity with its new component.
 	 */
-	public Entity attach(final Component component) {
+	public final Entity attach(final Component component) {
 		this.components.add(component);
 		component.onAttached(this);
 		
@@ -57,7 +68,7 @@ public class Entity extends Parent {
 	 * @param component The component to detach.
 	 * @return			The entity with its removed component.
 	 */
-	public <T extends Component> Entity detach(final Class<T> type) {
+	public final <T extends Component> Entity detach(final Class<T> type) {
 		final Component component = getComponent(type);
 		this.components.remove(component);
 		component.onDetached(this);
@@ -68,7 +79,7 @@ public class Entity extends Parent {
 	/**
 	 * @return Whether the provided type of component is attached to this entity.
 	 */
-	public <T extends Component> boolean has(final Class<T> type) {
+	public final <T extends Component> boolean has(final Class<T> type) {
 		return getComponent(type) != null;
 	}
 	
@@ -76,7 +87,7 @@ public class Entity extends Parent {
 	 * @return The component matching the provided type, or null.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends Component> T getComponent(final Class<T> type) {
+	public final <T extends Component> T getComponent(final Class<T> type) {
 		for(Component component : components) {
 			if(type.isAssignableFrom(component.getClass())) {
 				return (T) component;
@@ -86,50 +97,47 @@ public class Entity extends Parent {
 	}
 	
 	/**
-	 * @return The entity position from the parent's origin.
+	 * Performs an action with the specified type of <code>Component</code> if it exists for the
+	 * <code>Entity</code>.
+	 * 
+	 * @param type	 The type of component to perform the action with.
+	 * @param action The action to perform.
+	 * @return		 Whether the action has been performed.
 	 */
-	public Point2D getPosition() {
-		return new Point2D(getTranslateX(), getTranslateY());
+	public final <T extends Component> boolean perform(Class<T> type, VoidAction<T> action) {
+		T component = getComponent(type);
+		if(component != null) {
+			action.perform(component);
+			return true;
+		}
+		return false;
 	}
 	
 	/**
-	 * Sets the entity position from the parent's origin.
-	 * 
-	 * @param position The position vector.
-	 * @return		   The translated entity.
+	 * @return The width of the entity's bounding box.
 	 */
-	public Entity setPosition(final Point2D position) {
-		return setPosition(position.getX(), position.getY());
+	public final double getWidth() {
+		return getLayoutBounds().getWidth();
 	}
 	
 	/**
-	 * Sets the entity position from the parent's origin.
-	 * 
-	 * @param x The X position vector.
-	 * @param y The Y position vector.
-	 * @return	The translated entity.
+	 * @return The height of the entity's bounding box.
 	 */
-	public Entity setPosition(final double x, final double y) {
-		setTranslateX(x);
-		setTranslateY(y);
-		return this;
+	public final double getHeight() {
+		return getLayoutBounds().getHeight();
 	}
 	
 	/**
-	 * Translates the entity by the provided vector.
-	 * 
-	 * @param x The X translation vector.
-	 * @param y The Y translation vector.
+	 * @return The center point of this entity.
 	 */
-	public void translate(final double x, final double y) {
-		setTranslateX(getTranslateX() + x);
-		setTranslateY(getTranslateY() + y);
+	public final Point2D getCenter() {
+		return getComponent(Transform.class).getPosition().add(getWidth() / 2, getHeight() / 2);
 	}
 	
 	/**
 	 * @return Whether the <code>Entity</code> is enabled.
 	 */
-	public boolean isEnabled() {
+	public final boolean isEnabled() {
 		return enabled.get();
 	}
 	
@@ -139,7 +147,7 @@ public class Entity extends Parent {
 	 * 
 	 * @param enabled Whether the entity is enabled.
 	 */
-	public void setEnabled(final boolean enabled) {
+	public final void setEnabled(final boolean enabled) {
 		this.enabled.set(enabled);
 		if(enabled)
 			components.stream().forEach(Component::enable);
@@ -151,8 +159,9 @@ public class Entity extends Parent {
 	 * Deletes the <code>Entity</code> by deleting all of its components and children.
 	 */
 	public final void cleanup() {
+		setEnabled(false);
+		getChildren().clear();
 		components.stream().forEach(component -> component.cleanup());
 		components.clear();
-		getChildren().clear();
 	}
 }

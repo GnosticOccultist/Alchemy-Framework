@@ -1,5 +1,6 @@
-package fr.alchemy.core.entity;
+package fr.alchemy.core.scene.component;
 
+import fr.alchemy.core.scene.entity.Entity;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -25,7 +26,7 @@ public abstract class Component {
 	 * 
 	 * @param now The current time.
 	 */
-	public abstract void update(final long now);
+	public void update(final long now) {}
 	
 	/**
 	 * This method is called whenever the component is attached to an <code>Entity</code>.
@@ -59,7 +60,7 @@ public abstract class Component {
 	 * Deletes the component. The function is called when the owner entity 
 	 * needs to be cleaned up.
 	 */
-	public abstract void cleanup();
+	public void cleanup() {}
 	
 	/**
 	 * @return The entity owning the component.

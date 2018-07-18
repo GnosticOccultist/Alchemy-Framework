@@ -10,6 +10,7 @@ import fr.alchemy.core.annotation.FXThread;
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.input.InputManager;
 import fr.alchemy.core.listener.ExitListener;
+import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.util.NanoTimer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -80,7 +81,7 @@ public abstract class AlchemyApplication extends Application {
 		
 		initializeSettings(settings);
 		
-		this.scene.initialize(settings.getWidth(), settings.getHeight(), timer);
+		this.scene.initialize(this, settings.getWidth(), settings.getHeight());
 		
 		this.window = new Window(this);
 		this.window.initialize(primaryStage, scene.getFXScene());
@@ -201,6 +202,13 @@ public abstract class AlchemyApplication extends Application {
 	 */
 	public AssetManager getAssetManager() {
 		return assetManager;
+	}
+	
+	/**
+	 * @return The timer of the <code>AlchemyApplication</code>.
+	 */
+	public NanoTimer getTimer() {
+		return timer;
 	}
 	
 	/**
