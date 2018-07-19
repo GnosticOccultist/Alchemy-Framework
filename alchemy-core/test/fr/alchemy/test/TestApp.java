@@ -45,6 +45,7 @@ public class TestApp extends AlchemyApplication {
 		inputManager.addKeyPressBinding(KeyCode.T, () -> entityTest.perform(VisualComponent.class, v -> {
 			v.getView().clear();
 			v.getView().addNode(new Circle(10, Color.RED));
+			entityTest.detach(Transform.class);
 		}));
 	}
 

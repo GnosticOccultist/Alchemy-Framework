@@ -1,5 +1,6 @@
 package fr.alchemy.core.scene.component;
 
+import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -11,6 +12,7 @@ import javafx.geometry.Point2D;
  * 
  * @author GnosticOccultist
  */
+@CoreComponent
 public final class Transform extends Component {
 
 	/**

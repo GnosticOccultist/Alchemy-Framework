@@ -1,8 +1,11 @@
 package fr.alchemy.core.scene.entity;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
@@ -71,6 +74,14 @@ public class Entity {
 	 */
 	public final <T extends Component> Entity detach(final Class<T> type) {
 		final Component component = getComponent(type);
+		
+		for(Annotation annotation : type.getAnnotations()) {
+			if(annotation.annotationType().equals(CoreComponent.class)) {
+				System.err.println(type.getSimpleName() + 
+						" is marked as a core component, therefore it can't be detached!");
+				return this;
+			}
+		}
 		
 		this.components.remove(component);
 		component.onDetached(this);

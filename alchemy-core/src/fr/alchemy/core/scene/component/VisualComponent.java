@@ -1,10 +1,18 @@
 package fr.alchemy.core.scene.component;
 
+import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.core.scene.entity.EntityView;
 import javafx.scene.Node;
 
-public class VisualComponent extends Component {
+/**
+ * <code>VisualComponent</code> handles the {@link EntityView visual aspect} of an {@link Entity entity}.
+ * It can be used to add visual nodes for the entity.
+ * 
+ * @author GnosticOccultist
+ */
+@CoreComponent
+public final class VisualComponent extends Component {
 	/**
 	 * The view bounded to the entity.
 	 */
