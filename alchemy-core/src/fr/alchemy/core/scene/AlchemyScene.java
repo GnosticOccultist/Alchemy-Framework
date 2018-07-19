@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
+import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Point2D;
@@ -127,7 +128,7 @@ public class AlchemyScene {
 	
 	public void addEntity(final Entity entity) {
 		this.entities.add(entity);
-		this.appRoot.getChildren().add(entity);
+		this.appRoot.getChildren().add(entity.getComponent(VisualComponent.class).getView());
 	}
 	
 	/**

@@ -94,6 +94,20 @@ public final class Transform extends Component {
 	}
 	
 	/**
+	 * @return The position X coordinate property.
+	 */
+	public DoubleProperty posXProperty() {
+		return posX;
+	}
+	
+	/**
+	 * @return The position Y coordinate property.
+	 */
+	public DoubleProperty posYProperty() {
+		return posY;
+	}
+	
+	/**
 	 * @return The X coordinate of the position.
 	 */
 	public double getPosX() {
@@ -144,6 +158,13 @@ public final class Transform extends Component {
 	}
 	
 	/**
+	 * @return The rotation property.
+	 */
+	public DoubleProperty rotationProperty() {
+		return rotation;
+	}
+	
+	/**
 	 * @return The rotation value.
 	 */
 	public double getRotation() {
@@ -166,6 +187,20 @@ public final class Transform extends Component {
 	 */
 	public void rotate(final double angle) {
 		rotation.set(getRotation() + angle);
+	}
+	
+	/**
+	 * @return The X coordinate property of the scaling vector.
+	 */
+	public DoubleProperty scaleXProperty() {
+		return scaleX;
+	}
+	
+	/**
+	 * @return The Y coordinate property of the scaling vector.
+	 */
+	public DoubleProperty scaleYProperty() {
+		return scaleY;
 	}
 	
 	/**

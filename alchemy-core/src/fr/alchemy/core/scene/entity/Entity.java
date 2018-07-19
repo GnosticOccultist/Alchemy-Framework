@@ -5,13 +5,10 @@ import java.util.List;
 
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.Transform;
+import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.util.VoidAction;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Point2D;
-import javafx.scene.Parent;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 /**
  * <code>Entity</code> represents a scene object defined by one, multiple or no {@link Component components}.
@@ -19,7 +16,7 @@ import javafx.scene.shape.Rectangle;
  * 
  * @author GnosticOccultist
  */
-public class Entity extends Parent {
+public class Entity {
 	
 	/**
 	 * The list of components defining the entity.
@@ -30,9 +27,13 @@ public class Entity extends Parent {
 	 */
 	private BooleanProperty enabled = new SimpleBooleanProperty(true);
 	
+	/**
+	 * Instantiates a new <code>Entity</code> with a <code>Transform</code> 
+	 * and a <code>VisualComponent</code>.
+	 */
 	public Entity() {
-		getChildren().add(new Rectangle(50, 50, Color.RED));
-		components.add(new Transform());
+		attach(new Transform());
+		attach(new VisualComponent());
 	}
 	
 	/**
@@ -70,6 +71,7 @@ public class Entity extends Parent {
 	 */
 	public final <T extends Component> Entity detach(final Class<T> type) {
 		final Component component = getComponent(type);
+		
 		this.components.remove(component);
 		component.onDetached(this);
 		
@@ -114,27 +116,6 @@ public class Entity extends Parent {
 	}
 	
 	/**
-	 * @return The width of the entity's bounding box.
-	 */
-	public final double getWidth() {
-		return getLayoutBounds().getWidth();
-	}
-	
-	/**
-	 * @return The height of the entity's bounding box.
-	 */
-	public final double getHeight() {
-		return getLayoutBounds().getHeight();
-	}
-	
-	/**
-	 * @return The center point of this entity.
-	 */
-	public final Point2D getCenter() {
-		return getComponent(Transform.class).getPosition().add(getWidth() / 2, getHeight() / 2);
-	}
-	
-	/**
 	 * @return Whether the <code>Entity</code> is enabled.
 	 */
 	public final boolean isEnabled() {
@@ -160,7 +141,7 @@ public class Entity extends Parent {
 	 */
 	public final void cleanup() {
 		setEnabled(false);
-		getChildren().clear();
+		
 		components.stream().forEach(component -> component.cleanup());
 		components.clear();
 	}
