@@ -9,12 +9,14 @@ import org.slf4j.LoggerFactory;
 import fr.alchemy.core.annotation.FXThread;
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.input.InputManager;
-import fr.alchemy.core.listener.ExitListener;
+import fr.alchemy.core.listener.ApplicationListener;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.util.NanoTimer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.stage.Stage;
 
 /**
@@ -44,6 +46,10 @@ public abstract class AlchemyApplication extends Application {
 		@Override
 		public void handle(long internalTime) {
 			try {
+				if(!hasStarted()) {
+					return;
+				}
+				
 				internalUpdate(internalTime);
 			} catch (Throwable t) {
 				logger().error("A fatal error has occured !", t);
@@ -70,8 +76,12 @@ public abstract class AlchemyApplication extends Application {
 	/**
 	 * The application listeners.
 	 */
-	private List<ExitListener> listeners = new ArrayList<>();
-
+	private List<ApplicationListener> listeners = new ArrayList<>();
+	/**
+	 * Whether the application has been correctly started.
+	 */
+	private BooleanProperty started = new SimpleBooleanProperty(false);
+	
 	@Override
 	@FXThread
 	public final void start(Stage primaryStage) throws Exception {
@@ -93,6 +103,8 @@ public abstract class AlchemyApplication extends Application {
 		postInitialize();
 		
 		window.show();
+		
+		started.set(true);
 		loop.start();
 	}
 	
@@ -121,29 +133,33 @@ public abstract class AlchemyApplication extends Application {
 	}
 	
 	/**
-	 * Pauses the <code>AlchemyApplication</code>.
+	 * Pauses the <code>AlchemyApplication</code>. If you want to add a pausing task, 
+	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#pause()}
 	 */
 	public final void pause() {
+		listeners.forEach(ApplicationListener::pause);
 		loop.stop();
 	}
 	
 	/**
-	 * Resumes the <code>AlchemyApplication</code>.
+	 * Resumes the <code>AlchemyApplication</code>. If you want to add a resuming task, 
+	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#resume()}
 	 */
 	public final void resume() {
+		listeners.forEach(ApplicationListener::resume);
 		loop.start();
 	}
 	
 	/**
 	 * Called automatically when the close is requested. If you want to add an exiting task, use
-	 * {@link AlchemyApplication#registerListener(ExitListener)} to register an {@link ExitListener}.
+	 * {@link AlchemyApplication#registerListener(ApplicationListener)} to register an {@link ApplicationListener#exit()}
 	 * <p>
 	 * You can however call the method to manually quit the application.
 	 */
 	public final void exit() {
 		logger().info("Closing " + getClass().getSimpleName());
 		
-		listeners.forEach(ExitListener::exit);
+		listeners.forEach(ApplicationListener::exit);
 		Platform.exit();
 	}
 	
@@ -152,8 +168,17 @@ public abstract class AlchemyApplication extends Application {
 	 * 
 	 * @param listener The listener to register.
 	 */
-	public void registerListener(final ExitListener listener) {
+	public void registerListener(final ApplicationListener listener) {
 		this.listeners.add(listener);
+	}
+	
+	/**
+	 * Unregisters the provided listener from the <code>AlchemyApplication</code>.
+	 * 
+	 * @param listener The listener to unregister.
+	 */
+	public void unregisterListener(final ApplicationListener listener) {
+		this.listeners.remove(listener);
 	}
 
 	/**
@@ -184,17 +209,25 @@ public abstract class AlchemyApplication extends Application {
 	protected abstract void update();
 	
 	/**
-	 * @return The current time of the <code>AlchemyApplication</code>.
-	 */
-	protected long getNow() {
-		return timer.getNow();
-	}
-	
-	/**
 	 * @return The scene of the <code>AlchemyApplication</code>.
 	 */
 	public AlchemyScene getScene() {
 		return scene;
+	}
+	
+	/**
+	 * @return The listeners of the <code>AlchemyApplication</code>.
+	 */
+	protected List<ApplicationListener> getListeners() {
+		return listeners;
+	}
+	
+	/**
+	 * @return Whether the application has been correctly started, meaning
+	 * 		   that the main loop can start.
+	 */
+	protected boolean hasStarted() {
+		return started.get();
 	}
 	
 	/**

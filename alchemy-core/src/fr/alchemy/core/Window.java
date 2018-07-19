@@ -1,5 +1,6 @@
 package fr.alchemy.core;
 
+import fr.alchemy.core.listener.ApplicationListener;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -46,6 +47,16 @@ public class Window {
 				mainStage.getIcons().add(application.getAssetManager().loadImage(iconPath));
 			}
 		}
+		
+		mainStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			if(newValue.equals(Boolean.TRUE) && application.hasStarted()) {
+				application.resume();
+				application.getListeners().forEach(ApplicationListener::show);
+			} else if (newValue.equals(Boolean.FALSE) && application.hasStarted()) {
+				application.pause();
+				application.getListeners().forEach(ApplicationListener::hide);
+			}
+		});
 		
 		mainStage.setScene(scene);
 		mainStage.sizeToScene();

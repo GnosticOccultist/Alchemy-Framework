@@ -1,10 +1,9 @@
 package fr.alchemy.test;
 
-import java.nio.file.Paths;
-
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.listener.ApplicationListener;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
@@ -24,13 +23,18 @@ public class TestApp extends AlchemyApplication {
 
 	@Override
 	protected void initialize() {
-		assetManager.registerRootDirectory(Paths.get("C:/Users/Stickxy/Documents/Alexis/Jeux/Anoriand/EditorWorkspace"));
 		Texture texture = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
 		
 		entityTest = new Entity();
 		entityTest.perform(VisualComponent.class, v -> v.getView().addNode(texture));
 		scene.addEntity(entityTest);
 		
+		registerListener(new ApplicationListener() {
+			@Override
+			public final void resume() {
+				System.out.println("Resuming");
+			}
+		});
 	}
 
 	@Override
