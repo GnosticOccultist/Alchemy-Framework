@@ -24,6 +24,7 @@ public class TestApp extends AlchemyApplication {
 	@Override
 	protected void initialize() {
 		Texture texture = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
+		texture.grayscale();
 		
 		entityTest = new Entity();
 		entityTest.perform(VisualComponent.class, v -> v.getView().addNode(texture));
@@ -40,13 +41,13 @@ public class TestApp extends AlchemyApplication {
 	@Override
 	protected void update() {
 		entityTest.perform(Transform.class, t -> t.rotate(10));
-		entityTest.perform(Transform.class, t -> t.translate(1, 1));
+		entityTest.perform(Transform.class, t -> t.setPosition(inputManager.getMouse().getAppX(), inputManager.getMouse().getAppY()));
 		
 		inputManager.addKeyPressBinding(KeyCode.T, () -> entityTest.perform(VisualComponent.class, v -> {
 			v.getView().clear();
 			v.getView().addNode(new Circle(10, Color.RED));
-			entityTest.detach(Transform.class);
 		}));
+	
 	}
 
 	public static void main(String[] args) {

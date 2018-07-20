@@ -1,8 +1,13 @@
 package fr.alchemy.core.asset;
 
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.core.util.ModifierAction;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 
 /**
  * <code>Texture</code> represents a 2D image which can be set as a graphics node for
@@ -22,5 +27,75 @@ public class Texture extends ImageView {
 	 */
 	Texture(Image image) {
 		super(image);
+	}
+	
+	/**
+	 * Sets the width, height and image of the provided <code>Texture</code>
+	 * to this one.
+	 * 
+	 * @param other The other texture to copy from.
+	 */
+	public final void set(final Texture other) {
+		setFitWidth(other.getFitWidth());
+		setFitHeight(other.getFitHeight());
+		setImage(other.getImage());
+	}
+	
+	/**
+	 * Scales the <code>Texture</code> image to the gray.
+	 */
+	public final void grayscale() {
+		set(applyEffect(Color::grayscale));
+	}
+	
+	/**
+	 * Brighten the <code>Texture</code> image.
+	 */
+	public final void brighter() {
+		set(applyEffect(Color::brighter));
+	}
+	
+	/**
+	 * Darken the <code>Texture</code> image.
+	 */
+	public final void darker() {
+		set(applyEffect(Color::darker));
+	}
+	
+	/**
+	 * Lower saturation of the <code>Texture</code> image.
+	 */
+	public final void desaturate() {
+		set(applyEffect(Color::desaturate));
+	}
+	
+	/**
+	 * Rise saturation of the <code>Texture</code> image.
+	 */
+	public final void saturate() {
+		set(applyEffect(Color::saturate));
+	}
+
+	/**
+	 * Applies a desired effect onto a <code>Texture</code> image by
+	 * modifying its color.
+	 * 
+	 * @return The modified texture.
+	 */
+	public final Texture applyEffect(final ModifierAction<Color> modifier) {
+		final int width = (int) getImage().getWidth();
+		final int height = (int) getImage().getHeight();
+		
+		final PixelReader reader = getImage().getPixelReader();
+		final WritableImage image = new WritableImage(width, height);
+		final PixelWriter writer = image.getPixelWriter();
+		
+		for(int x = 0; x < width; x++) {
+			for(int y = 0; y < height; y++) {
+				writer.setColor(x, y, modifier.modify(reader.getColor(x, y)));
+			}
+		}
+		
+		return new Texture(image);
 	}
 }
