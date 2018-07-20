@@ -9,6 +9,8 @@ import javafx.scene.shape.Circle;
 /**
  * <code>EntityView</code> is the separated class to handle the view of an {@link Entity entity},
  * therefore you need to associate the view to the entity using a {@link VisualComponent}.
+ * <p>
+ * The <code>EntityView</code> should only contained graphic nodes as children.
  * 
  * @author Stickxy
  */
@@ -45,12 +47,32 @@ public final class EntityView extends Parent {
 	}
 	
 	/**
+	 * Adds the specified graphic nodes to the <code>EntityView</code>.
+	 * 
+	 * @param graphics The graphic nodes to add.
+	 */
+	public void addNodes(final Node...graphics) {
+		for(Node graphic : graphics) {
+			addNode(graphic);
+		}
+	}
+	
+	/**
 	 * Removes the specified graphic node from the <code>EntityView</code>.
 	 * 
 	 * @param graphic The graphic node to remove.
 	 */
 	public void removeNode(final Node graphic) {
 		getChildren().remove(graphic);
+	}
+	
+	/**
+	 * Removes the specified graphic node from the <code>EntityView</code>.
+	 * 
+	 * @param graphics The graphic nodes to remove.
+	 */
+	public void removeNodes(final Node...graphics) {
+		getChildren().removeAll(graphics);
 	}
 	
 	/**

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.alchemy.core.AlchemyApplication;
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -82,10 +81,6 @@ public final class InputManager {
 		if(enabled) {
 			keyPressActions.forEach((key, action) -> { if (isPressed(key)) action.run(); }); 
 		}
-		
-		final Point2D origin = application.getScene().getViewportOrigin();
-		mouse.x = mouse.screenX / application.getScene().getSizeRatio() + origin.getX();
-		mouse.y = mouse.screenY / application.getScene().getSizeRatio() + origin.getY();
 	} 
 	
 	/**

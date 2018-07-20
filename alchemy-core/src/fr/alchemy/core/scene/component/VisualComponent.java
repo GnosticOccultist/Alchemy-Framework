@@ -42,13 +42,14 @@ public final class VisualComponent extends Component {
 	
 	@Override
 	public void onDetached(final Entity entity) {
-		getView().clear();
+		unbindView();
 		
 		super.onDetached(entity);
 	}
 	
 	@Override
 	public void cleanup() {
+		unbindView();
 		getView().clear();
 		
 		super.cleanup();
@@ -68,6 +69,20 @@ public final class VisualComponent extends Component {
 		
 		getView().scaleXProperty().bind(transform.scaleXProperty());
 		getView().scaleYProperty().bind(transform.scaleYProperty());
+	}
+	
+	/**
+	 * Unbinds the <code>EntityView</code> from the <code>Transform</code> component
+	 * of the <code>Entity</code>.
+	 */
+	private void unbindView() {
+		getView().translateXProperty().unbind();
+		getView().translateYProperty().unbind();
+		
+		getView().rotateProperty().unbind();
+		
+		getView().scaleXProperty().unbind();
+		getView().scaleYProperty().unbind();
 	}
 	
 	/**

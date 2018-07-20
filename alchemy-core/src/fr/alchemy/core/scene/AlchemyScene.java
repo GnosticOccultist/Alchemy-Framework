@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
+import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.embed.swing.SwingFXUtils;
@@ -143,12 +144,45 @@ public class AlchemyScene {
 	}
 	
 	/**
+	 * Converts a point on the screen into a point in the <code>AlchemyScene</code>.
+	 * 
+	 * @param screenPoint The point in UI coordinates.
+	 * @return			  The point in scene coordinates.
+	 */
+	public Point2D screenToGame(final Point2D screenPoint) {
+        return screenPoint.multiply(1.0 / getSizeRatio()).add(getViewportOrigin());
+    }
+	
+	/**
 	 * Sets the background color to the specified color.
 	 * 
 	 * @param color The background color.
 	 */
 	public void setBackgroundColor(final Color color) {
+		mainScene.setFill(color);
 		mainRoot.setBackground(new Background(new BackgroundFill(color, null, null)));
+	}
+	
+	/**
+	 * Binds the viewport origin to the provided <code>Entity</code> position. 
+	 * A delta distance can be set between the origin and the entity position with
+	 * the provided x and y values.
+	 * 
+	 * @param entity The entity to bind the viewport to.
+	 * @param x		 The delta-X value.
+	 * @param y		 The delta-Y value.
+	 */
+	public void bindViewportOrigin(final Entity entity, final int x, final int y) {
+		appRoot.layoutXProperty().bind(entity.getComponent(Transform.class).posXProperty().negate().add(x));
+		appRoot.layoutYProperty().bind(entity.getComponent(Transform.class).posYProperty().negate().add(y));
+	}
+	
+	/**
+	 * Unbinds the viewport origin from its previous property.
+	 */
+	public void unbindViewportOrigin() {
+		appRoot.layoutXProperty().unbind();
+		appRoot.layoutYProperty().unbind();
 	}
 	
 	/**

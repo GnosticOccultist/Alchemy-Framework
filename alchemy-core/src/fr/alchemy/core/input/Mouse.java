@@ -17,11 +17,6 @@ public final class Mouse {
 	 */
 	private InputManager inputManager;
 	/**
-	 * The mouse X and Y position within the application with 
-	 * viewport's origin translation.
-	 */
-	public double x, y;
-	/**
 	 * The mouse X and Y position within the screen coordinate system.
 	 */
 	public double screenX, screenY;
@@ -47,11 +42,6 @@ public final class Mouse {
 		this.event = event;
 		this.screenX = event.getSceneX();
 		this.screenY = event.getSceneY();
-		
-		final Point2D origin = inputManager.getApplication().getScene().getViewportOrigin();
-		final double sizeRatio = inputManager.getApplication().getScene().getSizeRatio();
-		this.x = screenX / sizeRatio + origin.getX();
-		this.y = screenY / sizeRatio + origin.getY();
 		
 		if(leftPressed) {
 			if(event.getButton() == MouseButton.PRIMARY && isReleased(event)) {
@@ -79,6 +69,20 @@ public final class Mouse {
 		return event.getEventType() == MouseEvent.MOUSE_RELEASED
 				|| event.getEventType() == MouseEvent.MOUSE_MOVED;
 	}
+	
+	/**
+	 * @return The mouse X in the application coordinate system.
+	 */
+	public double getAppX() {
+		return inputManager.getApplication().getScene().screenToGame(new Point2D(screenX, screenY)).getX();
+	}
+
+	/**
+	 * @return The mouse Y in the application coordinate system.
+	 */
+	public double getAppY() {
+        return inputManager.getApplication().getScene().screenToGame(new Point2D(screenX, screenY)).getY();
+    }
 	
 	/**
 	 * @return The currently invoked mouse event.

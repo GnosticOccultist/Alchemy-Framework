@@ -1,7 +1,6 @@
 package fr.alchemy.core.scene.entity;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedType;
 import java.util.ArrayList;
 import java.util.List;
 
