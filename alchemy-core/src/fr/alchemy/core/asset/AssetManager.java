@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * <code>AssetManager</code> loads all the assets needed for the <code>AlchemyApplication</code>.
@@ -62,6 +63,26 @@ public class AssetManager {
 			final InputStream is = openStream(name);
 			if(is != null) {
 				return new Image(is);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Loads a <code>ImageView</code> from the specified file name and return it as an icon.
+	 * It will search the asset internally and in every specified root folders.
+	 * If the asset isn't found it will return null.
+	 * 
+	 * @param name The name of the image file.
+	 * @return	   The image object or null if not found.
+	 */
+	public ImageView loadIcon(final String name) {
+		try {
+			final InputStream is = openStream(name);
+			if(is != null) {
+				return new ImageView(new Image(is, 16, 16, false, true));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

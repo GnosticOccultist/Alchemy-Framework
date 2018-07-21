@@ -18,7 +18,7 @@ public class TestApp extends AlchemyApplication {
 	@Override
 	protected void initializeSettings(AlchemySettings settings) {
 		settings.put("Title", "Test App");
-		settings.put("Fullscreen", false);
+		settings.put("ShowFPS", true);
 	}
 
 	@Override

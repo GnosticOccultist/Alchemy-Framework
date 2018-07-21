@@ -35,10 +35,6 @@ public abstract class AlchemyApplication extends Application {
 	 */
 	private Logger logger = LoggerFactory.getLogger("alchemy.app");
 	/**
-	 * The application window.
-	 */
-	private Window window;
-	/**
 	 * The main loop timer.
 	 */
 	private AnimationTimer loop = new AnimationTimer() {
@@ -60,7 +56,11 @@ public abstract class AlchemyApplication extends Application {
 	/**
 	 * The application scene.
 	 */
-	protected AlchemyScene scene = new AlchemyScene(); 
+	protected AlchemyScene scene = new AlchemyScene(this); 
+	/**
+	 * The application window.
+	 */
+	private final Window window = new Window(this);
 	/**
 	 * The input manager.
 	 */
@@ -91,12 +91,11 @@ public abstract class AlchemyApplication extends Application {
 		
 		initializeSettings(settings);
 		
-		this.scene.initialize(this, settings.getWidth(), settings.getHeight());
+		preInitialize();
 		
-		this.window = new Window(this);
-		this.window.initialize(primaryStage, scene.getFXScene());
-		
-		this.inputManager.initialize(scene.getFXScene());
+		getScene().initialize(settings.getWidth(), settings.getHeight());
+		getWindow().initialize(primaryStage, scene.getFXScene());
+		getInputManager().initialize(scene.getFXScene());
 		
 		initialize();
 		
@@ -123,7 +122,7 @@ public abstract class AlchemyApplication extends Application {
 		inputManager.update(timer.getNow());
 		
 		// Updates the entities in the scene graph.
-		scene.update(timer.getNow());
+		getScene().update(timer.getNow());
 		
 		// Update implementation of the app.
 		update();
@@ -148,6 +147,13 @@ public abstract class AlchemyApplication extends Application {
 	public final void resume() {
 		listeners.forEach(ApplicationListener::resume);
 		loop.start();
+	}
+	
+	@Override
+	@FXThread
+	public void stop() throws Exception {
+		super.stop();
+		exit();
 	}
 	
 	/**
@@ -190,6 +196,12 @@ public abstract class AlchemyApplication extends Application {
 	protected abstract void initializeSettings(AlchemySettings settings);
 	
 	/**
+	 * Called <strong>BEFORE</strong> all internal initialize methods are called and <strong>AFTER</strong>
+	 * the settings were initialized.
+	 */
+	protected void preInitialize() {}
+	
+	/**
 	 * Initializes the <code>AlchemyApplication</code> by setting up the UI and the application pane. 
 	 * 
 	 * @param appRoot The application pane.
@@ -209,6 +221,8 @@ public abstract class AlchemyApplication extends Application {
 	protected abstract void update();
 	
 	/**
+	 * This scene can be changed to an other implementation if needed.
+	 * 
 	 * @return The scene of the <code>AlchemyApplication</code>.
 	 */
 	public AlchemyScene getScene() {
@@ -235,6 +249,20 @@ public abstract class AlchemyApplication extends Application {
 	 */
 	public AssetManager getAssetManager() {
 		return assetManager;
+	}
+	
+	/**
+	 * @return The window of the <code>AlchemyApplication</code>.
+	 */
+	private Window getWindow() {
+		return window;
+	}
+	
+	/**
+	 * @return The input manager of the <code>AlchemyApplication</code>.
+	 */
+	private InputManager getInputManager() {
+		return inputManager;
 	}
 	
 	/**

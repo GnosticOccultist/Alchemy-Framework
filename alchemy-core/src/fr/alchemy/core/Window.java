@@ -31,13 +31,20 @@ public class Window {
 		final AlchemySettings settings = AlchemySettings.settings();
 		
 		// Sets the title and resizable if needed.
-		mainStage.setTitle(settings.getTitle() + " " + settings.getVersion());
+		mainStage.setTitle(settings.getTitle() + " - " + settings.getVersion());
 		mainStage.setResizable(settings.boolValue("Resizable"));
 		
 		// Enters fullscreen mode if needed.
 		if(settings.boolValue("Fullscreen")) {
 			mainStage.setFullScreen(true);
 			mainStage.setFullScreenExitHint("");
+		}
+		
+		if(settings.boolValue("Maximized")) {
+			mainStage.setMaximized(true);
+		} else {
+			mainStage.setMaximized(false);
+			mainStage.sizeToScene();
 		}
 		
 		// Loads the icons for the window.
@@ -59,7 +66,7 @@ public class Window {
 		});
 		
 		mainStage.setScene(scene);
-		mainStage.sizeToScene();
+		
 		
 		mainStage.setOnCloseRequest(event -> application.exit());
 	}

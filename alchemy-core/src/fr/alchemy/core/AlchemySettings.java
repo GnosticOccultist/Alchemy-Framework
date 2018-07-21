@@ -35,6 +35,7 @@ public final class AlchemySettings extends HashMap<String, Object> {
 		DEFAULT_SETTINGS.put("Width", 800);
 		DEFAULT_SETTINGS.put("Height", 600);
 		DEFAULT_SETTINGS.put("Resizable", false);
+		DEFAULT_SETTINGS.put("Maximized", false);
 		DEFAULT_SETTINGS.put("Fullscreen", false);
 		DEFAULT_SETTINGS.put("ShowFPS", false);
 		DEFAULT_SETTINGS.put("IconPaths", new String[] {"resources/icons/logo_colored_x32.png"});
