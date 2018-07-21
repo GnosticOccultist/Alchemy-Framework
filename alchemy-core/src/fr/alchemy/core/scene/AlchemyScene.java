@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
-import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.embed.swing.SwingFXUtils;
@@ -28,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -53,21 +53,27 @@ public class AlchemyScene {
 	/**
 	 * The root for all the entities.
 	 */
-	private Group appRoot = new Group(); 
+	protected Group appRoot = new Group(); 
 	/**
 	 * The overlay root above {@link #appRoot}. Contains all the UI elements, native JavaFX nodes.
 	 * May also contain some entities. The UI root isn't affected by viewport movement.
 	 */
-	private Group uiRoot = new Group();
+	protected Group uiRoot = new Group();
 	/**
-	 * The root of the {@link #mainScene}. 
-	 * Contains {@link #appRoot} and {@link #uiRoot} in this order.
+	 * The sub-root of the {@link #mainScene}. 
+	 * Contains {@link #appRoot} and {@link #uiRoot} in this order,
+	 * {@link #root} as its parent.
 	 */
-	private Pane mainRoot = new Pane(appRoot, uiRoot);
+	protected Region subRoot = new Pane(new Pane(appRoot, uiRoot));
+	/**
+	 * The root of the {@link #mainScene}.
+	 * Contains {@link #subRoot} and is supposed to be leaved untouched.
+	 */
+	protected Pane root = new Pane(subRoot);
 	/**
 	 * The application scene.
 	 */
-	protected Scene mainScene = new Scene(mainRoot);
+	protected Scene mainScene = new Scene(root);
 	/**
 	 * Equals user system width / target width 
 	 */
@@ -76,13 +82,27 @@ public class AlchemyScene {
 	 * The list of entities in the scene graph.
 	 */
 	public List<Entity> entities = new ArrayList<>();
+	/**
+	 * The viewport of the scene graph.
+	 */
+	private final Viewport viewport = new Viewport();
 	
-	public void initialize(final AlchemyApplication application, final double width, final double height) {
+	public AlchemyScene(final AlchemyApplication application) {
 		this.application = application;
-		
+	}
+	
+	public void initialize(final double width, final double height) {
 		setPrefSize(width, height);
 		setBackgroundColor(Color.BLACK);
-		mainScene.setRoot(mainRoot);
+		mainScene.setRoot(root);
+	
+		getSubRoot().prefWidthProperty().bind(root.widthProperty());
+		getSubRoot().prefHeightProperty().bind(root.heightProperty());
+		
+		root.requestFocus();
+		
+		appRoot.layoutXProperty().bind(viewport.xProperty().negate()); 
+		appRoot.layoutYProperty().bind(viewport.yProperty().negate()); 
 		
 		final AlchemySettings settings = AlchemySettings.settings();
 		if(settings.boolValue("ShowFPS")) {
@@ -110,16 +130,16 @@ public class AlchemyScene {
 				Screen.getPrimary().getVisualBounds();
 		
 		if(settings.getWidth() <= bounds.getWidth() && settings.getHeight() <= bounds.getHeight()) {
-			mainRoot.setPrefSize(settings.getWidth(), settings.getHeight());
+			root.setPrefSize(settings.getWidth(), settings.getHeight());
 		} else {
 			double ratio = settings.getWidth() * 1.0 / settings.getHeight();
 			
 			for(int newWidth = (int) bounds.getWidth(); newWidth > 0; newWidth--) {
 				if(newWidth / ratio <= bounds.getHeight()) {
-					mainRoot.setPrefSize(newWidth, (int) (newWidth / ratio));
+					root.setPrefSize(newWidth, (int) (newWidth / ratio));
 					
 					double newSizeRatio = newWidth * 1.0 / settings.getWidth();
-					mainRoot.getTransforms().add(new Scale(newSizeRatio, newSizeRatio));
+					root.getTransforms().add(new Scale(newSizeRatio, newSizeRatio));
 					sizeRatio = newSizeRatio;
 					break;
 				}
@@ -127,6 +147,9 @@ public class AlchemyScene {
 		}
 	}
 	
+	/*
+	 * TODO: Add a specific class to handle the list of entities and easily search into it.
+	 */
 	public void addEntity(final Entity entity) {
 		this.entities.add(entity);
 		this.appRoot.getChildren().add(entity.getComponent(VisualComponent.class).getView());
@@ -150,7 +173,7 @@ public class AlchemyScene {
 	 * @return			  The point in scene coordinates.
 	 */
 	public Point2D screenToGame(final Point2D screenPoint) {
-        return screenPoint.multiply(1.0 / getSizeRatio()).add(getViewportOrigin());
+        return screenPoint.multiply(1.0 / getSizeRatio()).add(viewport.getOrigin());
     }
 	
 	/**
@@ -160,48 +183,7 @@ public class AlchemyScene {
 	 */
 	public void setBackgroundColor(final Color color) {
 		mainScene.setFill(color);
-		mainRoot.setBackground(new Background(new BackgroundFill(color, null, null)));
-	}
-	
-	/**
-	 * Binds the viewport origin to the provided <code>Entity</code> position. 
-	 * A delta distance can be set between the origin and the entity position with
-	 * the provided x and y values.
-	 * 
-	 * @param entity The entity to bind the viewport to.
-	 * @param x		 The delta-X value.
-	 * @param y		 The delta-Y value.
-	 */
-	public void bindViewportOrigin(final Entity entity, final int x, final int y) {
-		appRoot.layoutXProperty().bind(entity.getComponent(Transform.class).posXProperty().negate().add(x));
-		appRoot.layoutYProperty().bind(entity.getComponent(Transform.class).posYProperty().negate().add(y));
-	}
-	
-	/**
-	 * Unbinds the viewport origin from its previous property.
-	 */
-	public void unbindViewportOrigin() {
-		appRoot.layoutXProperty().unbind();
-		appRoot.layoutYProperty().unbind();
-	}
-	
-	/**
-	 * Sets the viewport origin to the provided X and Y coordinate.
-	 * It can be used to mimic camera movement.
-	 * 
-	 * @param x The X coordinate.
-	 * @param y The Y coordinate.
-	 */
-	public void setViewportOrigin(final int x, final int y) {
-		appRoot.setLayoutX(-x);
-		appRoot.setLayoutY(-y);
-	}
-	
-	/**
-	 * @return The viewport origin in the top-left corner.
-	 */
-	public final Point2D getViewportOrigin() {
-		return new Point2D(-appRoot.getLayoutX(), -appRoot.getLayoutY());
+		getSubRoot().setBackground(new Background(new BackgroundFill(color, null, null)));
 	}
 	
 	/**
@@ -238,11 +220,32 @@ public class AlchemyScene {
 	}
 	
 	/**
+	 * @return The <code>AlchemyApplication</code>.
+	 */
+	protected AlchemyApplication getApplication() {
+		return application;
+	}
+	
+	/**
+	 * @return The sub-root pane of the <code>AlchemyScene</code>.
+	 */
+	protected Region getSubRoot() {
+		return subRoot;
+	}
+	
+	/**
 	 * @return The size ratio of the screen resolution
 	 * 		   over the target resolution.
 	 */
 	public final double getSizeRatio() {
 		return sizeRatio;
+	}
+	
+	/**
+	 * @return The viewport of the <code>AchemyScene</code>.
+	 */
+	public final Viewport getViewport() {
+		return viewport;
 	}
 	
 	/**
