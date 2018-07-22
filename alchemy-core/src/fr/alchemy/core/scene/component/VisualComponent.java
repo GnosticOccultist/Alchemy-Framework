@@ -1,6 +1,7 @@
 package fr.alchemy.core.scene.component;
 
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.core.scene.entity.EntityView;
 import javafx.scene.Node;
@@ -31,6 +32,60 @@ public final class VisualComponent extends Component {
 	 */
 	public VisualComponent(final Node graphic) {
 		getView().addNode(graphic);
+	}
+	
+	/**
+	 * Sets the opacity to all the graphic nodes of the <code>VisualComponent</code>.
+	 * 
+	 * @param opacity The opacity value.
+	 */
+	public void setOpacity(final double opacity) {
+		view.getNodes().forEach(node -> node.setOpacity(opacity));
+	}
+	
+	/**
+	 * Apply a grayscale effect to all the <code>Texture</code> graphic node
+	 * of the <code>VisualComponent</code>.
+	 */
+	public void grayscale() {
+		view.getNodes().stream().filter(Texture.class::isInstance)
+			.map(Texture.class::cast).forEach(Texture::grayscale);
+	}
+	
+	/**
+	 * Apply a saturation effect to all the <code>Texture</code> graphic node
+	 * of the <code>VisualComponent</code>.
+	 */
+	public void saturate() {
+		view.getNodes().stream().filter(Texture.class::isInstance)
+			.map(Texture.class::cast).forEach(Texture::saturate);
+	}
+	
+	/**
+	 * Apply a desaturation effect to all the <code>Texture</code> graphic node
+	 * of the <code>VisualComponent</code>.
+	 */
+	public void desaturate() {
+		view.getNodes().stream().filter(Texture.class::isInstance)
+			.map(Texture.class::cast).forEach(Texture::desaturate);
+	}
+	
+	/**
+	 * Apply a brighten effect to all the <code>Texture</code> graphic node
+	 * of the <code>VisualComponent</code>.
+	 */
+	public void brighter() {
+		view.getNodes().stream().filter(Texture.class::isInstance)
+			.map(Texture.class::cast).forEach(Texture::brighter);
+	}
+	
+	/**
+	 * Apply a darken effect to all the <code>Texture</code> graphic node
+	 * of the <code>VisualComponent</code>.
+	 */
+	public void darker() {
+		view.getNodes().stream().filter(Texture.class::isInstance)
+			.map(Texture.class::cast).forEach(Texture::darker);
 	}
 	
 	@Override

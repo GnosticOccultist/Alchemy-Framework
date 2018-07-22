@@ -151,9 +151,8 @@ public abstract class AlchemyApplication extends Application {
 	
 	@Override
 	@FXThread
-	public void stop() throws Exception {
+	public final void stop() throws Exception {
 		super.stop();
-		exit();
 	}
 	
 	/**

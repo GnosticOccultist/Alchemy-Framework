@@ -24,10 +24,11 @@ public class TestApp extends AlchemyApplication {
 	@Override
 	protected void initialize() {
 		Texture texture = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
-		texture.grayscale();
 		
 		entityTest = new Entity();
 		entityTest.perform(VisualComponent.class, v -> v.getView().addNode(texture));
+		entityTest.perform(VisualComponent.class, v -> v.grayscale());
+		entityTest.perform(VisualComponent.class, v -> v.setOpacity(0.1));
 		scene.addEntity(entityTest);
 		
 		registerListener(new ApplicationListener() {
