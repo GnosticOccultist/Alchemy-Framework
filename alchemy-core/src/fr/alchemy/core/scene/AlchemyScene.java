@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
+import fr.alchemy.core.event.AlchemyEventManager;
+import fr.alchemy.core.event.AlchemySceneEvent;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.embed.swing.SwingFXUtils;
@@ -163,7 +165,10 @@ public class AlchemyScene {
 	public void add(final Entity entity) {
 		this.entities.add(entity);
 		this.appRoot.getChildren().add(entity.getComponent(VisualComponent.class).getView());
+		
+		AlchemyEventManager.events().notify(AlchemySceneEvent.entityAdded(entity));
 	}
+	
 	/**
 	 * Removes the specified <code>Entity</code> from the <code>AlchemyScene</code>
 	 * and detach its <code>VisualComponent</code>.
@@ -173,6 +178,8 @@ public class AlchemyScene {
 	public void remove(final Entity entity) {
 		this.entities.remove(entity);
 		this.appRoot.getChildren().remove(entity.getComponent(VisualComponent.class).getView());
+		
+		AlchemyEventManager.events().notify(AlchemySceneEvent.entityRemoved(entity));
 	}
 	
 	/**
