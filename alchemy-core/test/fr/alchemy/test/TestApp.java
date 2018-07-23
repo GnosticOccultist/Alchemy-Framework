@@ -3,13 +3,11 @@ package fr.alchemy.test;
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.asset.Texture;
-import fr.alchemy.core.listener.ApplicationListener;
+import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 
 public class TestApp extends AlchemyApplication {
 
@@ -28,27 +26,16 @@ public class TestApp extends AlchemyApplication {
 		entityTest = new Entity();
 		entityTest.perform(VisualComponent.class, v -> v.getView().addNode(texture));
 		entityTest.perform(VisualComponent.class, v -> v.grayscale());
-		entityTest.perform(VisualComponent.class, v -> v.setOpacity(0.1));
-		scene.addEntity(entityTest);
 		
-		registerListener(new ApplicationListener() {
-			@Override
-			public final void resume() {
-				System.out.println("Resuming");
-			}
-		});
+		entityTest.attach(new NameComponent("Test"));
+		scene.add(entityTest);
+		
+		inputManager.addKeyTypedBinding(KeyCode.N, () -> entityTest.detach(NameComponent.class));
 	}
 
 	@Override
 	protected void update() {
-		entityTest.perform(Transform.class, t -> t.rotate(10));
-		entityTest.perform(Transform.class, t -> t.setPosition(inputManager.getMouse().getAppX(), inputManager.getMouse().getAppY()));
-		
-		inputManager.addKeyPressBinding(KeyCode.T, () -> entityTest.perform(VisualComponent.class, v -> {
-			v.getView().clear();
-			v.getView().addNode(new Circle(10, Color.RED));
-		}));
-	
+		entityTest.perform(Transform.class, t -> t.translate(1, 1));
 	}
 
 	public static void main(String[] args) {

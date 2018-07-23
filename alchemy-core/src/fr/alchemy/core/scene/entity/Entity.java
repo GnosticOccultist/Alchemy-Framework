@@ -81,8 +81,8 @@ public class Entity {
 				return this;
 			}
 		}
-		
-		this.components.remove(component);
+	
+		components.remove(component);
 		component.onDetached(this);
 		
 		return this;
