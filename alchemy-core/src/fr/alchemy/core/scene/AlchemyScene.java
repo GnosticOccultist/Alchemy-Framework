@@ -81,7 +81,7 @@ public class AlchemyScene {
 	/**
 	 * The list of entities in the scene graph.
 	 */
-	public List<Entity> entities = new ArrayList<>();
+	public List<Entity> entities = new ArrayList<Entity>();
 	/**
 	 * The viewport of the scene graph.
 	 */
@@ -103,6 +103,13 @@ public class AlchemyScene {
 		
 		appRoot.layoutXProperty().bind(viewport.xProperty().negate()); 
 		appRoot.layoutYProperty().bind(viewport.yProperty().negate()); 
+		
+		Scale scale = new Scale();
+		scale.pivotXProperty().bind(viewport.xProperty());
+		scale.pivotYProperty().bind(viewport.yProperty());
+		scale.xProperty().bind(viewport.zoomProperty());
+		scale.yProperty().bind(viewport.zoomProperty());
+		appRoot.getTransforms().add(scale);
 		
 		final AlchemySettings settings = AlchemySettings.settings();
 		if(settings.boolValue("ShowFPS")) {
@@ -147,12 +154,25 @@ public class AlchemyScene {
 		}
 	}
 	
-	/*
-	 * TODO: Add a specific class to handle the list of entities and easily search into it.
+	/**
+	 * Adds the specified <code>Entity</code> to the <code>AlchemyScene</code>
+	 * and attach its <code>VisualComponent</code>.
+	 * 
+	 * @param entity The entity to add.
 	 */
-	public void addEntity(final Entity entity) {
+	public void add(final Entity entity) {
 		this.entities.add(entity);
 		this.appRoot.getChildren().add(entity.getComponent(VisualComponent.class).getView());
+	}
+	/**
+	 * Removes the specified <code>Entity</code> from the <code>AlchemyScene</code>
+	 * and detach its <code>VisualComponent</code>.
+	 * 
+	 * @param entity The entity to remove.
+	 */
+	public void remove(final Entity entity) {
+		this.entities.remove(entity);
+		this.appRoot.getChildren().remove(entity.getComponent(VisualComponent.class).getView());
 	}
 	
 	/**

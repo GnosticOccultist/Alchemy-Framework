@@ -22,6 +22,10 @@ public final class Viewport {
 	 * The Y-axis property.
 	 */
 	private final DoubleProperty y = new SimpleDoubleProperty();
+	/**
+	 * The zoom property.
+	 */
+	private final DoubleProperty zoom = new SimpleDoubleProperty(1.0);
 	
 	/**
 	 * Binds the <code>Viewport</code> origin to the provided <code>Entity</code> position. 
@@ -43,6 +47,7 @@ public final class Viewport {
 	public void unbind() {
 		xProperty().unbind();
 		yProperty().unbind();
+		zoomProperty().unbind();
 	}
 	
 	/**
@@ -78,5 +83,28 @@ public final class Viewport {
 	 */
 	public Point2D getOrigin() {
 		return new Point2D(getX(), getY());
+	}
+	
+	/**
+	 * @return The zoom property.
+	 */
+	public DoubleProperty zoomProperty() {
+		return zoom;
+	}
+	
+	/**
+	 * Zoom the <code>Viewport</code> to the specified factor.
+	 * 
+	 * @param zoom The zooming factor.
+	 */
+	public void zoom(final double zoom) {
+		zoomProperty().set(getZoom() + zoom); 
+	}
+
+	/**
+	 * @return The zooming value.
+	 */
+	public double getZoom() {
+		return zoom.get();
 	}
 }
