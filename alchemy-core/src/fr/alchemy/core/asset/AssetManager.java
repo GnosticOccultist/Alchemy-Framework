@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,26 @@ public class AssetManager {
 	private List<Path> roots = new ArrayList<Path>();
 	
 	/**
+	 * Loads a JavaFX asset using an {@link InputStream} to create a 
+	 * new instance of the specified asset type.
+	 * 
+	 * @param type The JavaFX asset type to load.
+	 * @param name The name of the asset file.
+	 * @return	   The asset instance corresponding to the requested type.
+	 */
+	public <N> N loadFXAsset(final Class<N> type, final String name) {
+		try {
+			final InputStream is = openStream(name);
+			if(is != null) {
+				return type.getConstructor(InputStream.class).newInstance(is);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * Loads a <code>Texture</code> from the specified file name.
 	 * It will search the asset internally and in every specified root folders.
 	 * If the asset isn't found it will return null.
@@ -39,15 +60,8 @@ public class AssetManager {
 	 * @return	   The texture object or null if not found.
 	 */
 	public Texture loadTexture(final String name) {
-		try {
-			final InputStream is = openStream(name);
-			if(is != null) {
-				return new Texture(new Image(is));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		final Image image = loadImage(name);
+		return new Texture(image);
 	}
 	
 	/**
@@ -59,15 +73,7 @@ public class AssetManager {
 	 * @return	   The image object or null if not found.
 	 */
 	public Image loadImage(final String name) {
-		try {
-			final InputStream is = openStream(name);
-			if(is != null) {
-				return new Image(is);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return loadFXAsset(Image.class, name);
 	}
 	
 	/**
@@ -98,6 +104,16 @@ public class AssetManager {
 	 */
 	public void registerRootDirectory(final Path root) {
 		roots.add(root);
+	}
+	
+	/**
+	 * Registers a new root directory for the <code>AssetManager</code>
+	 * to look for asset to load.
+	 * 
+	 * @param root The root directory to search the asset in.
+	 */
+	public void registerRootDirectory(final String root) {
+		roots.add(Paths.get(root));
 	}
 	
 	private InputStream openStream(String name) throws IOException {
