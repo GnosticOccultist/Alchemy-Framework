@@ -39,7 +39,7 @@ public class AssetManager {
 	 * @param name The name of the asset file.
 	 * @return	   The asset instance corresponding to the requested type.
 	 */
-	public <N> N loadFXAsset(final Class<N> type, final String name) {
+	public <A> A loadFXAsset(final Class<A> type, final String name) {
 		try {
 			final InputStream is = openStream(name);
 			if(is != null) {
@@ -126,9 +126,9 @@ public class AssetManager {
 	}
 	
 	private InputStream openStreamInternal(String name) throws IOException {
-		URL url = locateInternal(name);
+		final URL url = locateInternal(name);
 		if(url != null) {
-			URLConnection connection = url.openConnection();
+			final URLConnection connection = url.openConnection();
 			connection.setUseCaches(false);
 			return connection.getInputStream();
 		}
@@ -140,7 +140,7 @@ public class AssetManager {
 			return null;
 		}
 		
-		for(Path path : roots) {
+		for(final Path path : roots) {
 			final Path resolve = path.resolve(name);
 			if(Files.exists(resolve)) {
 				return Files.newInputStream(resolve, StandardOpenOption.READ);		
@@ -154,7 +154,7 @@ public class AssetManager {
             name = name.substring(1);
         }
         
-        URL url = getClass().getResource("/" + name);
+        final URL url = getClass().getResource("/" + name);
 
         if (url == null) {
             return null;

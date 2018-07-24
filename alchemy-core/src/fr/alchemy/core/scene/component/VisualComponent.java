@@ -35,6 +35,20 @@ public final class VisualComponent extends Component {
 	}
 	
 	/**
+	 * Shows the <code>EntityView</code> and its graphic nodes.
+	 */
+	public void show() {
+		view.setVisible(true);
+	}
+	
+	/**
+	 * Hides the <code>EntityView</code> and its graphic nodes.
+	 */
+	public void hide() {
+		view.setVisible(false);
+	}
+	
+	/**
 	 * Sets the opacity to all the graphic nodes of the <code>VisualComponent</code>.
 	 * 
 	 * @param opacity The opacity value.
