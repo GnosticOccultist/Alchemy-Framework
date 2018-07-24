@@ -3,6 +3,7 @@ package fr.alchemy.core.event;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.event.Event;
 import javafx.event.EventType;
+import javafx.scene.Node;
 
 /**
  * <code>AlchemySceneEvent</code> contains all the events related to the <code>AlchemyScene</code>,
@@ -26,13 +27,26 @@ public class AlchemySceneEvent extends Event {
 	 */
 	public static final EventType<AlchemySceneEvent> ENTITY_REMOVED = new EventType<>(ALCHEMY_SCENE, "ENTITY_REMOVED");
 	/**
-	 * The entity concerned by the event.
+	 * The entity added event type.
 	 */
-	private final Entity entity;
+	public static final EventType<AlchemySceneEvent> UI_NODE_ADDED = new EventType<>(ALCHEMY_SCENE, "UI_NODE_ADDED");
+	/**
+	 * The entity removed event type.
+	 */
+	public static final EventType<AlchemySceneEvent> UI_NODE_REMOVED = new EventType<>(ALCHEMY_SCENE, "UI_NODE_REMOVED");
+	/**
+	 * The element concerned by the event or null.
+	 */
+	private final Object element;
 	
 	private AlchemySceneEvent(final EventType<? extends Event> eventType, final Entity entity) {
 		super(eventType);
-		this.entity = entity;
+		this.element = entity;
+	}
+	
+	private AlchemySceneEvent(final EventType<? extends Event> eventType, final Node node) {
+		super(eventType);
+		this.element = node;
 	}
 	
 	/**
@@ -50,9 +64,23 @@ public class AlchemySceneEvent extends Event {
     }
     
     /**
-     * @return The <code>Entity</code> concerned by the event.
+	 * @return A newly created {@link #UI_NODE_ADDED} <code>AlchemySceneEvent</code> event.
+	 */
+    public static AlchemySceneEvent UINodeAdded(final Node uiNode) {
+        return new AlchemySceneEvent(UI_NODE_ADDED, uiNode);
+    }
+    
+    /**
+	 * @return A newly created {@link #UI_NODE_REMOVED} <code>AlchemySceneEvent</code> event.
+	 */
+    public static AlchemySceneEvent UINodeRemoved(final Node uiNode) {
+        return new AlchemySceneEvent(UI_NODE_REMOVED, uiNode);
+    }
+    
+    /**
+     * @return The element concerned by the event or null.
      */
-    public Entity getEntity() {
-		return entity;
+    public Object getElement() {
+		return element;
 	}
 }

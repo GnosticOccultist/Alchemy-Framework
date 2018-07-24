@@ -33,8 +33,8 @@ public class TestApp extends AlchemyApplication {
 		entityTest.perform(VisualComponent.class, v -> v.grayscale());
 	
 		entityTest.attach(new NameComponent("Test"));
-		scene.add(entityTest);
-		
+		scene.addEntity(entityTest);
+	
 		inputManager.addKeyTypedBinding(KeyCode.N, () -> entityTest.detach(NameComponent.class));
 	}
 

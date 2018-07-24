@@ -6,6 +6,7 @@ import java.util.List;
 
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.scene.component.Component;
+import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.util.VoidAction;
@@ -73,6 +74,9 @@ public class Entity {
 	 */
 	public final <T extends Component> Entity detach(final Class<T> type) {
 		final Component component = getComponent(type);
+		if(component == null) {
+			return this;
+		}
 		
 		for(Annotation annotation : type.getAnnotations()) {
 			if(annotation.annotationType().equals(CoreComponent.class)) {
@@ -154,5 +158,25 @@ public class Entity {
 		
 		components.stream().forEach(component -> component.cleanup());
 		components.clear();
+	}
+	
+	/**
+	 * @return A name corresponding to this <code>Entity</code> or 
+	 * 		   'Entity' if nothing was found.
+	 */
+	public String name() {
+		if(getComponent(NameComponent.class) != null) {
+			return getComponent(NameComponent.class).getName();
+		}
+		
+		return "Entity";
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Entity: ");
+		components.forEach(c -> sb.append(c.toString() + "\n"));
+		return sb.toString();
 	}
 }
