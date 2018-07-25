@@ -185,7 +185,7 @@ public abstract class AbstractScene {
 	 * @param entity The entity.
 	 */
 	protected void addEntity(final Entity entity) {
-		logger().info("Added " + entity.name() + " to the " + getClass().getSimpleName());
+		logger().info("Added " + entity.name() + "-(Entity) to the " + getClass().getSimpleName());
 		this.entities.add(entity);
 	}
 	
@@ -196,7 +196,7 @@ public abstract class AbstractScene {
 	 * @param uiNode The UI node.
 	 */
 	protected void addUINode(final Node uiNode) {
-		logger().info("Added " + uiNode.getClass().getSimpleName() + " to the " + getClass().getSimpleName());
+		logger().info("Added " + uiNode.getClass().getSimpleName() + "-(UI) to the " + getClass().getSimpleName());
 	}
 	
 	/**

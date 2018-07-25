@@ -2,6 +2,7 @@ package fr.alchemy.core.scene.component;
 
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.core.scene.entity.EntityView;
 import javafx.scene.Node;
@@ -18,6 +19,10 @@ public final class VisualComponent extends Component {
 	 * The view bounded to the entity.
 	 */
 	private final EntityView view = new EntityView();
+	/**
+	 * The scene layer in which the view will be rendered on.
+	 */
+	private SceneLayer sceneLayer = SceneLayer.DEFAULT;
 	
 	/**
 	 * Instantiates a new empty <code>VisualComponent</code>.
@@ -46,6 +51,27 @@ public final class VisualComponent extends Component {
 	 */
 	public void hide() {
 		view.setVisible(false);
+	}
+	
+	/**
+	 * @return The scene layer in which the view will be rendered on.
+	 */
+	public SceneLayer getSceneLayer() {
+		return sceneLayer;
+	}
+	
+	/**
+	 * Sets the scene layer in which the view will be rendered on.
+	 * 
+	 * @param sceneLayer The scene layer.
+	 */
+	public void setSceneLayer(final SceneLayer sceneLayer) {
+		if(sceneLayer == null) {
+			this.sceneLayer = SceneLayer.DEFAULT;
+			return;
+		}
+		
+		this.sceneLayer = sceneLayer;
 	}
 	
 	/**

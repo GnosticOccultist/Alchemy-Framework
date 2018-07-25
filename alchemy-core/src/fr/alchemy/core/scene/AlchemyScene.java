@@ -1,10 +1,15 @@
 package fr.alchemy.core.scene;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.core.event.AlchemySceneEvent;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.core.scene.entity.EntityView;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -55,7 +60,9 @@ public class AlchemyScene extends AbstractScene {
 	public void addEntity(final Entity entity) {
 		super.addEntity(entity);
 		
-		this.sceneRoot.getChildren().add(entity.getComponent(VisualComponent.class).getView());
+		final SceneLayer layer = entity.getComponent(VisualComponent.class).getSceneLayer();
+		final EntityView view = entity.getComponent(VisualComponent.class).getView();
+		getRenderBatch(layer).getChildren().add(view);
 		
 		AlchemyEventManager.events().notify(AlchemySceneEvent.entityAdded(entity));
 	}
@@ -70,7 +77,10 @@ public class AlchemyScene extends AbstractScene {
 	 */
 	public void removeEntity(final Entity entity) {
 		this.entities.remove(entity);
-		this.sceneRoot.getChildren().remove(entity.getComponent(VisualComponent.class).getView());
+		
+		final SceneLayer layer = entity.getComponent(VisualComponent.class).getSceneLayer();
+		final EntityView view = entity.getComponent(VisualComponent.class).getView();
+		getRenderBatch(layer).getChildren().remove(view);
 		
 		AlchemyEventManager.events().notify(AlchemySceneEvent.entityRemoved(entity));
 	}
@@ -113,6 +123,32 @@ public class AlchemyScene extends AbstractScene {
 	public void setBackgroundColor(final Color color) {
 		getFXScene().setFill(color);
 		getRoot().setBackground(new Background(new BackgroundFill(color, null, null)));
+	}
+	
+	private Group getRenderBatch(final SceneLayer layer) {
+		Integer sceneLayer = layer.index();
+		
+		Group batch = null;
+		
+		for(Node node : sceneRoot.getChildren()) {
+			if((int) node.getUserData() == sceneLayer) {
+				batch = (Group) node;
+				break;
+			}
+		}
+		
+		if(batch == null) {
+			batch = new Group();
+			batch.setUserData(sceneLayer);
+			sceneRoot.getChildren().add(batch);
+		}
+		
+		List<Node> tmpBatches = new ArrayList<>(sceneRoot.getChildren());
+		Collections.sort(tmpBatches, (b1, b2) -> Integer.compare((int) b1.getUserData(), (int) b2.getUserData()));
+		
+		sceneRoot.getChildren().setAll(tmpBatches);
+		
+		return batch;
 	}
 	
 	/**

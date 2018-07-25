@@ -3,11 +3,13 @@ package fr.alchemy.test;
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.NameComponent;
-import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 public class TestApp extends AlchemyApplication {
 
@@ -31,16 +33,23 @@ public class TestApp extends AlchemyApplication {
 		entityTest = new Entity();
 		entityTest.perform(VisualComponent.class, v -> v.getView().addNode(texture));
 		entityTest.perform(VisualComponent.class, v -> v.grayscale());
-	
+		entityTest.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Test", 20));
+		
+		Entity entity = new Entity();
+		entity.perform(VisualComponent.class, v -> v.getView().addNode(new Circle(20, Color.RED)));
+		entity.getComponent(VisualComponent.class).setSceneLayer(SceneLayer.TOP);
+		
 		entityTest.attach(new NameComponent("Test"));
+		scene.addEntity(entity);
 		scene.addEntity(entityTest);
+		
 	
-		inputManager.addKeyTypedBinding(KeyCode.N, () -> entityTest.detach(NameComponent.class));
+		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
 	}
 
 	@Override
 	protected void update() {
-		entityTest.perform(Transform.class, t -> t.translate(1, 1));
+		
 	}
 
 	public static void main(String[] args) {
