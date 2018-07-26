@@ -36,7 +36,29 @@ public final class VisualComponent extends Component {
 	 * @param graphic The graphic node to add.
 	 */
 	public VisualComponent(final Node graphic) {
+		this(graphic, SceneLayer.DEFAULT);
+	}
+	
+	/**
+	 * Instantiates a new <code>VisualComponent</code> with the specified
+	 * <code>SceneLayer</code> for the <code>EntityView</code>.
+	 * 
+	 * @param layer The layer for the view.
+	 */
+	public VisualComponent(final SceneLayer layer) {
+		this(null, layer);
+	}
+	
+	/**
+	 * Instantiates a new <code>VisualComponent</code> with the specified
+	 * graphic node for the <code>EntityView</code> and the <code>SceneLayer</code>.
+	 * 
+	 * @param graphic The graphic node to add.
+	 * @param layer   The layer for the view.
+	 */
+	public VisualComponent(final Node graphic, final SceneLayer layer) {
 		getView().addNode(graphic);
+		setSceneLayer(sceneLayer);
 	}
 	
 	/**

@@ -6,7 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.alchemy.core.annotation.FXThread;
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.input.InputManager;
 import fr.alchemy.core.listener.ApplicationListener;
@@ -83,7 +82,6 @@ public abstract class AlchemyApplication extends Application {
 	private BooleanProperty started = new SimpleBooleanProperty(false);
 	
 	@Override
-	@FXThread
 	public final void start(Stage primaryStage) throws Exception {
 		logger().info("Starting " + getClass().getSimpleName());
 		
@@ -113,7 +111,6 @@ public abstract class AlchemyApplication extends Application {
 	 * 
 	 * @param internalTime The time-stamp of the current frame given in nanoseconds (from JavaFX).
 	 */
-	@FXThread
 	private void internalUpdate(final long internalTime) {
 		// Setup the current tick and the current time.
 		timer.tickStart(internalTime);
@@ -150,7 +147,6 @@ public abstract class AlchemyApplication extends Application {
 	}
 	
 	@Override
-	@FXThread
 	public final void stop() throws Exception {
 		super.stop();
 	}

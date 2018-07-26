@@ -100,6 +100,10 @@ public abstract class AbstractScene {
 		}
 	}
 	
+	/**
+	 * Initializes the <code>Viewport</code> of the scene by binding the 
+	 * {@link #getSceneRoot() scene root} to the viewport.
+	 */
 	public void initializeViewport() {
 		getSceneRoot().layoutXProperty().bind(viewport.xProperty().negate()); 
 		getSceneRoot().layoutYProperty().bind(viewport.yProperty().negate()); 
@@ -110,6 +114,20 @@ public abstract class AbstractScene {
 		scale.xProperty().bind(viewport.zoomProperty());
 		scale.yProperty().bind(viewport.zoomProperty());
 		getSceneRoot().getTransforms().add(scale);
+	}
+	
+	/**
+	 * Show the content root of the scene.
+	 */
+	public void show() {
+		getContentRoot().setVisible(true);
+	}
+	
+	/**
+	 * Hide the content root of the scene.
+	 */
+	public void hide() {
+		getContentRoot().setVisible(false);
 	}
 	
 	/**

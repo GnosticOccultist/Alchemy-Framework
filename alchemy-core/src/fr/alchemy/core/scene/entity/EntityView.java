@@ -37,6 +37,10 @@ public final class EntityView extends Parent {
 	 * @param graphic The graphic node to add.
 	 */
 	public void addNode(final Node graphic) {
+		if(graphic == null) {
+			return;
+		}
+		
 		if(graphic instanceof Circle) {
 			final Circle circle = (Circle) graphic;
 			circle.setCenterX(circle.getRadius());

@@ -5,6 +5,7 @@ import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.NameComponent;
+import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.input.KeyCode;
@@ -40,6 +41,7 @@ public class TestApp extends AlchemyApplication {
 		entity.getComponent(VisualComponent.class).setSceneLayer(SceneLayer.TOP);
 		
 		entityTest.attach(new NameComponent("Test"));
+		entityTest.getComponent(NameComponent.class).setColor(Color.RED);
 		scene.addEntity(entity);
 		scene.addEntity(entityTest);
 		
@@ -49,7 +51,7 @@ public class TestApp extends AlchemyApplication {
 
 	@Override
 	protected void update() {
-		
+		entityTest.perform(Transform.class, t -> t.translate(0.5, 0.5));
 	}
 
 	public static void main(String[] args) {

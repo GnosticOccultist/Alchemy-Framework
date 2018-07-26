@@ -2,6 +2,7 @@ package fr.alchemy.core.scene.component;
 
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Paint;
 
 /**
  * <code>NameComponent</code> allows the <code>Entity</code> to own a name 
@@ -92,6 +93,15 @@ public class NameComponent extends Component {
 	public void setName(final String name) {
 		this.name = name;
 		this.nameLabel.setText(getName());
+	}
+	
+	/**
+	 * Sets the color of the String label name.
+	 * 
+	 * @param color The color for the name.
+	 */
+	public void setColor(final Paint color) {
+		nameLabel.setTextFill(color);
 	}
 	
 	@Override
