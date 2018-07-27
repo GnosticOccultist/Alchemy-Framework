@@ -15,7 +15,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  * <code>Entity</code> represents a scene object defined by one, multiple or no {@link Component components}.
- * Its state is updated every loop cycle. 
+ * Its state is updated every loop cycle as well as its components. However either of those can be disabled to
+ * prevent updating.
+ * <p>
+ * Two components are added by default when creating a new <code>Entity</code>: {@link Transform} and {@link VisualComponent}
+ * to allow the entity to have position/rotation/scale and graphics node in the scene.
  * 
  * @author GnosticOccultist
  */
@@ -100,6 +104,18 @@ public class Entity {
 	}
 	
 	/**
+	 * @return Whether the provided type of component is enabled for this entity.
+	 * 		   If the component doesn't exist it will return false.
+	 */
+	public final <T extends Component> boolean isEnabled(final Class<T> type) {
+		final T component = getComponent(type);
+		if(component != null) {
+			return component.isEnabled();
+		}
+		return false;
+	}
+	
+	/**
 	 * @return The component matching the provided type, or null.
 	 */
 	@SuppressWarnings("unchecked")
@@ -114,15 +130,16 @@ public class Entity {
 	
 	/**
 	 * Performs an action with the specified type of <code>Component</code> if it exists for the
-	 * <code>Entity</code>.
+	 * <code>Entity</code> and is enabled.
 	 * 
+	 * @see Component#enable()
 	 * @param type	 The type of component to perform the action with.
 	 * @param action The action to perform.
 	 * @return		 Whether the action has been performed.
 	 */
 	public final <T extends Component> boolean perform(Class<T> type, VoidAction<T> action) {
-		T component = getComponent(type);
-		if(component != null) {
+		final T component = getComponent(type);
+		if(component != null && component.isEnabled()) {
 			action.perform(component);
 			return true;
 		}

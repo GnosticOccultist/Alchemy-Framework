@@ -30,18 +30,6 @@ public class Texture extends ImageView {
 	}
 	
 	/**
-	 * Sets the width, height and image of the provided <code>Texture</code>
-	 * to this one.
-	 * 
-	 * @param other The other texture to copy from.
-	 */
-	public final void set(final Texture other) {
-		setFitWidth(other.getFitWidth());
-		setFitHeight(other.getFitHeight());
-		setImage(other.getImage());
-	}
-	
-	/**
 	 * Scales the <code>Texture</code> image to the gray.
 	 */
 	public final void grayscale() {
@@ -97,5 +85,30 @@ public class Texture extends ImageView {
 		}
 		
 		return new Texture(image);
+	}
+	
+	/**
+	 * Sets the width, height and image of the provided <code>Texture</code>
+	 * to this one.
+	 * 
+	 * @param other The other texture to copy from.
+	 */
+	public final void set(final Texture other) {
+		setFitWidth(other.getFitWidth());
+		setFitHeight(other.getFitHeight());
+		setImage(other.getImage());
+	}
+	
+	/**
+	 * Creates a new instance of <code>Texture</code> with the width, height and image
+	 * of this one.
+	 * 
+	 * @return A copy of the <code>Texture</code>.
+	 */
+	public final Texture copy() {
+		final Texture texture = new Texture(getImage());
+		texture.setFitWidth(getFitWidth());
+		texture.setFitHeight(getFitHeight());
+		return texture;
 	}
 }
