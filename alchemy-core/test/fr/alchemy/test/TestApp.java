@@ -3,6 +3,7 @@ package fr.alchemy.test;
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.Transform;
@@ -33,7 +34,6 @@ public class TestApp extends AlchemyApplication {
 		
 		entityTest = new Entity();
 		entityTest.perform(VisualComponent.class, v -> v.getView().addNode(texture));
-		entityTest.perform(VisualComponent.class, v -> v.grayscale());
 		entityTest.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Test", 20));
 		
 		Entity entity = new Entity();
@@ -45,6 +45,7 @@ public class TestApp extends AlchemyApplication {
 		scene.addEntity(entity);
 		scene.addEntity(entityTest);
 		
+		AlchemyExecutor.executor().scheduleAtFixedRate(() -> System.out.println("ok"), 5000);
 	
 		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
 	}

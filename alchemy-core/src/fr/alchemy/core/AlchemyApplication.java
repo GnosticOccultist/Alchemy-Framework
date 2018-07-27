@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.alchemy.core.asset.AssetManager;
+import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.input.InputManager;
 import fr.alchemy.core.listener.ApplicationListener;
 import fr.alchemy.core.scene.AlchemyScene;
@@ -158,10 +159,13 @@ public abstract class AlchemyApplication extends Application {
 	 * You can however call the method to manually quit the application.
 	 */
 	public final void exit() {
-		logger().info("Closing " + getClass().getSimpleName());
+		logger().info("Closing " + getClass().getSimpleName() + "...");
 		
 		listeners.forEach(ApplicationListener::exit);
+		AlchemyExecutor.executor().shutdown();
 		Platform.exit();
+		
+		logger().info("Closed " + getClass().getSimpleName() + " successfully!");
 	}
 	
 	/**
