@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -112,15 +111,6 @@ public final class AlchemyExecutor {
 	}
 	
 	/**
-	 * Add the provided task to be executed inside the {@link ForkJoinPool#commonPool()}.
-	 * 
-	 * @param task The task to be executed.
-	 */
-	public void performOnBackground(final Runnable task) {
-		ForkJoinPool.commonPool().execute(task);
-	}
-	
-	/**
 	 * Creates and executes a one-shot action after the given delay (in milliseconds).
 	 * 
 	 * @param runnable The task to execute.
@@ -150,9 +140,7 @@ public final class AlchemyExecutor {
 	 */
 	public void shutdown() {
 		logger().info("Shutting down tasks executor device");
-		
 		scheduledExecutorService.shutdown();
-		
 		executorsMap.values().forEach(t -> Arrays.asList(t).forEach(AlchemyTaskExecutor::shutdown));
 		executorsMap.clear();
 	}

@@ -140,8 +140,8 @@ public class AssetManager {
 			return null;
 		}
 		
-		for(int i = 0; i < roots.size(); i++) {
-			final Path resolve = roots.get(i).resolve(name);
+		for(final Path path : roots) {
+			final Path resolve = path.resolve(name);
 			if(Files.exists(resolve)) {
 				return Files.newInputStream(resolve, StandardOpenOption.READ);		
 			}

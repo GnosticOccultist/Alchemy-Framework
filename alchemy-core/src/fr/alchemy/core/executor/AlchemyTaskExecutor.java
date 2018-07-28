@@ -1,6 +1,5 @@
 package fr.alchemy.core.executor;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -8,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author GnosticOccultist
  */
-public interface AlchemyTaskExecutor extends Executor {
+public interface AlchemyTaskExecutor {
 	
 	static AtomicInteger nextTaskExecutor = new AtomicInteger(0);
 	
@@ -17,7 +16,6 @@ public interface AlchemyTaskExecutor extends Executor {
 	 * 
 	 * @param task The task to execute.
 	 */
-	@Override
 	void execute(final Runnable task);
 	
 	/**
