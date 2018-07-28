@@ -120,9 +120,9 @@ public class Entity {
 	 */
 	@SuppressWarnings("unchecked")
 	public final <T extends Component> T getComponent(final Class<T> type) {
-		for(Component component : components) {
-			if(type.isAssignableFrom(component.getClass())) {
-				return (T) component;
+		for(int i = 0; i < components.size(); i++) {
+			if(type.isAssignableFrom(components.get(i).getClass())) {
+				return (T) components.get(i);
 			}
 		}
 		return null;

@@ -1,6 +1,5 @@
 package fr.alchemy.core;
 
-import fr.alchemy.core.listener.ApplicationListener;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -49,19 +48,23 @@ public class Window {
 		
 		// Loads the icons for the window.
 		final String[] iconPaths = settings.getIconPaths();
-		for(String iconPath : iconPaths) {
-			if(iconPath != null && !iconPath.isEmpty()) {
-				mainStage.getIcons().add(application.getAssetManager().loadImage(iconPath));
+		for(int i = 0; i < iconPaths.length; i++) {
+			if(iconPaths[i] != null && !iconPaths[i].isEmpty()) {
+				mainStage.getIcons().add(application.getAssetManager().loadImage(iconPaths[i]));
 			}
 		}
 		
 		mainStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
 			if(newValue.equals(Boolean.TRUE) && application.hasStarted()) {
 				application.resume();
-				application.getListeners().forEach(ApplicationListener::show);
+				for(int i = 0; i < application.getListeners().size(); i++) {
+					application.getListeners().array()[i].show();
+				}
 			} else if (newValue.equals(Boolean.FALSE) && application.hasStarted()) {
 				application.pause();
-				application.getListeners().forEach(ApplicationListener::hide);
+				for(int i = 0; i < application.getListeners().size(); i++) {
+					application.getListeners().array()[i].hide();
+				}
 			}
 		});
 		

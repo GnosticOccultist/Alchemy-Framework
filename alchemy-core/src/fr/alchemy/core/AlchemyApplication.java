@@ -1,7 +1,5 @@
 package fr.alchemy.core;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +10,7 @@ import fr.alchemy.core.input.InputManager;
 import fr.alchemy.core.listener.ApplicationListener;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.util.NanoTimer;
+import fr.alchemy.utilities.collections.Array;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -76,7 +75,7 @@ public abstract class AlchemyApplication extends Application {
 	/**
 	 * The application listeners.
 	 */
-	private List<ApplicationListener> listeners = new ArrayList<>();
+	private Array<ApplicationListener> listeners = new Array<>(ApplicationListener.class);
 	/**
 	 * Whether the application has been correctly started.
 	 */
@@ -134,7 +133,10 @@ public abstract class AlchemyApplication extends Application {
 	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#pause()}
 	 */
 	public final void pause() {
-		listeners.forEach(ApplicationListener::pause);
+		for(int i = 0; i < listeners.size(); i++) {
+			listeners.array()[i].pause();
+		}
+		
 		loop.stop();
 	}
 	
@@ -143,7 +145,9 @@ public abstract class AlchemyApplication extends Application {
 	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#resume()}
 	 */
 	public final void resume() {
-		listeners.forEach(ApplicationListener::resume);
+		for(int i = 0; i < listeners.size(); i++) {
+			listeners.array()[i].resume();
+		}
 		loop.start();
 	}
 	
@@ -161,7 +165,9 @@ public abstract class AlchemyApplication extends Application {
 	public final void exit() {
 		logger().info("Closing " + getClass().getSimpleName() + "...");
 		
-		listeners.forEach(ApplicationListener::exit);
+		for(int i = 0; i < listeners.size(); i++) {
+			listeners.array()[i].exit();
+		}
 		AlchemyExecutor.executor().shutdown();
 		Platform.exit();
 		
@@ -231,7 +237,7 @@ public abstract class AlchemyApplication extends Application {
 	/**
 	 * @return The listeners of the <code>AlchemyApplication</code>.
 	 */
-	protected List<ApplicationListener> getListeners() {
+	protected Array<ApplicationListener> getListeners() {
 		return listeners;
 	}
 	
