@@ -75,7 +75,7 @@ public abstract class AlchemyApplication extends Application {
 	/**
 	 * The application listeners.
 	 */
-	private Array<ApplicationListener> listeners = new Array<>(ApplicationListener.class);
+	private Array<ApplicationListener> listeners = Array.newEmptyArray(ApplicationListener.class);
 	/**
 	 * Whether the application has been correctly started.
 	 */
@@ -132,11 +132,8 @@ public abstract class AlchemyApplication extends Application {
 	 * Pauses the <code>AlchemyApplication</code>. If you want to add a pausing task, 
 	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#pause()}
 	 */
-	public final void pause() {
-		for(int i = 0; i < listeners.size(); i++) {
-			listeners.array()[i].pause();
-		}
-		
+	public final void pause() {	
+		listeners.perform(ApplicationListener::pause);	
 		loop.stop();
 	}
 	
@@ -145,9 +142,7 @@ public abstract class AlchemyApplication extends Application {
 	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#resume()}
 	 */
 	public final void resume() {
-		for(int i = 0; i < listeners.size(); i++) {
-			listeners.array()[i].resume();
-		}
+		listeners.perform(ApplicationListener::resume);	
 		loop.start();
 	}
 	
@@ -165,9 +160,7 @@ public abstract class AlchemyApplication extends Application {
 	public final void exit() {
 		logger().info("Closing " + getClass().getSimpleName() + "...");
 		
-		for(int i = 0; i < listeners.size(); i++) {
-			listeners.array()[i].exit();
-		}
+		listeners.perform(ApplicationListener::exit);	
 		AlchemyExecutor.executor().shutdown();
 		Platform.exit();
 		

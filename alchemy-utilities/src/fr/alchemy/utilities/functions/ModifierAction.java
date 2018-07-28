@@ -1,4 +1,4 @@
-package fr.alchemy.core.util;
+package fr.alchemy.utilities.functions;
 
 /**
  * A functional interface allowing the user to perform a certain type of action to the invoked object
@@ -15,5 +15,5 @@ public interface ModifierAction<T> {
 	 * 
 	 * @return The modified object.
 	 */
-	T modify(T object);
+	T modify(final T object);
 }

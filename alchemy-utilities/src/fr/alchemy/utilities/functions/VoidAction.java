@@ -1,10 +1,10 @@
-package fr.alchemy.core.util;
+package fr.alchemy.utilities.functions;
 
 /**
  * A functional interface allowing the user to perform a specific action 
  * with the invoked object.
  * 
- * @author Stickxy
+ * @author GnosticOccultist
  */
 @FunctionalInterface
 public interface VoidAction<T> {
@@ -14,5 +14,5 @@ public interface VoidAction<T> {
 	 * 
 	 * @param object The object to perform the action with.
 	 */
-	void perform(T object);
+	void perform(final T object);
 }

@@ -9,7 +9,7 @@ import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
-import fr.alchemy.core.util.VoidAction;
+import fr.alchemy.utilities.functions.VoidAction;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 

@@ -5,7 +5,17 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Consumer;
 
+import fr.alchemy.utilities.functions.ModifierAction;
+import fr.alchemy.utilities.functions.VoidAction;
+
+/**
+ * <code>Array</code> represents a dynamic implementation of an array, meaning
+ * it can be resized and its elements added or removed during its life-time.
+ * 
+ * @author GnosticOccultist
+ */
 public class Array<E> implements Collection<E> {
 
 	/**
@@ -17,11 +27,33 @@ public class Array<E> implements Collection<E> {
 	 */
 	protected int size;
 	
-	public Array(final Class<E> type) {
+	/**
+	 * Creates a new empty <code>Array</code> with a size of 10.
+	 *    
+	 * @param type The type of object that the array will contain.
+	 * @return	   The new empty array.
+	 */
+	public static <T> Array<T> newEmptyArray(final Class<T> type) {
+		return new Array<>(type);
+	}
+	
+	/**
+	 * Creates a new empty <code>Array</code> with the provided 
+	 * initial size.
+	 *    
+	 * @param type The type of object that the array will contain.
+	 * @param size The initial size of the array.
+	 * @return	   The new empty array.
+	 */
+	public static <T> Array<T> newEmptyArray(final Class<T> type, final int size) {
+		return new Array<>(type, size);
+	}
+	
+	private Array(final Class<E> type) {
 		this(type, 10);
 	}
 	
-	public Array(final Class<E> type, final int size) {
+	private Array(final Class<E> type, final int size) {
 		if(size < 0) {
 			throw new IllegalArgumentException("Size cannot be negative!");
 		}
@@ -87,14 +119,6 @@ public class Array<E> implements Collection<E> {
 			setSize(0);
 		}
 	}
-	
-	protected void setArray(final E[] array) {
-		this.array = array;
-	}
-	
-	protected void setSize(final int size) {
-		this.size = size;
-	}
 
 	@Override
 	public boolean contains(final Object object) {
@@ -146,6 +170,12 @@ public class Array<E> implements Collection<E> {
         return index >= 0;
 	}
 	
+    /**
+     * Finds the index of the provided object in the <code>Array</code>.
+     *
+     * @param object The object to find the index.
+     * @return 		 The index of the object or -1.
+     */
     public int indexOf(final Object object) {
         int index = 0;
 
@@ -211,15 +241,6 @@ public class Array<E> implements Collection<E> {
 	}
 
 	@Override
-	public final int size() {
-		return size;
-	}
-	
-    public final E[] array() {
-        return array;
-    }
-
-	@Override
 	public Object[] toArray() {
 		E[] array = array();
 		return Arrays.copyOf(array, size(), array.getClass());
@@ -240,11 +261,89 @@ public class Array<E> implements Collection<E> {
 		Class<T[]> arrayClass = (Class<T[]>) newArray.getClass();
 		Class<T> componentType = (Class<T>) arrayClass.getComponentType();
 
-     	newArray = (T[]) java.lang.reflect.Array.newInstance(componentType, size());
+     	newArray = (T[]) createNewArray((Class<E>) componentType, size());
         array = array();
 
         System.arraycopy(array, 0, newArray, 0, size());
         
         return newArray;
+	}
+	
+	/**
+	 * @return The wrapped array.
+	 */
+    public final E[] array() {
+        return array;
+    }
+	
+	/**
+	 * Sets the wrapped array.
+	 * 
+	 * @param array The wrapped array.
+	 */
+	protected void setArray(final E[] array) {
+		this.array = array;
+	}
+	
+	/**
+	 * Sets the size of the <code>Array</code>.
+	 * 
+	 * @param size The size of the array.
+	 */
+	protected void setSize(final int size) {
+		this.size = size;
+	}
+	
+	/**
+	 * @return The size of the <code>Array</code>.
+	 */
+	@Override
+	public final int size() {
+		return size;
+	}
+	
+	/**
+	 * Applies the modifying action to each element of the <code>Array</code>.
+	 * 
+	 * @param action The modifier action.
+	 */
+	public void modify(final ModifierAction<E> action) {
+		final E[] array = array();
+
+		for (int i = 0, length = size(); i < length; i++) {
+			array[i] = action.modify(array[i]);
+		}
+	}
+	
+	/**
+	 * Applies the action to each element of the <code>Array</code>.
+	 * 
+	 * @param action The action to execute.
+	 */
+	public void perform(final VoidAction<? super E> action) {
+		final E[] array = array();
+
+		for (int i = 0, length = size(); i < length; i++) {
+			
+			if(array[i] == null) {
+				break;
+			}
+			
+			action.perform(array[i]);
+		}
+	}
+	
+	@Override
+	public void forEach(final Consumer<? super E> consumer) {
+		final E[] array = array();
+		
+		for (int i = 0, length = size(); i < length; i++) {
+			
+			if(array[i] == null) {
+				break;
+			}
+			
+			consumer.accept(array[i]);
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package fr.alchemy.core;
 
+import fr.alchemy.core.listener.ApplicationListener;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -57,19 +58,16 @@ public class Window {
 		mainStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
 			if(newValue.equals(Boolean.TRUE) && application.hasStarted()) {
 				application.resume();
-				for(int i = 0; i < application.getListeners().size(); i++) {
-					application.getListeners().array()[i].show();
-				}
+				application.getListeners().perform(ApplicationListener::show);	
 			} else if (newValue.equals(Boolean.FALSE) && application.hasStarted()) {
 				application.pause();
 				for(int i = 0; i < application.getListeners().size(); i++) {
-					application.getListeners().array()[i].hide();
+					application.getListeners().perform(ApplicationListener::hide);	
 				}
 			}
 		});
 		
 		mainStage.setScene(scene);
-		
 		
 		mainStage.setOnCloseRequest(event -> application.exit());
 	}
