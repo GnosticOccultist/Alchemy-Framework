@@ -16,6 +16,7 @@ import java.util.List;
 import fr.alchemy.core.asset.cache.AssetCache;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.AudioClip;
 
 /**
  * <code>AssetManager</code> loads all the assets needed for the <code>AlchemyApplication</code>.
@@ -51,7 +52,11 @@ public class AssetManager {
 				return type.getConstructor(InputStream.class).newInstance(is);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				return type.getConstructor(String.class).newInstance(getClass().getResource(name).toExternalForm());
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -70,7 +75,7 @@ public class AssetManager {
 			return (Texture) asset;
 		}
 		
-		final Texture texture = new Texture(loadImage(name));
+		final Texture texture = new Texture(loadFXAsset(Image.class, name));
 		cache.cache(name, texture);
 		return texture;
 	}
@@ -112,6 +117,27 @@ public class AssetManager {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	/**
+	 * Loads a <code>Sound</code> from the specified file name.
+	 * It will search the asset internally and in every specified root folders.
+	 * If the asset isn't found it will return null.
+	 * <p>
+	 * After instanciation, you can call {@link Sound#play()} to play the sound effect.
+	 * 
+	 * @param name The asset name.
+	 * @return	   The loaded sound or null if not found.
+	 */
+	public Sound loadSound(final String name) {
+		final Object asset = cache.acquire(name);
+		if(asset != null && asset instanceof Sound) {
+			return (Sound) asset;
+		}
+		
+		final Sound texture = new Sound(loadFXAsset(AudioClip.class, name));
+		cache.cache(name, texture);
+		return texture;
 	}
 	
 	/**

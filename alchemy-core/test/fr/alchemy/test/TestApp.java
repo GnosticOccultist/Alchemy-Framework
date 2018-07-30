@@ -2,6 +2,7 @@ package fr.alchemy.test;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
+import fr.alchemy.core.asset.Sound;
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.scene.SceneLayer;
@@ -24,11 +25,6 @@ public class TestApp extends AlchemyApplication {
 	}
 
 	@Override
-	protected void preInitialize() {
-		
-	}
-	
-	@Override
 	protected void initialize() {
 		Texture texture = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
 		
@@ -45,12 +41,12 @@ public class TestApp extends AlchemyApplication {
 		scene.addEntity(entity);
 		scene.addEntity(entityTest);
 		
-		Texture texture2 = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
-		System.out.println(texture2);
-		
 		AlchemyExecutor.executor().scheduleAtFixedRate(() -> System.out.println("ok"), 5000);
 	
 		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
+		
+		Sound sound = assetManager.loadSound("/resources/sounds/ring.wav");
+		sound.play();
 	}
 
 	@Override
