@@ -13,6 +13,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.alchemy.core.asset.cache.AssetCache;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -26,6 +27,10 @@ import javafx.scene.image.ImageView;
  * @author GnosticOccultist
  */
 public class AssetManager {
+	/**
+	 * The asset cache.
+	 */
+	private final AssetCache cache = new AssetCache();
 	/**
 	 * The list of root folders to search the assets for.
 	 */
@@ -60,8 +65,14 @@ public class AssetManager {
 	 * @return	   The texture object or null if not found.
 	 */
 	public Texture loadTexture(final String name) {
-		final Image image = loadImage(name);
-		return new Texture(image);
+		final Object asset = cache.acquire(name);
+		if(asset != null && asset instanceof Texture) {
+			return (Texture) asset;
+		}
+		
+		final Texture texture = new Texture(loadImage(name));
+		cache.cache(name, texture);
+		return texture;
 	}
 	
 	/**
@@ -73,7 +84,14 @@ public class AssetManager {
 	 * @return	   The image object or null if not found.
 	 */
 	public Image loadImage(final String name) {
-		return loadFXAsset(Image.class, name);
+		final Object asset = cache.acquire(name);
+		if(asset != null && asset instanceof Image) {
+			return (Image) asset;
+		}
+		
+		final Image image = loadFXAsset(Image.class, name);
+		cache.cache(name, image);
+		return image;
 	}
 	
 	/**

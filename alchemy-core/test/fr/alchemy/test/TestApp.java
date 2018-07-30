@@ -45,6 +45,9 @@ public class TestApp extends AlchemyApplication {
 		scene.addEntity(entity);
 		scene.addEntity(entityTest);
 		
+		Texture texture2 = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
+		System.out.println(texture2);
+		
 		AlchemyExecutor.executor().scheduleAtFixedRate(() -> System.out.println("ok"), 5000);
 	
 		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
