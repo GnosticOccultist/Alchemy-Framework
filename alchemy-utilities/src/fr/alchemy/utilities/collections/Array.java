@@ -156,7 +156,7 @@ public class Array<E> implements Collection<E> {
 
 	@Override
 	public Iterator<E> iterator() {
-		throw new UnsupportedOperationException("No iterator available for now!");
+		return new ArrayIterator<>(this);
 	}
 
 	@Override
