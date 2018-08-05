@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.alchemy.core.asset.cache.AssetCache;
+import fr.alchemy.core.asset.cache.Cleanable;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
@@ -71,7 +72,7 @@ public class AssetManager {
 	 * @return	   The texture object or null if not found.
 	 */
 	public Texture loadTexture(final String name) {
-		final Object asset = cache.acquire(name);
+		final Cleanable asset = cache.acquire(name);
 		if(asset != null && asset instanceof Texture) {
 			return (Texture) asset;
 		}
@@ -90,13 +91,13 @@ public class AssetManager {
 	 * @return	   The image object or null if not found.
 	 */
 	public Image loadImage(final String name) {
-		final Object asset = cache.acquire(name);
-		if(asset != null && asset instanceof Image) {
-			return (Image) asset;
+		final Cleanable asset = cache.acquire(name);
+		if(asset != null && asset instanceof Texture) {
+			return ((Texture) asset).getImage();
 		}
 		
 		final Image image = loadFXAsset(Image.class, name);
-		cache.cache(name, image);
+		cache.cache(name, new Texture(image));
 		return image;
 	}
 	
@@ -131,7 +132,7 @@ public class AssetManager {
 	 * @return	   The loaded sound or null if not found.
 	 */
 	public Sound loadSound(final String name) {
-		final Object asset = cache.acquire(name);
+		final Cleanable asset = cache.acquire(name);
 		if(asset != null && asset instanceof Sound) {
 			return (Sound) asset;
 		}
@@ -152,7 +153,7 @@ public class AssetManager {
 	 * @return	   The loaded sound or null if not found.
 	 */
 	public Music loadMusic(final String name) {
-		final Object asset = cache.acquire(name);
+		final Cleanable asset = cache.acquire(name);
 		if(asset != null && asset instanceof Music) {
 			return (Music) asset;
 		}

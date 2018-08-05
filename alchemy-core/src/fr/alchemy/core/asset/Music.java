@@ -4,6 +4,7 @@ import fr.alchemy.core.asset.cache.Cleanable;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
+import javafx.util.Duration;
 
 /**
  * <code>Music</code> is a wrapper class around a {@link MediaPlayer} which
@@ -48,6 +49,19 @@ public final class Music implements Cleanable {
 	}
 	
 	/**
+	 * Sets the starting and stopping time of the <code>Music</code>.
+	 * 
+	 * @param start The starting time.
+	 * @param end   The stopping time.
+	 * @return      The updated music.
+	 */
+	public Music setInterval(final Duration start, final Duration end) {
+		this.player.setStartTime(start);
+		this.player.setStopTime(end);
+		return this;
+	}
+	
+	/**
 	 * Sets the number of times the <code>Music</code> needs to be played
 	 * in a row. 
 	 * 
@@ -78,6 +92,19 @@ public final class Music implements Cleanable {
 	 */
 	public Music setVolume(final double volume) {
 		this.player.setVolume(volume);
+		return this;
+	}
+	
+	/**
+	 * Sets whether the <code>Music</code> needs to be muted.
+	 * Note that it as no effect on the volume and it will only stop the audio
+	 * to be produced.
+	 * 
+	 * @param mute Whether to mute the music.
+	 * @return	   The updated music.
+	 */
+	public Music mute(final boolean mute) {
+		this.player.setMute(mute);
 		return this;
 	}
 	
