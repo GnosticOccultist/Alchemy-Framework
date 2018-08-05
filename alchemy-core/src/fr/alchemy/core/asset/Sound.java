@@ -41,7 +41,7 @@ public final class Sound {
 	}
 	
 	/**
-	 * Sets the number of times the <code>Sounds</code> needs to be played
+	 * Sets the number of times the <code>Sound</code> needs to be played
 	 * in a row. 
 	 * 
 	 * @param count The count of cycling sound.

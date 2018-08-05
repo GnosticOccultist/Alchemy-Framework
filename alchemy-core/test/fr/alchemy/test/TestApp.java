@@ -2,7 +2,7 @@ package fr.alchemy.test;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
-import fr.alchemy.core.asset.Sound;
+import fr.alchemy.core.asset.Music;
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.scene.SceneLayer;
@@ -17,11 +17,17 @@ import javafx.scene.shape.Circle;
 public class TestApp extends AlchemyApplication {
 
 	private Entity entityTest;
+	private Music musicTest;
 	
 	@Override
 	protected void initializeSettings(AlchemySettings settings) {
 		settings.put("Title", "Test App");
 		settings.put("ShowFPS", true);
+	}
+	
+	@Override
+	protected void preInitialize() {	
+		musicTest = assetManager.loadMusic("/resources/sounds/ferambie.mp3"); 	
 	}
 
 	@Override
@@ -45,8 +51,10 @@ public class TestApp extends AlchemyApplication {
 	
 		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
 		
-		Sound sound = assetManager.loadSound("/resources/sounds/ring.wav");
-		sound.play();
+		AlchemyExecutor.executor().performOnBackground(() -> {
+			musicTest.setCycleCount(Integer.MAX_VALUE);
+			musicTest.play();
+		});	
 	}
 
 	@Override
