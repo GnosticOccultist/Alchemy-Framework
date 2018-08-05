@@ -20,7 +20,7 @@ public final class AssetCache {
 	/**
 	 * The table containing the assets classed by path.
 	 */
-	private final Map<Path, Object> cache = new HashMap<Path, Object>();
+	private final Map<Path, Cleanable> cache = new HashMap<Path, Cleanable>();
 	
 	/**
 	 * Caches the specified asset with its path as the key.
@@ -29,7 +29,7 @@ public final class AssetCache {
 	 * @param asset The asset to cache.
 	 * @return		The previously associated value to the key or null.
 	 */
-	public Object cache(final String path, final Object asset) {
+	public Cleanable cache(final String path, final Cleanable asset) {
 		return cache.put(Paths.get(path), asset);
 	}
 	
@@ -40,7 +40,7 @@ public final class AssetCache {
 	 * @param asset The asset to cache.
 	 * @return		The previously associated value to the key or null.
 	 */
-	public Object cache(final Path path, final Object asset) {
+	public Cleanable cache(final Path path, final Cleanable asset) {
 		return cache.put(path, asset);
 	}
 	
@@ -51,7 +51,7 @@ public final class AssetCache {
 	 * @param path The path to use as the key.
 	 * @return	   The asset from the cache.
 	 */
-	public Object acquire(final String path) {
+	public Cleanable acquire(final String path) {
 		return cache.get(Paths.get(path));
 	}
 	
@@ -62,7 +62,7 @@ public final class AssetCache {
 	 * @param path The path to use as the key.
 	 * @return	   The asset from the cache.
 	 */
-	public Object acquire(final Path path) {
+	public Cleanable acquire(final Path path) {
 		return cache.get(path);
 	}
 	
@@ -95,14 +95,15 @@ public final class AssetCache {
 	 * @param asset The asset to remove.
 	 * @return 		The previously mapped key to the path.
 	 */
-	public boolean uncache(final Path path, final Object asset) {
+	public boolean uncache(final Path path, final Cleanable asset) {
 		return cache.remove(path, asset);
 	}
 	
 	/**
-	 * Clears the cache from all of its assets.
+	 * Cleanup the assets and clears the cache from its content.
 	 */
 	public void clear() {
+		cache.values().forEach(Cleanable::cleanup);
 		cache.clear();
 	}
 }

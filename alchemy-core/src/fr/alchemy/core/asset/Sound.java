@@ -1,5 +1,6 @@
 package fr.alchemy.core.asset;
 
+import fr.alchemy.core.asset.cache.Cleanable;
 import javafx.scene.media.AudioClip;
 
 /**
@@ -8,11 +9,11 @@ import javafx.scene.media.AudioClip;
  * 
  * @author GnosticOccultist
  */
-public final class Sound {
+public final class Sound implements Cleanable {
 	/**
 	 * The audio accessing the sound.
 	 */
-	private final AudioClip audio;
+	private AudioClip audio;
 	
 	Sound(final AudioClip audio) {
 		this.audio = audio;
@@ -65,5 +66,11 @@ public final class Sound {
 	 */
 	public void stop() {
 		this.audio.stop();
+	}
+
+	@Override
+	public void cleanup() {
+		stop();
+		audio = null;
 	}
 }

@@ -1,5 +1,6 @@
 package fr.alchemy.core.asset;
 
+import fr.alchemy.core.asset.cache.Cleanable;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.utilities.functions.ModifierAction;
 import javafx.scene.image.Image;
@@ -16,7 +17,7 @@ import javafx.scene.paint.Color;
  * 
  * @author GnosticOccultist
  */
-public class Texture extends ImageView {
+public class Texture extends ImageView implements Cleanable {
 	
 	/**
 	 * <strong>Internal use only!</strong>
@@ -110,5 +111,10 @@ public class Texture extends ImageView {
 		texture.setFitWidth(getFitWidth());
 		texture.setFitHeight(getFitHeight());
 		return texture;
+	}
+
+	@Override
+	public void cleanup() {
+		setImage(null);
 	}
 }

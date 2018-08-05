@@ -1,5 +1,6 @@
 package fr.alchemy.core.asset;
 
+import fr.alchemy.core.asset.cache.Cleanable;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
@@ -10,21 +11,40 @@ import javafx.scene.media.MediaPlayer.Status;
  * 
  * @author GnosticOccultist
  */
-public final class Music {
+public final class Music implements Cleanable {
 	/**
 	 * The media player accessing the sound.
 	 */
 	private final MediaPlayer player;
 	
 	Music(final Media media) {
+		this(media, false);
+	}
+	
+	Music(final Media media, final boolean autoPlay) {
 		this.player = new MediaPlayer(media);
+		this.player.setAutoPlay(autoPlay);
 	}
 	
 	/**
 	 * Plays or resume the <code>Music</code> playback.
 	 */
 	public void play() {
-		player.play();
+		this.player.play();
+	}
+	
+	/**
+	 * Pauses the <code>Music</code> playback.
+	 */
+	public void pause() {
+		this.player.pause();
+	}
+	
+	/**
+	 * Stops the <code>Music</code> playback.
+	 */
+	public void stop() {
+		this.player.stop();
 	}
 	
 	/**
@@ -34,22 +54,31 @@ public final class Music {
 	 * @param count The count of cycling music.
 	 * @return      The updated music.
 	 */
-	public void setCycleCount(final int cycle) {
-		player.setCycleCount(cycle);
+	public Music setCycleCount(final int cycle) {
+		this.player.setCycleCount(cycle);
+		return this;
 	}
 	
 	/**
-	 * Pauses the <code>Music</code> playback.
+	 * Sets the speed at which the <code>Music</code> is played.
+	 * 
+	 * @param speed The music rate.
+	 * @return      The updated music.
 	 */
-	public void pause() {
-		player.pause();
+	public Music setSpeed(final double speed) {
+		this.player.setRate(speed);
+		return this;
 	}
 	
 	/**
-	 * Stops the <code>Music</code> playback.
+	 * Sets the volume of the <code>Music</code>.
+	 * 
+	 * @param volume The music volume.
+	 * @return       The updated music.
 	 */
-	public void stop() {
-		player.stop();
+	public Music setVolume(final double volume) {
+		this.player.setVolume(volume);
+		return this;
 	}
 	
 	/**
@@ -62,11 +91,13 @@ public final class Music {
 	/**
 	 * Cleanup the <code>Music</code> by disposing the {@link MediaPlayer}
 	 */
+	@Override
 	public void cleanup() {
 		if(getStatus() == Status.DISPOSED) {
 			// Already disposed !
 			return;
 		}
+		stop();
 		player.dispose();
 	}
 }
