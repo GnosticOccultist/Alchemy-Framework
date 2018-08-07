@@ -5,6 +5,7 @@ import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.asset.Music;
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.executor.AlchemyExecutor;
+import fr.alchemy.core.physic.BoundingBox;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.Transform;
@@ -12,12 +13,13 @@ import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
 public class TestApp extends AlchemyApplication {
 
 	private Entity entityTest;
 	private Music musicTest;
+	private BoundingBox box;
 	
 	@Override
 	protected void initializeSettings(AlchemySettings settings) {
@@ -39,7 +41,9 @@ public class TestApp extends AlchemyApplication {
 		entityTest.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Test", 20));
 		
 		Entity entity = new Entity();
-		entity.perform(VisualComponent.class, v -> v.getView().addNode(new Circle(20, Color.RED)));
+		Rectangle rect = new Rectangle(20, 20, 25, 25);
+		rect.setFill(Color.RED);
+		entity.perform(VisualComponent.class, v -> v.getView().addNode(rect));
 		entity.getComponent(VisualComponent.class).setSceneLayer(SceneLayer.TOP);
 		
 		entityTest.attach(new NameComponent("Test"));
@@ -48,6 +52,8 @@ public class TestApp extends AlchemyApplication {
 		scene.addEntity(entityTest);
 		
 		AlchemyExecutor.executor().scheduleAtFixedRate(() -> System.out.println("ok"), 5000);
+		
+		box = new BoundingBox(20, 20, 25, 25);
 	
 		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
 		
@@ -60,6 +66,9 @@ public class TestApp extends AlchemyApplication {
 	@Override
 	protected void update() {
 		entityTest.perform(Transform.class, t -> t.translate(0.5, 0.5));
+		if(box.contains(inputManager.getMouse().screenX, inputManager.getMouse().screenY)) {
+			System.out.println("Contained!");
+		}
 	}
 
 	public static void main(String[] args) {
