@@ -13,6 +13,14 @@ import org.slf4j.LoggerFactory;
 
 import fr.alchemy.core.AlchemyApplication;
 
+/**
+ * <code>AlchemyExecutor</code> represents the manager of all tge {@link AlchemyTaskExecutor}.
+ * You can register new task executor device by calling {@link #registerExecutor(Class)}.
+ * <p>
+ * It contains as well some default executors, such as a scheduled and a background executor.
+ * 
+ * @author GnosticOccultist
+ */
 public final class AlchemyExecutor {
 
 	/**

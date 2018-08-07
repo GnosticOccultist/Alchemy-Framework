@@ -105,6 +105,11 @@ public class NameComponent extends Component {
 	}
 	
 	@Override
+	public String toString() {
+		return "Name: " + name;
+	}
+	
+	@Override
 	public boolean equals(final Object obj) {
 		if(obj instanceof NameComponent) {
 			return name.equals(((NameComponent) obj).name);

@@ -93,4 +93,9 @@ public final class EntityView extends Parent {
 	public ObservableList<Node> getNodes() {
 		return getChildren();
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }

@@ -208,4 +208,9 @@ public final class VisualComponent extends Component {
 	public EntityView getView() {
 		return view;
 	}
+	
+	@Override
+	public String toString() {
+		return "Visual: " + view + " Scene Layer: " + sceneLayer;
+	}
 }

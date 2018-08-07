@@ -7,6 +7,8 @@ import javafx.geometry.Point2D;
  * <code>BoundingBox</code> is a rectangular box which represents the bounds of a 
  * scene-graph object such as {@link Entity}.
  * It is defined with an upper-left corner point and a width and height for each axis.
+ * 
+ * @author GnosticOccultist
  */
 public final class BoundingBox {
 	/**
