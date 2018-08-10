@@ -7,6 +7,7 @@ import java.util.List;
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.NameComponent;
+import fr.alchemy.core.scene.component.SimpleObjectComponent;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.utilities.functions.VoidAction;
@@ -119,10 +120,26 @@ public class Entity {
 	 * @return The component matching the provided type, or null.
 	 */
 	@SuppressWarnings("unchecked")
-	public final <T extends Component> T getComponent(final Class<T> type) {
+	public final <C extends Component> C getComponent(final Class<C> type) {
 		for(int i = 0; i < components.size(); i++) {
 			if(type.isAssignableFrom(components.get(i).getClass())) {
-				return (T) components.get(i);
+				return (C) components.get(i);
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @return The wrapped object of a {@link SimpleObjectComponent} 
+	 * 		   matching the provided type, or null.
+	 */
+	@SuppressWarnings("unchecked")
+	public final <T> T getObjectComponent(final Class<T> type) {
+		for(int i = 0; i < components.size(); i++) {
+			if(SimpleObjectComponent.class.isAssignableFrom(components.get(i).getClass())) {
+				if(type.isAssignableFrom(((SimpleObjectComponent<T>)components.get(i)).getObject().getClass())) {
+					return ((SimpleObjectComponent<T>)components.get(i)).getObject();
+				}
 			}
 		}
 		return null;

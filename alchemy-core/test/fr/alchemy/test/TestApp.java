@@ -5,21 +5,22 @@ import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.asset.Music;
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.executor.AlchemyExecutor;
-import fr.alchemy.core.physic.BoundingBox;
+import fr.alchemy.core.physic.BoundingCircle;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.NameComponent;
+import fr.alchemy.core.scene.component.SimpleObjectComponent;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Circle;
 
 public class TestApp extends AlchemyApplication {
 
 	private Entity entityTest;
 	private Music musicTest;
-	private BoundingBox box;
+	private BoundingCircle circ;
 	
 	@Override
 	protected void initializeSettings(AlchemySettings settings) {
@@ -41,9 +42,9 @@ public class TestApp extends AlchemyApplication {
 		entityTest.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Test", 20));
 		
 		Entity entity = new Entity();
-		Rectangle rect = new Rectangle(20, 20, 25, 25);
-		rect.setFill(Color.RED);
-		entity.perform(VisualComponent.class, v -> v.getView().addNode(rect));
+		Circle circle = new Circle(20, 20, 25);
+		circle.setFill(Color.RED);
+		entity.perform(VisualComponent.class, v -> v.getView().addNode(circle));
 		entity.getComponent(VisualComponent.class).setSceneLayer(SceneLayer.TOP);
 		
 		entityTest.attach(new NameComponent("Test"));
@@ -53,8 +54,9 @@ public class TestApp extends AlchemyApplication {
 		
 		AlchemyExecutor.executor().scheduleAtFixedRate(() -> System.out.println("ok"), 5000);
 		
-		box = new BoundingBox(20, 20, 25, 25);
-	
+		circ = new BoundingCircle(20, 20, 25);
+		entityTest.attach(new SimpleObjectComponent<BoundingCircle>(circ));
+		
 		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
 		
 		AlchemyExecutor.executor().performOnBackground(() -> {
@@ -65,8 +67,8 @@ public class TestApp extends AlchemyApplication {
 
 	@Override
 	protected void update() {
-		entityTest.perform(Transform.class, t -> t.translate(0.5, 0.5));
-		if(box.contains(inputManager.getMouse().screenX, inputManager.getMouse().screenY)) {
+		entityTest.getComponent(Transform.class).setPosition(inputManager.getMouse().screenX, inputManager.getMouse().screenY);
+		if(circ.contains(inputManager.getMouse().screenX, inputManager.getMouse().screenY)) {
 			System.out.println("Contained!");
 		}
 	}
