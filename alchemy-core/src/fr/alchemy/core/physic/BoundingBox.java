@@ -20,14 +20,17 @@ public final class BoundingBox {
 	 */
 	private double width, height;
 	
+	public BoundingBox(final double width, final double height) {
+		this(0, 0, width, height);
+	}
+	
+	public BoundingBox(final Point2D corner, final double width, final double height) {
+		this(corner.getX(), corner.getY(), width, height);
+	}
+	
 	public BoundingBox(final double x, final double y, final double width, final double height) {
 		this.x = x;
 		this.y = y;
-		this.width = width;
-		this.height = height;
-	}
-	
-	public BoundingBox(final double width, final double height) {
 		this.width = width;
 		this.height = height;
 	}
@@ -61,6 +64,38 @@ public final class BoundingBox {
 
 		return ((minX > x && minX < x + width) && (maxX > x && maxX < x + width))
 			&& ((minY > y && minY < y + height) && (maxY > y && maxY < y + height));
+	}
+	
+	/**
+	 * @return The perimeter of the <code>BoundingBox</code>.
+	 */
+	public double perimeter() {
+		return 2 * (width + height);
+	}
+	
+	/**
+	 * @return The area of the <code>BoundingBox</code>.
+	 */
+	public double area() {
+		return width * height;
+	}
+	
+	/**
+	 * @return The center coordinates of the <code>BoundingBox</code>.
+	 */
+	public Point2D getCenter() {
+		return new Point2D(x + width / 2, y + height / 2);
+	}
+	
+	/**
+	 * Centers the <code>BoundingBox</code> on the provided coordinates.
+	 * 
+	 * @return The updated bounding box.
+	 */
+	public BoundingBox center(final double x, final double y) {
+		setX(x - width / 2);
+		setY(y - height / 2);
+		return this;
 	}
 	
 	/***
@@ -149,5 +184,26 @@ public final class BoundingBox {
 	public BoundingBox setHeight(final double height) {
 		this.height = height;
 		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o) {
+		if(this == o) {
+			return true;
+		}
+		if(o == null || !(o instanceof BoundingBox)) {
+			return false;
+		}
+		BoundingBox box = (BoundingBox) o;
+		if(width != box.width || height != box.height || x != box.x || y != box.y) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ": Corner[" + x + ";" + y + "]" 
+					+ " Width: " + width + " Height: " + height;
 	}
 }

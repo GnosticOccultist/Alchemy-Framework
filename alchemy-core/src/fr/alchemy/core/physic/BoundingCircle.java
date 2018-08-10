@@ -21,13 +21,17 @@ public final class BoundingCircle {
 	 */
 	private double radius;
 	
+	public BoundingCircle(final double radius) {
+		this(0, 0, radius);
+	}
+	
+	public BoundingCircle(final Point2D corner, final double radius) {
+		this(corner.getX(), corner.getY(), radius);
+	}
+	
 	public BoundingCircle(final double x, final double y, final double radius) {
 		this.x = x;
 		this.y = y;
-		this.radius = radius;
-	}
-	
-	public BoundingCircle(final double radius) {
 		this.radius = radius;
 	}
 	
@@ -66,6 +70,20 @@ public final class BoundingCircle {
 		
 		final double totalRadius = radius + circle.radius;
 		return (!(dRadius * dRadius < dx * dx + dy * dy) && (dx * dx + dy * dy < totalRadius * totalRadius));
+	}
+	
+	/**
+	 * @return The perimeter of the <code>BoundingCircle</code>.
+	 */
+	public double perimeter() {
+		return 2 * radius * Math.PI;
+	}
+	
+	/**
+	 * @return The area of the <code>BoundingCircle</code>.
+	 */
+	public double area() {
+		return radius * radius * Math.PI;
 	}
 	
 	/***
@@ -135,5 +153,26 @@ public final class BoundingCircle {
 	public BoundingCircle setRadius(final double radius) {
 		this.radius = radius;
 		return this;
+	}
+	
+	@Override
+	public boolean equals(final Object o) {
+		if(this == o) {
+			return true;
+		}
+		if(o == null || !(o instanceof BoundingCircle)) {
+			return false;
+		}
+		BoundingCircle circle = (BoundingCircle) o;
+		if(x != circle.x || y != circle.y || radius != circle.radius) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ": Center[" + x + ";" + y + "]" 
+					+ " Radius: " + radius;
 	}
 }
