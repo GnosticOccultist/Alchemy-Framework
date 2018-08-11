@@ -1,15 +1,19 @@
 package fr.alchemy.core.scene.entity;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.SimpleObjectComponent;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
+import fr.alchemy.utilities.ByteUtils;
 import fr.alchemy.utilities.functions.VoidAction;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -24,7 +28,7 @@ import javafx.beans.property.SimpleBooleanProperty;
  * 
  * @author GnosticOccultist
  */
-public class Entity {
+public class Entity implements Exportable {
 	
 	/**
 	 * The list of components defining the entity.
@@ -212,5 +216,19 @@ public class Entity {
 		sb.append("Entity: ");
 		components.forEach(c -> sb.append(c.toString() + "\n"));
 		return sb.toString();
+	}
+
+	@Override
+	public void export(final OutputStream os) throws IOException {
+		os.write(ByteUtils.toBytes(getClass().getName()));
+		os.write(ByteUtils.toBytes("enabled"));
+		os.write(ByteUtils.toBytes(enabled.get()));
+		
+		os.write(ByteUtils.toBytes("components"));
+		os.write(ByteUtils.toBytes(components.size()));
+		
+		for(Component component : components) {
+			component.export(os);
+		}
 	}
 }

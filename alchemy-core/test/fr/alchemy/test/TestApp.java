@@ -63,6 +63,8 @@ public class TestApp extends AlchemyApplication {
 			musicTest.setCycleCount(Integer.MAX_VALUE);
 			musicTest.play();
 		});	
+		
+		assetManager.saveAsset(entityTest, "C:/Users/Stickxy/Documents/Alexis/Jeux/AlchemyWorkspace/entity.ecs");
 	}
 
 	@Override

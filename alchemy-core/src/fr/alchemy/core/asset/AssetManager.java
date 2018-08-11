@@ -3,6 +3,7 @@ package fr.alchemy.core.asset;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -13,6 +14,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.asset.cache.AssetCache;
 import fr.alchemy.core.asset.cache.Cleanable;
 import javafx.scene.image.Image;
@@ -61,6 +64,22 @@ public class AssetManager {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Saves the specified {@link Exportable} to the provided binary file.
+	 * 
+	 * @param exportable The exportable instance to save.
+	 * @param path		 The path for the file on the disk.
+	 */
+	public void saveAsset(final Exportable exportable, final String path) {
+		final BinaryExporter exporter = BinaryExporter.getInstance();
+		
+		try (final OutputStream out = Files.newOutputStream(Paths.get(path))) {
+			exporter.export(exportable, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
 	}
 	
 	/**

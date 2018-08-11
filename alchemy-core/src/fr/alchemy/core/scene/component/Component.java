@@ -1,6 +1,11 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.utilities.ByteUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -10,7 +15,7 @@ import javafx.beans.property.SimpleBooleanProperty;
  * 
  * @author GnosticOccultist
  */
-public abstract class Component {
+public abstract class Component implements Exportable {
 	/**
 	 * The entity owning the component.
 	 */
@@ -97,5 +102,12 @@ public abstract class Component {
 	 */
 	public void disable() {
 		this.enabled.set(false);
+	}
+	
+	@Override
+	public void export(final OutputStream os) throws IOException {
+		os.write(ByteUtils.toBytes(getClass().getName()));
+		os.write(ByteUtils.toBytes("enabled"));
+		os.write(ByteUtils.toBytes(enabled.get()));
 	}
 }
