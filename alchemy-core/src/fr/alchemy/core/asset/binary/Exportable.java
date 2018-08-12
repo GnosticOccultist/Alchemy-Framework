@@ -15,7 +15,16 @@ public interface Exportable {
 	 * Exports the instance of the class implementing this interface into a file
 	 * of a specified format.
 	 * 
+	 * @param os			The output stream.
 	 * @throws IOException 
 	 */
 	void export(final OutputStream os) throws IOException;
+	
+	/**
+	 * Imports from a file an exportable assets which can be load into the application.
+	 * 
+	 * @param is			The input stream.
+	 * @throws IOException
+	 */
+	void insert(final BinaryReader reader) throws IOException;
 }

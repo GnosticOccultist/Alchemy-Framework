@@ -1,7 +1,12 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.utilities.ByteUtils;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
@@ -247,9 +252,57 @@ public final class Transform extends Component {
 		setScale(getScaleX() + x, getScaleY() + y);
 	}
 	
+	/**
+	 * Sets the values of this <code>Transform</code> to the provided one.
+	 * 
+	 * @param other The transform to get the values from.
+	 */
+	public void set(final Transform other) {
+		setPosition(other.getPosX(), other.getPosY());
+		setRotation(other.getRotation());
+		setScale(other.getScaleX(), other.getScaleY());
+	}
+	
 	@Override
 	public String toString() {
 		return "[" + getClass().getSimpleName() + "]: " + "posX: " + posX + " posY: " + posY +
 				" rotation: " + rotation + " scaleX: " + scaleX + " scaleY: " + scaleY;
+	}
+	
+	@Override
+	public void export(final OutputStream os) throws IOException {
+		super.export(os);
+		
+		os.write(ByteUtils.toBytes(getClass().getName().length()));
+		os.write(ByteUtils.toBytes(getClass().getName()));
+		
+		os.write(ByteUtils.toBytes("posX".length()));
+		os.write(ByteUtils.toBytes("posX"));
+		os.write(ByteUtils.toBytes(posX.get()));
+		
+		os.write(ByteUtils.toBytes("posY".length()));
+		os.write(ByteUtils.toBytes("posY"));
+		os.write(ByteUtils.toBytes(posY.get()));
+		
+		os.write(ByteUtils.toBytes("rotation".length()));
+		os.write(ByteUtils.toBytes("rotation"));
+		os.write(ByteUtils.toBytes(rotation.get()));
+		
+		os.write(ByteUtils.toBytes("scaleX".length()));
+		os.write(ByteUtils.toBytes("scaleX"));
+		os.write(ByteUtils.toBytes(scaleX.get()));
+		
+		os.write(ByteUtils.toBytes("scaleY".length()));
+		os.write(ByteUtils.toBytes("scaleY"));
+		os.write(ByteUtils.toBytes(scaleY.get()));
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		super.insert(reader);
+		
+		setPosition(reader.readDouble("posX"), reader.readDouble("posY"));
+		setRotation(reader.readDouble("rotation"));
+		setScale(reader.readDouble("scaleX"), reader.readDouble("scaleY"));
 	}
 }

@@ -1,10 +1,15 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.core.scene.entity.EntityView;
+import fr.alchemy.utilities.ByteUtils;
 import javafx.scene.Node;
 
 /**
@@ -61,6 +66,16 @@ public final class VisualComponent extends Component {
 		setSceneLayer(sceneLayer);
 	}
 	
+	@Override
+	public void enable() {
+		show();
+	}
+	
+	@Override
+	public void disable() {
+		hide();
+	}
+	
 	/**
 	 * Shows the <code>EntityView</code> and its graphic nodes.
 	 */
@@ -94,6 +109,21 @@ public final class VisualComponent extends Component {
 		}
 		
 		this.sceneLayer = sceneLayer;
+	}
+	
+	/**
+	 * @return The <code>EntityView</code>.
+	 */
+	public EntityView getView() {
+		return view;
+	}
+	
+	public void setView(final EntityView view) {
+		if(view == null) {
+			return;
+		}
+		
+		view.getNodes().setAll(view.getNodes());
 	}
 	
 	/**
@@ -172,6 +202,10 @@ public final class VisualComponent extends Component {
 		super.cleanup();
 	}
 	
+	public void refresh() {
+		bindView();
+	}
+	
 	/**
 	 * Binds the <code>EntityView</code> to the <code>Transform</code> component
 	 * of the <code>Entity</code>.
@@ -202,15 +236,30 @@ public final class VisualComponent extends Component {
 		getView().scaleYProperty().unbind();
 	}
 	
-	/**
-	 * @return The <code>EntityView</code>.
-	 */
-	public EntityView getView() {
-		return view;
+	public void set(final VisualComponent other) {
+		view.getNodes().setAll(other.view.getNodes());
+		sceneLayer = new SceneLayer(other.sceneLayer.name(), other.sceneLayer.index());
 	}
 	
 	@Override
 	public String toString() {
 		return "Visual: " + view + " Scene Layer: " + sceneLayer;
+	}
+	
+	@Override
+	public void export(final OutputStream os) throws IOException {
+		super.export(os);
+		os.write(ByteUtils.toBytes(getClass().getName().length()));
+		os.write(ByteUtils.toBytes(getClass().getName()));
+		
+		sceneLayer.export(os);
+		view.export(os);
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		super.insert(reader);
+		setSceneLayer(reader.readExportable(SceneLayer.class));
+		setView(reader.readExportable(EntityView.class));
 	}
 }

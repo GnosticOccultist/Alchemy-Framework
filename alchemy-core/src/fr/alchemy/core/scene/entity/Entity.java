@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.NameComponent;
@@ -168,6 +169,30 @@ public class Entity implements Exportable {
 	}
 	
 	/**
+	 * Performs an action with the specified type of <code>Component</code> if it exists for the
+	 * <code>Entity</code> and ignore if the component is enabled or disabled.
+	 * 
+	 * @param type	 The type of component to perform the action with.
+	 * @param action The action to perform.
+	 * @return		 Whether the action has been performed.
+	 */
+	public final <T extends Component> boolean forcePerform(Class<T> type, VoidAction<T> action) {
+		final T component = getComponent(type);
+		if(component != null) {
+			action.perform(component);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @return The enabled property of the <code>Entity</code>.
+	 */
+	public final BooleanProperty enabledProperty() {
+		return enabled;
+	}
+	
+	/**
 	 * @return Whether the <code>Entity</code> is enabled.
 	 */
 	public final boolean isEnabled() {
@@ -182,10 +207,6 @@ public class Entity implements Exportable {
 	 */
 	public final void setEnabled(final boolean enabled) {
 		this.enabled.set(enabled);
-		if(enabled)
-			components.stream().forEach(Component::enable);
-		else
-			components.stream().forEach(Component::disable);
 	}
 	
 	/**
@@ -220,15 +241,22 @@ public class Entity implements Exportable {
 
 	@Override
 	public void export(final OutputStream os) throws IOException {
+		os.write(ByteUtils.toBytes(getClass().getName().length()));
 		os.write(ByteUtils.toBytes(getClass().getName()));
+		os.write(ByteUtils.toBytes("enabled".length()));
 		os.write(ByteUtils.toBytes("enabled"));
 		os.write(ByteUtils.toBytes(enabled.get()));
-		
-		os.write(ByteUtils.toBytes("components"));
-		os.write(ByteUtils.toBytes(components.size()));
 		
 		for(Component component : components) {
 			component.export(os);
 		}
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		enabled.set(reader.readBoolean("enabled"));
+		getComponent(Transform.class).set(reader.readExportable(Transform.class));
+		getComponent(VisualComponent.class).set(reader.readExportable(VisualComponent.class));
+		perform(VisualComponent.class, v -> v.refresh());
 	}
 }

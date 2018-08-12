@@ -1,6 +1,15 @@
 package fr.alchemy.core.scene.entity;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.component.VisualComponent;
+import fr.alchemy.utilities.ByteUtils;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -14,7 +23,7 @@ import javafx.scene.shape.Circle;
  * 
  * @author Stickxy
  */
-public final class EntityView extends Parent {
+public final class EntityView extends Parent implements Exportable {
 	
 	/**
 	 * Instantiates an empty <code>EntityView</code>.
@@ -48,6 +57,17 @@ public final class EntityView extends Parent {
 		}
 		
 		getChildren().add(graphic);
+	}
+	
+	/**
+	 * Adds the specified graphic nodes to the <code>EntityView</code>.
+	 * 
+	 * @param observableList The graphic nodes to add.
+	 */
+	public void addNodes(final ObservableList<Node> observableList) {
+		for(Node graphic : observableList) {
+			addNode(graphic);
+		}
 	}
 	
 	/**
@@ -94,8 +114,36 @@ public final class EntityView extends Parent {
 		return getChildren();
 	}
 	
+	/**
+	 * @return The list of {@link Texture textures} used as graphical nodes.
+	 */
+	public List<Texture> getTextures() {
+		return getChildren().stream().filter(Texture.class::isInstance)
+				.map(Texture.class::cast).collect(Collectors.toList());
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
+	}
+
+	@Override
+	public void export(final OutputStream os) throws IOException {
+		os.write(ByteUtils.toBytes(getClass().getName().length()));
+		os.write(ByteUtils.toBytes(getClass().getName()));
+		
+		final List<Texture> textures = getTextures();
+		os.write(ByteUtils.toBytes(textures.size()));
+		for(int i = 0; i < textures.size(); i++) {
+			os.write(ByteUtils.toBytes(new String("texture_" + i).length()));
+			os.write(ByteUtils.toBytes(new String("texture_" + i)));
+			os.write(ByteUtils.toBytes(textures.get(i).getFile().length()));
+			os.write(ByteUtils.toBytes(textures.get(i).getFile()));
+		}
+	}
+
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		addNodes(reader.readTextures("texture"));
 	}
 }

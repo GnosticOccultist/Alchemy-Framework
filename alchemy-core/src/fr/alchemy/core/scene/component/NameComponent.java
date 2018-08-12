@@ -22,18 +22,17 @@ public class NameComponent extends Component {
 	private Label nameLabel = new Label();
 	
 	public NameComponent() {
-		this("Unkown");
+		this("Unknown");
 	}
 	
 	public NameComponent(final String name) {
-		this(name, true);
+		this(name, false);
 	}
 	
 	public NameComponent(final String name, final boolean visible) {
 		setName(name);
 		setVisible(visible);
 		this.nameLabel.setLayoutY(-20);
-		
 	}
 	
 	@Override
@@ -48,6 +47,16 @@ public class NameComponent extends Component {
 		detachLabel();
 		
 		super.onDetached(entity);
+	}
+	
+	@Override
+	public void enable() {
+		setVisible(true);
+	}
+	
+	@Override
+	public void disable() {
+		setVisible(false);
 	}
 	
 	/**

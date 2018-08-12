@@ -19,6 +19,8 @@ import javafx.scene.paint.Color;
  */
 public class Texture extends ImageView implements Cleanable {
 	
+	private final String file;
+	
 	/**
 	 * <strong>Internal use only!</strong>
 	 * <p>If you want to instantiates a new <code>Texture</code>, please
@@ -26,8 +28,9 @@ public class Texture extends ImageView implements Cleanable {
 	 * 
 	 * @param image The image.
 	 */
-	Texture(Image image) {
+	Texture(final Image image, final String file) {
 		super(image);
+		this.file = file;
 	}
 	
 	/**
@@ -85,7 +88,11 @@ public class Texture extends ImageView implements Cleanable {
 			}
 		}
 		
-		return new Texture(image);
+		return new Texture(image, file);
+	}
+
+	public String getFile() {
+		return file;
 	}
 	
 	/**
@@ -107,7 +114,7 @@ public class Texture extends ImageView implements Cleanable {
 	 * @return A copy of the <code>Texture</code>.
 	 */
 	public final Texture copy() {
-		final Texture texture = new Texture(getImage());
+		final Texture texture = new Texture(getImage(), file);
 		texture.setFitWidth(getFitWidth());
 		texture.setFitHeight(getFitHeight());
 		return texture;

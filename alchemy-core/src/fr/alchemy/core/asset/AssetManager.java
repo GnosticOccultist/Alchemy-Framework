@@ -73,13 +73,30 @@ public class AssetManager {
 	 * @param path		 The path for the file on the disk.
 	 */
 	public void saveAsset(final Exportable exportable, final String path) {
-		final BinaryExporter exporter = BinaryExporter.getInstance();
+		final BinaryExporter exporter = BinaryExporter.getInstance(this);
 		
 		try (final OutputStream out = Files.newOutputStream(Paths.get(path))) {
 			exporter.export(exportable, out);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
+	}
+	
+	/**
+	 * Saves the specified {@link Exportable} to the provided binary file.
+	 * 
+	 * @param exportable The exportable instance to save.
+	 * @param path		 The path for the file on the disk.
+	 */
+	public Exportable loadAsset(final String path) {
+		final BinaryExporter exporter = BinaryExporter.getInstance(this);
+		
+		try (final InputStream is = Files.newInputStream(Paths.get(path), StandardOpenOption.READ)) {
+			return exporter.insert(is, Paths.get(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		return null;
 	}
 	
 	/**
@@ -96,7 +113,7 @@ public class AssetManager {
 			return (Texture) asset;
 		}
 		
-		final Texture texture = new Texture(loadFXAsset(Image.class, name));
+		final Texture texture = new Texture(loadFXAsset(Image.class, name), name);
 		cache.cache(name, texture);
 		return texture;
 	}
@@ -116,7 +133,7 @@ public class AssetManager {
 		}
 		
 		final Image image = loadFXAsset(Image.class, name);
-		cache.cache(name, new Texture(image));
+		cache.cache(name, new Texture(image, name));
 		return image;
 	}
 	
