@@ -180,7 +180,7 @@ public final class BinaryWriter {
 			write(name + "_" + i, values.get(i));
 		}
 	}
-	
+
 	/**
 	 * Writes the name and the name's length to the {@link OutputStream}.
 	 * 

@@ -117,6 +117,6 @@ public abstract class Component implements Exportable {
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
-		enabled.set(reader.read("enabled", true));
+		enabled.set(reader.readBoolean("enabled", true));
 	}
 }

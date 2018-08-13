@@ -122,7 +122,7 @@ public final class VisualComponent extends Component {
 			return;
 		}
 		
-		view.getNodes().setAll(view.getNodes());
+		this.view.getNodes().setAll(view.getNodes());
 	}
 	
 	/**
@@ -257,9 +257,8 @@ public final class VisualComponent extends Component {
 	public void insert(final BinaryReader reader) throws IOException {
 		super.insert(reader);
 		
-		setSceneLayer(reader.read(SceneLayer.class, SceneLayer.DEFAULT));
-		setView(reader.read(EntityView.class, view));
-		
+		setSceneLayer(reader.readExportable(SceneLayer.class, SceneLayer.DEFAULT));
+		setView(reader.readExportable(EntityView.class, view));
 		// TODO: Store the constant scene layer if needed.
 	}
 }

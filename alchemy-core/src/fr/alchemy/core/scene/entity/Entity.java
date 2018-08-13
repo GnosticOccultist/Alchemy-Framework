@@ -249,9 +249,9 @@ public class Entity implements Exportable {
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
-		enabled.set(reader.read("enabled", true));
-		getComponent(Transform.class).set(reader.read(Transform.class, getComponent(Transform.class)));
-		getComponent(VisualComponent.class).set(reader.read(VisualComponent.class, getComponent(VisualComponent.class)));
-		perform(VisualComponent.class, v -> v.refresh());
+		enabled.set(reader.readBoolean("enabled", true));
+		
+		getComponent(Transform.class).set(reader.readExportable(Transform.class, getComponent(Transform.class)));
+		getComponent(VisualComponent.class).set(reader.readExportable(VisualComponent.class, getComponent(VisualComponent.class)));
 	}
 }

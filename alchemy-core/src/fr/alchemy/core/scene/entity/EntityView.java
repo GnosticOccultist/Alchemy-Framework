@@ -134,6 +134,7 @@ public final class EntityView extends Parent implements Exportable {
 
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
-		addNodes(reader.readArray("views", null));
+		final Texture[] textures = reader.readTextureArray("views", null);
+		addNodes(textures);
 	}
 }

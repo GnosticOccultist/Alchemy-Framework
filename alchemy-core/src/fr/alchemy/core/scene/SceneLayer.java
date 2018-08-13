@@ -106,7 +106,7 @@ public class SceneLayer implements Exportable {
 
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
-		name = reader.read("name", "undefined");
-		index = reader.read("index", SceneLayer.DEFAULT.index());
+		name = reader.readString("name", "undefined");
+		index = reader.readInteger("index", SceneLayer.DEFAULT.index());
 	}
 }

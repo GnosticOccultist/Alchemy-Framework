@@ -283,8 +283,8 @@ public final class Transform extends Component {
 	public void insert(final BinaryReader reader) throws IOException {
 		super.insert(reader);
 		
-		setPosition(reader.read("posX", 0), reader.read("posY", 0));
-		setRotation(reader.read("rotation", 0));
-		setScale(reader.read("scaleX", 1), reader.read("scaleY", 1));
+		setPosition(reader.readDouble("posX", 0), reader.readDouble("posY", 0));
+		setRotation(reader.readDouble("rotation", 0));
+		setScale(reader.readDouble("scaleX", 1), reader.readDouble("scaleY", 1));
 	}
 }

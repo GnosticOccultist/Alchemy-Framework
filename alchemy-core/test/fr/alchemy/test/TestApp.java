@@ -68,8 +68,8 @@ public class TestApp extends AlchemyApplication {
 			musicTest.play();
 		});	
 		
-		assetManager.saveAsset(entityTest, "C:/Users/Stickxy/Documents/Alexis/Jeux/AlchemyWorkspace/entity.ecs");
-		Entity clone = (Entity) assetManager.loadAsset("C:/Users/Stickxy/Documents/Alexis/Jeux/AlchemyWorkspace/entity.ecs");
+		assetManager.saveAsset(entityTest, "resources/entity/entity.ecs");
+		Entity clone = (Entity) assetManager.loadAsset("resources/entity/entity.ecs");
 
 		scene.addEntity(clone);
 	}
