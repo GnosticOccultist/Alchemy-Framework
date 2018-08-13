@@ -15,18 +15,21 @@ import fr.alchemy.utilities.ByteUtils;
  * 
  * @author GnosticOccultist
  */
-public final class BinaryExporter {
+public final class BinaryManager {
 	
 	public final AssetManager assetManager;
 	
 	/**
-	 * @return The single instance of the <code>BinaryExporter</code>.
+	 * Creates a new <code>BinaryManager</code> instance which is used to load binary asset file.
+	 * You should use the {@link AssetManager} and call {@link AssetManager#loadAsset(String)} to load 
+	 * a binary file or {@link AssetManager#saveAsset(Exportable, String)} to save an {@link Exportable} to a
+	 * binary file.
 	 */
-	public static BinaryExporter getInstance(final AssetManager assetManager) {
-		return new BinaryExporter(assetManager);
+	public static BinaryManager newManager(final AssetManager assetManager) {
+		return new BinaryManager(assetManager);
 	}
 	
-	private BinaryExporter(final AssetManager assetManager) {
+	private BinaryManager(final AssetManager assetManager) {
 		this.assetManager = assetManager;
 	}
 	
@@ -42,7 +45,8 @@ public final class BinaryExporter {
 		
 		// TODO: Add an header for the file and versioning.
 		
-		exportable.export(os);
+		final BinaryWriter writer = new BinaryWriter(this, os);
+		writer.write(exportable);
 	}
 	
 	/**
@@ -63,7 +67,7 @@ public final class BinaryExporter {
 		final String className = ByteUtils.readString(bytes, classLength, numBytes);
 		numBytes += classLength;
 	
-        final BinaryReader reader = new BinaryReader(this, is, bytes, numBytes);
+        final BinaryReader reader = new BinaryReader(this, bytes, numBytes);
 		Exportable obj = insertObject(className, reader);
         
 		return obj;
