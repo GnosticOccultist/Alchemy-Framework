@@ -1,12 +1,11 @@
 package fr.alchemy.core.scene.component;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.entity.Entity;
-import fr.alchemy.utilities.ByteUtils;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
@@ -270,39 +269,22 @@ public final class Transform extends Component {
 	}
 	
 	@Override
-	public void export(final OutputStream os) throws IOException {
-		super.export(os);
+	public void export(final BinaryWriter writer) throws IOException {
+		super.export(writer);
 		
-		os.write(ByteUtils.toBytes(getClass().getName().length()));
-		os.write(ByteUtils.toBytes(getClass().getName()));
-		
-		os.write(ByteUtils.toBytes("posX".length()));
-		os.write(ByteUtils.toBytes("posX"));
-		os.write(ByteUtils.toBytes(posX.get()));
-		
-		os.write(ByteUtils.toBytes("posY".length()));
-		os.write(ByteUtils.toBytes("posY"));
-		os.write(ByteUtils.toBytes(posY.get()));
-		
-		os.write(ByteUtils.toBytes("rotation".length()));
-		os.write(ByteUtils.toBytes("rotation"));
-		os.write(ByteUtils.toBytes(rotation.get()));
-		
-		os.write(ByteUtils.toBytes("scaleX".length()));
-		os.write(ByteUtils.toBytes("scaleX"));
-		os.write(ByteUtils.toBytes(scaleX.get()));
-		
-		os.write(ByteUtils.toBytes("scaleY".length()));
-		os.write(ByteUtils.toBytes("scaleY"));
-		os.write(ByteUtils.toBytes(scaleY.get()));
+		writer.write("posX", posX.get());
+		writer.write("posY", posY.get());
+		writer.write("rotation", rotation.get());
+		writer.write("scaleX", scaleX.get());
+		writer.write("scaleY", scaleY.get());
 	}
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
 		super.insert(reader);
 		
-		setPosition(reader.readDouble("posX"), reader.readDouble("posY"));
-		setRotation(reader.readDouble("rotation"));
-		setScale(reader.readDouble("scaleX"), reader.readDouble("scaleY"));
+		setPosition(reader.read("posX", 0), reader.read("posY", 0));
+		setRotation(reader.read("rotation", 0));
+		setScale(reader.read("scaleX", 1), reader.read("scaleY", 1));
 	}
 }

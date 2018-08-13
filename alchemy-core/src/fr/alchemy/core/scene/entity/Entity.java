@@ -1,20 +1,19 @@
 package fr.alchemy.core.scene.entity;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.SimpleObjectComponent;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
-import fr.alchemy.utilities.ByteUtils;
 import fr.alchemy.utilities.functions.VoidAction;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -240,23 +239,19 @@ public class Entity implements Exportable {
 	}
 
 	@Override
-	public void export(final OutputStream os) throws IOException {
-		os.write(ByteUtils.toBytes(getClass().getName().length()));
-		os.write(ByteUtils.toBytes(getClass().getName()));
-		os.write(ByteUtils.toBytes("enabled".length()));
-		os.write(ByteUtils.toBytes("enabled"));
-		os.write(ByteUtils.toBytes(enabled.get()));
+	public void export(final BinaryWriter writer) throws IOException {
+		writer.write("enabled", enabled.get());
 		
 		for(Component component : components) {
-			component.export(os);
+			writer.write(component);
 		}
 	}
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
-		enabled.set(reader.readBoolean("enabled"));
-		getComponent(Transform.class).set(reader.readExportable(Transform.class));
-		getComponent(VisualComponent.class).set(reader.readExportable(VisualComponent.class));
+		enabled.set(reader.read("enabled", true));
+		getComponent(Transform.class).set(reader.read(Transform.class, getComponent(Transform.class)));
+		getComponent(VisualComponent.class).set(reader.read(VisualComponent.class, getComponent(VisualComponent.class)));
 		perform(VisualComponent.class, v -> v.refresh());
 	}
 }

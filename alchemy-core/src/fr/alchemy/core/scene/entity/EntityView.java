@@ -1,15 +1,14 @@
 package fr.alchemy.core.scene.entity;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.component.VisualComponent;
-import fr.alchemy.utilities.ByteUtils;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -128,22 +127,13 @@ public final class EntityView extends Parent implements Exportable {
 	}
 
 	@Override
-	public void export(final OutputStream os) throws IOException {
-		os.write(ByteUtils.toBytes(getClass().getName().length()));
-		os.write(ByteUtils.toBytes(getClass().getName()));
-		
+	public void export(final BinaryWriter writer) throws IOException {
 		final List<Texture> textures = getTextures();
-		os.write(ByteUtils.toBytes(textures.size()));
-		for(int i = 0; i < textures.size(); i++) {
-			os.write(ByteUtils.toBytes(new String("texture_" + i).length()));
-			os.write(ByteUtils.toBytes(new String("texture_" + i)));
-			os.write(ByteUtils.toBytes(textures.get(i).getFile().length()));
-			os.write(ByteUtils.toBytes(textures.get(i).getFile()));
-		}
+		writer.write("views", textures);
 	}
 
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
-		addNodes(reader.readTextures("texture"));
+		addNodes(reader.readArray("views", null));
 	}
 }

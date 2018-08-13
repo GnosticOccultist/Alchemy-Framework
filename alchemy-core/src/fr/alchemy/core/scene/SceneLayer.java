@@ -1,12 +1,11 @@
 package fr.alchemy.core.scene;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
-import fr.alchemy.utilities.ByteUtils;
 
 /**
  * <code>SceneLayer</code> is a layer inside a scene used to group object for rendering.
@@ -100,23 +99,14 @@ public class SceneLayer implements Exportable {
 	}
 
 	@Override
-	public void export(final OutputStream os) throws IOException {
-		os.write(ByteUtils.toBytes(getClass().getName().length()));
-		os.write(ByteUtils.toBytes(getClass().getName()));
-		
-		os.write(ByteUtils.toBytes("name".length()));
-		os.write(ByteUtils.toBytes("name"));
-		os.write(ByteUtils.toBytes(name.length()));
-		os.write(ByteUtils.toBytes(name));
-		
-		os.write(ByteUtils.toBytes("index".length()));
-		os.write(ByteUtils.toBytes("index"));
-		os.write(ByteUtils.toBytes(index));
+	public void export(final BinaryWriter writer) throws IOException {
+		writer.write("name", name);
+		writer.write("index", index);
 	}
 
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
-		name = reader.readString("name");
-		index = reader.readInt("index");
+		name = reader.read("name", "undefined");
+		index = reader.read("index", SceneLayer.DEFAULT.index());
 	}
 }

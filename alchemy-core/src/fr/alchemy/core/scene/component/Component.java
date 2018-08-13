@@ -1,9 +1,9 @@
 package fr.alchemy.core.scene.component;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.beans.property.BooleanProperty;
@@ -111,11 +111,12 @@ public abstract class Component implements Exportable {
 	public void disable() {}
 	
 	@Override
-	public void export(final OutputStream os) throws IOException {
-		
+	public void export(final BinaryWriter writer) throws IOException {
+		writer.write("enabled", enabled.get());
 	}
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
+		enabled.set(reader.read("enabled", true));
 	}
 }

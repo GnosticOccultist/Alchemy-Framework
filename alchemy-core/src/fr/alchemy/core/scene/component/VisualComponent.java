@@ -1,15 +1,14 @@
 package fr.alchemy.core.scene.component;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.core.scene.entity.EntityView;
-import fr.alchemy.utilities.ByteUtils;
 import javafx.scene.Node;
 
 /**
@@ -247,22 +246,19 @@ public final class VisualComponent extends Component {
 	}
 	
 	@Override
-	public void export(final OutputStream os) throws IOException {
-		super.export(os);
-		
-		os.write(ByteUtils.toBytes(getClass().getName().length()));
-		os.write(ByteUtils.toBytes(getClass().getName()));
-		
-		sceneLayer.export(os);
-		view.export(os);
+	public void export(final BinaryWriter writer) throws IOException {
+		super.export(writer);
+	
+		writer.write(sceneLayer);
+		writer.write(view);
 	}
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
 		super.insert(reader);
 		
-		setSceneLayer(reader.readExportable(SceneLayer.class));
-		setView(reader.readExportable(EntityView.class));
+		setSceneLayer(reader.read(SceneLayer.class, SceneLayer.DEFAULT));
+		setView(reader.read(EntityView.class, view));
 		
 		// TODO: Store the constant scene layer if needed.
 	}
