@@ -249,6 +249,7 @@ public final class VisualComponent extends Component {
 	@Override
 	public void export(final OutputStream os) throws IOException {
 		super.export(os);
+		
 		os.write(ByteUtils.toBytes(getClass().getName().length()));
 		os.write(ByteUtils.toBytes(getClass().getName()));
 		
@@ -259,7 +260,10 @@ public final class VisualComponent extends Component {
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
 		super.insert(reader);
+		
 		setSceneLayer(reader.readExportable(SceneLayer.class));
 		setView(reader.readExportable(EntityView.class));
+		
+		// TODO: Store the constant scene layer if needed.
 	}
 }

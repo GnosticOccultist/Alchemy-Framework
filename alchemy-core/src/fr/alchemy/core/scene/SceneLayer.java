@@ -69,6 +69,31 @@ public class SceneLayer implements Exportable {
 		return index;
 	}
 	
+	/**
+	 * @return Whether the provided name and index equals to the <code>SceneLayer</code>.
+	 */
+	public boolean equals(final String name, final int index) {
+		if(name == this.name && index == this.index) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean equals(final Object o) {
+		if(this == o) {
+			return true;
+		}
+		if(o == null || !(o instanceof SceneLayer)) {
+			return false;
+		}
+		SceneLayer layer = (SceneLayer) o;
+		if(layer.name() == this.name && layer.index() == this.index) {
+			return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public String toString() {
 		return name + "[" + index + "]";
@@ -86,7 +111,7 @@ public class SceneLayer implements Exportable {
 		
 		os.write(ByteUtils.toBytes("index".length()));
 		os.write(ByteUtils.toBytes("index"));
-		os.write(ByteUtils.toBytes(name));
+		os.write(ByteUtils.toBytes(index));
 	}
 
 	@Override

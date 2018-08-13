@@ -28,10 +28,8 @@ public abstract class Component implements Exportable {
 	public Component() {
 		enabled.addListener((observable, oldValue, newValue) -> {
 			if(newValue == Boolean.TRUE) {
-				System.out.println(getClass().getSimpleName() + "true");
 				enable();
 			} else {
-				System.out.println( getClass().getSimpleName() + "false");
 				disable();
 			}
 		});

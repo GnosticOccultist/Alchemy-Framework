@@ -21,7 +21,7 @@ public final class BinaryReader {
 	}
 	
 	public boolean readBoolean(final String name) throws IOException {
-		final int classLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String fieldName = ByteUtils.readString(bytes, classLength, numBytes);
 		if(!name.equals(fieldName)) {
@@ -29,13 +29,13 @@ public final class BinaryReader {
 			return false;
 		}
 		numBytes += classLength;
-		final boolean value = ByteUtils.convertBooleanFromBytes(bytes, numBytes);
+		final boolean value = ByteUtils.readBoolean(bytes, numBytes);
 		numBytes += 1;
 		return value;
 	}
 	
 	public double readDouble(final String name) throws IOException {
-		final int classLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String fieldName = ByteUtils.readString(bytes, classLength, numBytes);
 		if(!name.equals(fieldName)) {
@@ -44,13 +44,13 @@ public final class BinaryReader {
 		}
 		
 		numBytes += classLength;
-		final long value = ByteUtils.convertLongFromBytes(bytes, numBytes);
+		final double value = ByteUtils.readDouble(bytes, numBytes);
 		numBytes += 8;
 		return value;
 	}
 	
 	public int readInt(final String name) throws IOException {
-		final int classLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String fieldName = ByteUtils.readString(bytes, classLength, numBytes);
 		if(!name.equals(fieldName)) {
@@ -59,13 +59,13 @@ public final class BinaryReader {
 		}
 		
 		numBytes += classLength;
-		final int value = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int value = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		return value;
 	}
 	
 	public String readString(final String name) throws IOException {
-		final int classLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String fieldName = ByteUtils.readString(bytes, classLength, numBytes);
 		if(!name.equals(fieldName)) {
@@ -74,7 +74,7 @@ public final class BinaryReader {
 		}
 		
 		numBytes += classLength;
-		final int stringLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int stringLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String string = ByteUtils.readString(bytes, stringLength, numBytes);
 		numBytes += stringLength;
@@ -83,7 +83,7 @@ public final class BinaryReader {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends Exportable> T readExportable(final Class<T> type) throws IOException {
-		final int classLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String className = ByteUtils.readString(bytes, classLength, numBytes);
 		if(!type.getName().equals(className)) {
@@ -96,7 +96,7 @@ public final class BinaryReader {
 	}
 	
 	public Texture readTexture(final String name) throws IOException {
-		final int classLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String fieldName = ByteUtils.readString(bytes, classLength, numBytes);
 		if(!name.equals(fieldName)) {
@@ -105,7 +105,7 @@ public final class BinaryReader {
 		}
 		
 		numBytes += classLength;
-		final int stringLength = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int stringLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String string = ByteUtils.readString(bytes, stringLength, numBytes);
 		numBytes += stringLength;
@@ -113,7 +113,7 @@ public final class BinaryReader {
 	}	
 	
 	public Texture[] readTextures(final String name) throws IOException {
-		final int size = ByteUtils.convertIntFromBytes(bytes, numBytes);
+		final int size = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		Texture[] textures = new Texture[size];
 		for(int i = 0; i < size; i++) {

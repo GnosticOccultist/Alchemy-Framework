@@ -56,12 +56,13 @@ public final class BinaryExporter {
 	public Exportable insert(final InputStream is, final Path path) throws IOException {
 		
 		// TODO: Add an header for the file and versioning.
-		final int classLength = ByteUtils.readInt(is);
-		final String className = ByteUtils.readString(is, classLength);
+		final byte[] bytes = Files.readAllBytes(path);
 		
-		int numBytes = 4 + classLength;
-        byte[] bytes = Files.readAllBytes(path);
-        
+		final int classLength = ByteUtils.readInteger(bytes, 0);
+		int numBytes = 4;
+		final String className = ByteUtils.readString(bytes, classLength, numBytes);
+		numBytes += classLength;
+	
         final BinaryReader reader = new BinaryReader(this, is, bytes, numBytes);
 		Exportable obj = insertObject(className, reader);
         
