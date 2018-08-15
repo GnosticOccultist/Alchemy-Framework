@@ -5,6 +5,10 @@ import java.io.InputStream;
 
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.scene.component.Component;
+import fr.alchemy.core.scene.component.Transform;
+import fr.alchemy.core.scene.component.VisualComponent;
+import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.utilities.ByteUtils;
 
 /**
@@ -182,18 +186,54 @@ public final class BinaryReader {
 	 * @return				The readed object value or the provided one.
 	 * @throws IOException
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends Exportable> T readExportable(final Class<T> type, final T defaultValue) throws IOException {
 		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String className = ByteUtils.readString(bytes, classLength, numBytes);
-		if(!type.getName().equals(className)) {
-			System.err.println(type.getName() + " doesn't match " + className + " . Please check if the class exists!");
-			return defaultValue;
-		}
 		numBytes += classLength;
-		final Exportable value = manager.insertObject(className, this);
-		return (T) value;
+		final T value = manager.insertObject(className, this);
+		return value;
+	}
+	
+	/**
+	 * Reads the bytes specified by the given name and turn it into an array of {@link Exportable}.
+	 * 
+	 * @param name			The name of the array of exportable.
+	 * @param defaultValue  The default array to return if reading fails.
+	 * @return				The readed array of textures or the provided one.
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends Exportable> T[] readExportableArray(final Class<T> type, final T[] defaultValue) throws IOException {
+		final int size = readInteger("size", 0);
+		final T[] exportables = (T[]) new Exportable[size];
+		for(int i = 0; i < size; i++) {
+			if(i + 1 < defaultValue.length) {
+				exportables[i] = readExportable(type, defaultValue[i]); 
+			} else {
+				exportables[i] = readExportable(type, null); 
+			}
+		}
+		return exportables;
+	}
+	
+	/**
+	 * Reads and attaches the {@link Component components} to the provided {@link Entity}.
+	 * 
+	 * @param entity The entity to attach the components to.
+	 * @throws IOException
+	 */
+	public void attachComponents(final Entity entity) throws IOException {
+		final Exportable[] components = readExportableArray(Exportable.class, new Exportable[] {new Transform(), new VisualComponent()});
+		entity.getComponent(Transform.class).set((Transform) components[0]);
+		entity.getComponent(VisualComponent.class).set((VisualComponent) components[1]);
+		
+		for(int i = 2; i < components.length; i++) {
+			if(components[i] instanceof Component) {
+				entity.attach((Component) components[i]);
+			}
+		}
+		
 	}
 	
 	/**
@@ -233,7 +273,7 @@ public final class BinaryReader {
 	 */
 	public Texture[] readTextureArray(final String name, final Texture defaultValue) throws IOException {
 		final int size = readInteger(name + "_size", 0);
-		Texture[] textures = new Texture[size];
+		final Texture[] textures = new Texture[size];
 		for(int i = 0; i < size; i++) {
 			textures[i] = readTexture(name + "_" + i, defaultValue); 
 		}

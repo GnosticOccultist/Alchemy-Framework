@@ -1,6 +1,6 @@
 package fr.alchemy.core.asset;
 
-import fr.alchemy.core.asset.cache.Cleanable;
+import fr.alchemy.core.asset.cache.Asset;
 import javafx.scene.media.AudioClip;
 
 /**
@@ -9,7 +9,7 @@ import javafx.scene.media.AudioClip;
  * 
  * @author GnosticOccultist
  */
-public final class Sound implements Cleanable {
+public final class Sound implements Asset {
 	/**
 	 * The audio accessing the sound.
 	 */

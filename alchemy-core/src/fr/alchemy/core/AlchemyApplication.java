@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.input.InputManager;
-import fr.alchemy.core.listener.ApplicationListener;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.util.NanoTimer;
 import fr.alchemy.utilities.collections.Array;

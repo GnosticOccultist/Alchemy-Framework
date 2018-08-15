@@ -71,6 +71,7 @@ public class TestApp extends AlchemyApplication {
 		assetManager.saveAsset(entityTest, "resources/entity/entity.ecs");
 		Entity clone = (Entity) assetManager.loadAsset("resources/entity/entity.ecs");
 
+		clone.getComponent(Transform.class).setPosition(0, 50);
 		scene.addEntity(clone);
 	}
 

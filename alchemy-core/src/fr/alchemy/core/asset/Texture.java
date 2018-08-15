@@ -1,6 +1,6 @@
 package fr.alchemy.core.asset;
 
-import fr.alchemy.core.asset.cache.Cleanable;
+import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.utilities.functions.ModifierAction;
 import javafx.scene.image.Image;
@@ -17,9 +17,18 @@ import javafx.scene.paint.Color;
  * 
  * @author GnosticOccultist
  */
-public class Texture extends ImageView implements Cleanable {
+public class Texture extends ImageView implements Asset {
 	
-	private final String file;
+	private String file;
+	
+	/**
+	 * <strong>Internal use only!</strong>
+	 * <p>If you want to instantiates a new <code>Texture</code>, please
+	 * use {@link AssetManager#loadTexture(String)}.
+	 */
+	Texture() {
+		this(null, "undefined");
+	}
 	
 	/**
 	 * <strong>Internal use only!</strong>
@@ -105,6 +114,7 @@ public class Texture extends ImageView implements Cleanable {
 		setFitWidth(other.getFitWidth());
 		setFitHeight(other.getFitHeight());
 		setImage(other.getImage());
+		file = new String(other.file);
 	}
 	
 	/**
@@ -117,6 +127,7 @@ public class Texture extends ImageView implements Cleanable {
 		final Texture texture = new Texture(getImage(), file);
 		texture.setFitWidth(getFitWidth());
 		texture.setFitHeight(getFitHeight());
+		texture.file = new String(file);
 		return texture;
 	}
 

@@ -1,5 +1,9 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Paint;
@@ -126,5 +130,17 @@ public class NameComponent extends Component {
 			return name.equals((String) obj);
 		}
 		return false;
+	}
+	
+	@Override
+	public void export(final BinaryWriter writer) throws IOException {
+		super.export(writer);
+		writer.write("name", name);
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		super.insert(reader);
+		setName(reader.readString("name", "Unknown"));
 	}
 }

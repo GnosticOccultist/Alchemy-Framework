@@ -148,6 +148,20 @@ public final class BinaryWriter {
 	}
 	
 	/**
+	 * Writes the provided {@link Exportable} array.
+	 *
+	 * @param values The texture array to write.
+	 * @throws IOException
+	 */
+	public void write(final List<? extends Exportable> values) throws IOException {
+		write("size", values.size());
+		
+		for(int i = 0; i < values.size(); i++) {
+			write(values.get(i));
+		}
+	}
+	
+	/**
 	 * Writes the provided {@link Texture} path and its class name into a byte array.
 	 * 
 	 * @param name 	The name of the texture.

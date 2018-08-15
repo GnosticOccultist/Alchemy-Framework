@@ -241,17 +241,12 @@ public class Entity implements Exportable {
 	@Override
 	public void export(final BinaryWriter writer) throws IOException {
 		writer.write("enabled", enabled.get());
-		
-		for(Component component : components) {
-			writer.write(component);
-		}
+		writer.write(components);
 	}
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
 		enabled.set(reader.readBoolean("enabled", true));
-		
-		getComponent(Transform.class).set(reader.readExportable(Transform.class, getComponent(Transform.class)));
-		getComponent(VisualComponent.class).set(reader.readExportable(VisualComponent.class, getComponent(VisualComponent.class)));
+		reader.attachComponents(this);
 	}
 }

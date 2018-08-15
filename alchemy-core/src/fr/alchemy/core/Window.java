@@ -1,6 +1,5 @@
 package fr.alchemy.core;
 
-import fr.alchemy.core.listener.ApplicationListener;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 

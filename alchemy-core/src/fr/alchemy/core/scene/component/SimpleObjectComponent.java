@@ -12,7 +12,9 @@ public class SimpleObjectComponent<T> extends Component {
 	/**
 	 * The object defining the component.
 	 */
-	private final T object;
+	private T object;
+	
+	public SimpleObjectComponent() {}
 	
 	public SimpleObjectComponent(final T object) {
 		this.object = object;

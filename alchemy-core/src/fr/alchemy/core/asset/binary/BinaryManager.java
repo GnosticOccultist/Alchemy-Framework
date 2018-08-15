@@ -57,7 +57,7 @@ public final class BinaryManager {
 	 * @param os		   The output stream.
 	 * @throws IOException Thrown if an exception occured when writing to the file.
 	 */
-	public Exportable insert(final InputStream is, final Path path) throws IOException {
+	public <T extends Exportable> T insert(final InputStream is, final Path path) throws IOException {
 		
 		// TODO: Add an header for the file and versioning.
 		final byte[] bytes = Files.readAllBytes(path);
@@ -68,13 +68,13 @@ public final class BinaryManager {
 		numBytes += classLength;
 	
         final BinaryReader reader = new BinaryReader(this, bytes, numBytes);
-		Exportable obj = insertObject(className, reader);
+		T obj = insertObject(className, reader);
         
 		return obj;
 	}
 	
-	public Exportable insertObject(final String className, final BinaryReader reader) throws IOException {
-		Exportable obj = null;
+	public <T extends Exportable> T insertObject(final String className, final BinaryReader reader) throws IOException {
+		T obj = null;
 	
 		try {
 			obj = createFromName(className);
@@ -89,9 +89,10 @@ public final class BinaryManager {
 		return obj;
 	}
 	
-	public static Exportable createFromName(final String className) throws ReflectiveOperationException {
+	@SuppressWarnings("unchecked")
+	public static <T extends Exportable> T createFromName(final String className) throws ReflectiveOperationException {
 		try {
-			return (Exportable) Class.forName(className).newInstance();
+			return (T) Class.forName(className).newInstance();
 		} catch (InstantiationException e) {
 			System.err.println("Error: Couldn't access constructor for the class: " + className + "! " + e.getMessage());
 			throw e;

@@ -1,6 +1,6 @@
 package fr.alchemy.core.asset;
 
-import fr.alchemy.core.asset.cache.Cleanable;
+import fr.alchemy.core.asset.cache.Asset;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
@@ -12,7 +12,7 @@ import javafx.util.Duration;
  * 
  * @author GnosticOccultist
  */
-public final class Music implements Cleanable {
+public final class Music implements Asset {
 	/**
 	 * The media player accessing the sound.
 	 */
