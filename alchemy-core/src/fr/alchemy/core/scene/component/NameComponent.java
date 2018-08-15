@@ -5,8 +5,8 @@ import java.io.IOException;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.core.util.Color;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Paint;
 
 /**
  * <code>NameComponent</code> allows the <code>Entity</code> to own a name 
@@ -113,7 +113,7 @@ public class NameComponent extends Component {
 	 * 
 	 * @param color The color for the name.
 	 */
-	public void setColor(final Paint color) {
+	public void setColor(final javafx.scene.paint.Color color) {
 		nameLabel.setTextFill(color);
 	}
 	
@@ -135,12 +135,18 @@ public class NameComponent extends Component {
 	@Override
 	public void export(final BinaryWriter writer) throws IOException {
 		super.export(writer);
-		writer.write("name", name);
+		
+		writer.write("name", name);	
+		final Color color = Color.from((javafx.scene.paint.Color) nameLabel.getTextFill());
+		writer.write(color);
 	}
 	
 	@Override
 	public void insert(final BinaryReader reader) throws IOException {
 		super.insert(reader);
+		
 		setName(reader.readString("name", "Unknown"));
+		final Color color = reader.readExportable(Color.class, new Color(1, 1, 1));
+		setColor(color.toFXColor());
 	}
 }

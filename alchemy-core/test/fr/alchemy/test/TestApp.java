@@ -44,7 +44,6 @@ public class TestApp extends AlchemyApplication {
 		
 		entityTest.attach(new NameComponent("Test"));
 		entityTest.getComponent(NameComponent.class).setColor(Color.RED);
-	
 		
 		Entity entity = new Entity();
 		Circle circle = new Circle(20, 20, 25);
@@ -55,8 +54,6 @@ public class TestApp extends AlchemyApplication {
 		scene.addEntity(entityTest);
 		
 		AlchemyExecutor.executor().scheduleAtFixedRate(() -> System.out.println("ok"), 5000);
-		
-		
 		
 		circ = new BoundingCircle(20, 20, 25);
 		entityTest.attach(new SimpleObjectComponent<BoundingCircle>(circ));

@@ -228,12 +228,9 @@ public final class BinaryReader {
 		entity.getComponent(Transform.class).set((Transform) components[0]);
 		entity.getComponent(VisualComponent.class).set((VisualComponent) components[1]);
 		
-		for(int i = 2; i < components.length; i++) {
-			if(components[i] instanceof Component) {
-				entity.attach((Component) components[i]);
-			}
+		for(int i = 2; i < components.length; i++) {	
+			entity.attach((Component) components[i]);	
 		}
-		
 	}
 	
 	/**
