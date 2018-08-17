@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.utilities.ByteUtils;
 
 /**
@@ -27,6 +28,36 @@ public final class BinaryWriter {
 	public BinaryWriter(final BinaryManager ex, final OutputStream os) {
 		this.manager = ex;
 		this.os = os;
+	}
+	
+	/**
+	 * Writes the provided object value and its name if the <code>BinaryWriter</code> can
+	 * into a byte array.
+	 * 
+	 * @param name	The name of the value.
+	 * @param value The object value to write.
+	 * @throws IOException
+	 */
+	public void write(final String name, final Object value) throws IOException {
+		if(value instanceof Boolean) {
+			write(name, (Boolean) value);
+		} else if(value instanceof Integer) {
+			write(name, (Integer) value);
+		} else if(value instanceof Float) {
+			write(name, (Float) value);
+		} else if(value instanceof Long) {
+			write(name, (Long) value);
+		} else if(value instanceof Double) {
+			write(name, (Double) value);
+		} else if(value instanceof String) {
+			write(name, (String) value);
+		} else if(value instanceof Exportable) {
+			write(name, (Exportable) value);
+		} else if(value instanceof Asset) {
+			write(name, (Asset) value);
+		} else {
+			System.err.println("Unable to write the specified value type: " + value.getClass().getName());
+		}
 	}
 	
 	/**
@@ -168,7 +199,7 @@ public final class BinaryWriter {
 	 * @param value The texture to write the path from.
 	 * @throws IOException
 	 */
-	public void write(final String name, final Texture value) throws IOException {
+	public void write(final String name, final Asset value) throws IOException {
 		if(value == null) {
 			throw new IOException("Name for '" + value + "' cannot be null or empty!");
 		}

@@ -14,9 +14,14 @@ public final class Sound implements Asset {
 	 * The audio accessing the sound.
 	 */
 	private AudioClip audio;
+	/**
+	 * The file's path of the sound.
+	 */
+	private String file;
 	
-	Sound(final AudioClip audio) {
+	Sound(final AudioClip audio, final String file) {
 		this.audio = audio;
+		this.file = file;
 	}
 	
 	/**
@@ -67,10 +72,16 @@ public final class Sound implements Asset {
 	public void stop() {
 		this.audio.stop();
 	}
+	
+	@Override
+	public String getFile() {
+		return file;
+	}
 
 	@Override
 	public void cleanup() {
 		stop();
 		audio = null;
+		file = null;
 	}
 }

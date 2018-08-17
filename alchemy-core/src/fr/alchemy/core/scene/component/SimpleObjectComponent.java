@@ -1,5 +1,9 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.entity.Entity;
 
 /**
@@ -30,5 +34,15 @@ public class SimpleObjectComponent<T> extends Component {
 	@Override
 	public String toString() {
 		return "Object: " + object;
+	}
+	
+	@Override
+	public void export(final BinaryWriter writer) throws IOException {
+		super.export(writer);
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		super.insert(reader);
 	}
 }

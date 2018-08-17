@@ -9,6 +9,11 @@ package fr.alchemy.core.asset.cache;
 public interface Asset {
 	
 	/**
+	 * @return The file path of the asset.
+	 */
+	String getFile();
+	
+	/**
 	 * Clean the object when no longer needed or to be resetted.
 	 */
 	void cleanup();

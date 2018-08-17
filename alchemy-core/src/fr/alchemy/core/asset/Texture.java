@@ -19,6 +19,9 @@ import javafx.scene.paint.Color;
  */
 public class Texture extends ImageView implements Asset {
 	
+	/**
+	 * The file's path of the texture.
+	 */
 	private String file;
 	
 	/**
@@ -134,5 +137,6 @@ public class Texture extends ImageView implements Asset {
 	@Override
 	public void cleanup() {
 		setImage(null);
+		file = null;
 	}
 }

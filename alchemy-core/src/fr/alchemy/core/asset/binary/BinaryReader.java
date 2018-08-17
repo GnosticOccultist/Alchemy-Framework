@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.Transform;
 import fr.alchemy.core.scene.component.VisualComponent;
@@ -37,6 +38,37 @@ public final class BinaryReader {
 		this.manager = ex;
 		this.bytes = bytes;
 		this.numBytes = numBytes;
+	}
+	
+	/**
+	 * Reads the byte specified by the given name and turn it into a boolean.
+	 * 
+	 * @param name			The name of the boolean value.
+	 * @param defaultValue  The default boolean value to return if reading fails.
+	 * @return				The readed boolean value or the provided one.
+	 * @throws IOException
+	 */
+	public Object read(final String name, final Object defaultValue) throws IOException {
+		if(defaultValue instanceof Boolean) {
+			return readBoolean(name, (Boolean) defaultValue);
+		} else if(defaultValue instanceof Integer) {
+			return readInteger(name, (Integer) defaultValue);
+		} else if(defaultValue instanceof Float) {
+			return readFloat(name, (Float) defaultValue);
+		} else if(defaultValue instanceof Long) {
+			return readLong(name, (Long) defaultValue);
+		} else if(defaultValue instanceof Double) {
+			return readDouble(name, (Double) defaultValue);
+		} else if(defaultValue instanceof String) {
+			return readString(name, (String) defaultValue);
+		} else if(defaultValue instanceof Exportable) {
+			return read(name, (Exportable) defaultValue);
+		} else if(defaultValue instanceof Asset) {
+			return readAsset(name, (Asset) defaultValue);
+		}
+		
+		System.err.println("Unable to write the specified value type: " + defaultValue.getClass().getName());
+		return null;
 	}
 	
 	/**
@@ -242,7 +274,7 @@ public final class BinaryReader {
 	 * @return				The readed texture value or the provided one.
 	 * @throws IOException
 	 */
-	public Texture readTexture(final String name, final Texture defaultValue) throws IOException {
+	public Asset readAsset(final String name, final Asset defaultValue) throws IOException {
 		final int classLength = ByteUtils.readInteger(bytes, numBytes);
 		numBytes += 4;
 		final String fieldName = ByteUtils.readString(bytes, classLength, numBytes);
@@ -268,11 +300,11 @@ public final class BinaryReader {
 	 * @return				The readed array of textures or the provided one.
 	 * @throws IOException
 	 */
-	public Texture[] readTextureArray(final String name, final Texture defaultValue) throws IOException {
+	public Asset[] readAssetArray(final String name, final Asset defaultValue) throws IOException {
 		final int size = readInteger(name + "_size", 0);
-		final Texture[] textures = new Texture[size];
+		final Asset[] textures = new Asset[size];
 		for(int i = 0; i < size; i++) {
-			textures[i] = readTexture(name + "_" + i, defaultValue); 
+			textures[i] = readAsset(name + "_" + i, defaultValue); 
 		}
 		return textures;
 	}

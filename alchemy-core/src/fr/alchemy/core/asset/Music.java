@@ -16,15 +16,20 @@ public final class Music implements Asset {
 	/**
 	 * The media player accessing the sound.
 	 */
-	private final MediaPlayer player;
+	private MediaPlayer player;
+	/**
+	 * The file's path of the music.
+	 */
+	private String file;
 	
-	Music(final Media media) {
-		this(media, false);
+	Music(final Media media, final String file) {
+		this(media, file, false);
 	}
 	
-	Music(final Media media, final boolean autoPlay) {
+	Music(final Media media, final String file, final boolean autoPlay) {
 		this.player = new MediaPlayer(media);
 		this.player.setAutoPlay(autoPlay);
+		this.file = file;
 	}
 	
 	/**
@@ -115,6 +120,11 @@ public final class Music implements Asset {
 		return player.getStatus();
 	}
 	
+	@Override
+	public String getFile() {
+		return file;
+	}
+	
 	/**
 	 * Cleanup the <code>Music</code> by disposing the {@link MediaPlayer}
 	 */
@@ -126,5 +136,7 @@ public final class Music implements Asset {
 		}
 		stop();
 		player.dispose();
+		player = null;
+		file = null;
 	}
 }

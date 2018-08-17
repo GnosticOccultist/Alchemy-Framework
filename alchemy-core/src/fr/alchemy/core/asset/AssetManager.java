@@ -173,7 +173,7 @@ public class AssetManager {
 			return (Sound) asset;
 		}
 		
-		final Sound sound = new Sound(loadFXAsset(AudioClip.class, name));
+		final Sound sound = new Sound(loadFXAsset(AudioClip.class, name), name);
 		cache.cache(name, sound);
 		return sound;
 	}
@@ -194,7 +194,7 @@ public class AssetManager {
 			return (Music) asset;
 		}
 		
-		final Music music = new Music(loadFXAsset(Media.class, name));
+		final Music music = new Music(loadFXAsset(Media.class, name), name);
 		cache.cache(name, music);
 		return music;
 	}
