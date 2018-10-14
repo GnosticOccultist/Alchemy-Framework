@@ -38,8 +38,12 @@ public class TestApp extends AlchemyApplication {
 		Texture texture = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
 		
 		entityTest = new Entity();
-		entityTest.perform(VisualComponent.class, v -> v.getView().addNode(texture));
+		
+		entityTest.forcePerform(VisualComponent.class, v -> v.getView().addNode(texture));
 		entityTest.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Test", 20));
+		
+		entityTest.attach(new NameComponent("Test"));
+		entityTest.getComponent(NameComponent.class).setColor(Color.RED);
 		
 		Entity entity = new Entity();
 		Circle circle = new Circle(20, 20, 25);
@@ -47,9 +51,6 @@ public class TestApp extends AlchemyApplication {
 		entity.perform(VisualComponent.class, v -> v.getView().addNode(circle));
 		entity.getComponent(VisualComponent.class).setSceneLayer(SceneLayer.TOP);
 		
-		entityTest.attach(new NameComponent("Test"));
-		entityTest.getComponent(NameComponent.class).setColor(Color.RED);
-		scene.addEntity(entity);
 		scene.addEntity(entityTest);
 		
 		AlchemyExecutor.executor().scheduleAtFixedRate(() -> System.out.println("ok"), 5000);
@@ -57,12 +58,18 @@ public class TestApp extends AlchemyApplication {
 		circ = new BoundingCircle(20, 20, 25);
 		entityTest.attach(new SimpleObjectComponent<BoundingCircle>(circ));
 		
-		inputManager.addKeyTypedBinding(KeyCode.N, () -> scene.removeEntity(entity));
+		inputManager.addKeyTypedBinding(KeyCode.N, () -> entityTest.setEnabled(true));
 		
 		AlchemyExecutor.executor().performOnBackground(() -> {
 			musicTest.setCycleCount(Integer.MAX_VALUE);
 			musicTest.play();
 		});	
+		
+		assetManager.saveAsset(entityTest, "resources/entity/entity.ecs");
+		Entity clone = (Entity) assetManager.loadAsset("resources/entity/entity.ecs");
+
+		clone.getComponent(Transform.class).setPosition(0, 50);
+		scene.addEntity(clone);
 	}
 
 	@Override

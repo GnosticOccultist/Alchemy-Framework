@@ -20,7 +20,7 @@ public final class AssetCache {
 	/**
 	 * The table containing the assets classed by path.
 	 */
-	private final Map<Path, Cleanable> cache = new HashMap<Path, Cleanable>();
+	private final Map<Path, Asset> cache = new HashMap<Path, Asset>();
 	
 	/**
 	 * Caches the specified asset with its path as the key.
@@ -29,7 +29,7 @@ public final class AssetCache {
 	 * @param asset The asset to cache.
 	 * @return		The previously associated value to the key or null.
 	 */
-	public Cleanable cache(final String path, final Cleanable asset) {
+	public Asset cache(final String path, final Asset asset) {
 		return cache.put(Paths.get(path), asset);
 	}
 	
@@ -40,7 +40,7 @@ public final class AssetCache {
 	 * @param asset The asset to cache.
 	 * @return		The previously associated value to the key or null.
 	 */
-	public Cleanable cache(final Path path, final Cleanable asset) {
+	public Asset cache(final Path path, final Asset asset) {
 		return cache.put(path, asset);
 	}
 	
@@ -51,7 +51,7 @@ public final class AssetCache {
 	 * @param path The path to use as the key.
 	 * @return	   The asset from the cache.
 	 */
-	public Cleanable acquire(final String path) {
+	public Asset acquire(final String path) {
 		return cache.get(Paths.get(path));
 	}
 	
@@ -62,7 +62,7 @@ public final class AssetCache {
 	 * @param path The path to use as the key.
 	 * @return	   The asset from the cache.
 	 */
-	public Cleanable acquire(final Path path) {
+	public Asset acquire(final Path path) {
 		return cache.get(path);
 	}
 	
@@ -95,7 +95,7 @@ public final class AssetCache {
 	 * @param asset The asset to remove.
 	 * @return 		The previously mapped key to the path.
 	 */
-	public boolean uncache(final Path path, final Cleanable asset) {
+	public boolean uncache(final Path path, final Asset asset) {
 		return cache.remove(path, asset);
 	}
 	
@@ -103,7 +103,7 @@ public final class AssetCache {
 	 * Cleanup the assets and clears the cache from its content.
 	 */
 	public void clear() {
-		cache.values().forEach(Cleanable::cleanup);
+		cache.values().forEach(Asset::cleanup);
 		cache.clear();
 	}
 }

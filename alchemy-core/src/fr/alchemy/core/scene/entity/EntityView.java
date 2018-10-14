@@ -1,5 +1,14 @@
 package fr.alchemy.core.scene.entity;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
+import fr.alchemy.core.asset.binary.Exportable;
+import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.scene.component.VisualComponent;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -14,7 +23,7 @@ import javafx.scene.shape.Circle;
  * 
  * @author Stickxy
  */
-public final class EntityView extends Parent {
+public final class EntityView extends Parent implements Exportable {
 	
 	/**
 	 * Instantiates an empty <code>EntityView</code>.
@@ -48,6 +57,17 @@ public final class EntityView extends Parent {
 		}
 		
 		getChildren().add(graphic);
+	}
+	
+	/**
+	 * Adds the specified graphic nodes to the <code>EntityView</code>.
+	 * 
+	 * @param observableList The graphic nodes to add.
+	 */
+	public void addNodes(final ObservableList<Node> observableList) {
+		for(Node graphic : observableList) {
+			addNode(graphic);
+		}
 	}
 	
 	/**
@@ -94,8 +114,32 @@ public final class EntityView extends Parent {
 		return getChildren();
 	}
 	
+	/**
+	 * @return The list of {@link Texture textures} used as graphical nodes.
+	 */
+	public List<Texture> getTextures() {
+		return getChildren().stream().filter(Texture.class::isInstance)
+				.map(Texture.class::cast).collect(Collectors.toList());
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
+	}
+
+	@Override
+	public void export(final BinaryWriter writer) throws IOException {
+		final List<Texture> textures = getTextures();
+		writer.write("views", textures);
+	}
+
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		final Asset[] assets = reader.readAssetArray("views", null);
+		for(int i = 0; i < assets.length; i++) {
+			if(assets[i] instanceof Texture) {
+				addNodes((Texture) assets[i]);
+			}
+		}
 	}
 }

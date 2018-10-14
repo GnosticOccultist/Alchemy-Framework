@@ -1,5 +1,10 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
+import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -10,7 +15,7 @@ import javafx.beans.property.SimpleBooleanProperty;
  * 
  * @author GnosticOccultist
  */
-public abstract class Component {
+public abstract class Component implements Exportable {
 	/**
 	 * The entity owning the component.
 	 */
@@ -19,6 +24,16 @@ public abstract class Component {
 	 * Whether the component is enabled.
 	 */
 	private final BooleanProperty enabled = new SimpleBooleanProperty(false);
+
+	public Component() {
+		enabled.addListener((observable, oldValue, newValue) -> {
+			if(newValue == Boolean.TRUE) {
+				enable();
+			} else {
+				disable();
+			}
+		});
+	}
 	
 	/**
 	 * Updates the component. The function is called when the entity updates itself, if
@@ -39,8 +54,8 @@ public abstract class Component {
 	 */
 	public void onAttached(final Entity entity) {
 		setOwner(entity);
-		enable();
-	}
+		enabled.bind(getOwner().enabledProperty());
+	}	
 	
 	/**
 	 * This method is called whenever the component is detached from an <code>Entity</code>.
@@ -52,8 +67,8 @@ public abstract class Component {
 	 * @param entity The entity from which the component was detached.
 	 */
 	public void onDetached(final Entity entity) {
+		enabled.unbind();
 		setOwner(null);
-		disable();
 	}
 	
 	/**
@@ -86,16 +101,22 @@ public abstract class Component {
 	}
 
 	/**
-	 * Enables the component.
+	 * Called when the component is enabled.
 	 */
-	public void enable() {
-		this.enabled.set(true);
-	}
+	public void enable() {}
 	
 	/**
-	 * Disables the component.
+	 * Called when the component is disabled.
 	 */
-	public void disable() {
-		this.enabled.set(false);
+	public void disable() {}
+	
+	@Override
+	public void export(final BinaryWriter writer) throws IOException {
+		writer.write("enabled", enabled.get());
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		enabled.set(reader.readBoolean("enabled", true));
 	}
 }

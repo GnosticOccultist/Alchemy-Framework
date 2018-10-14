@@ -3,6 +3,7 @@ package fr.alchemy.core.asset;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -13,8 +14,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.alchemy.core.asset.binary.BinaryManager;
+import fr.alchemy.core.asset.binary.Exportable;
+import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.asset.cache.AssetCache;
-import fr.alchemy.core.asset.cache.Cleanable;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
@@ -49,7 +52,7 @@ public class AssetManager {
 	 */
 	public <A> A loadFXAsset(final Class<A> type, final String name) {
 		try {
-			final InputStream is = openStream(name);
+			final InputStream is = openInStream(name);
 			if(is != null) {
 				return type.getConstructor(InputStream.class).newInstance(is);
 			}
@@ -64,6 +67,39 @@ public class AssetManager {
 	}
 	
 	/**
+	 * Saves the specified {@link Exportable} to the provided binary file.
+	 * 
+	 * @param exportable The exportable instance to save.
+	 * @param path		 The path for the file on the disk.
+	 */
+	public void saveAsset(final Exportable exportable, final String path) {
+		final BinaryManager exporter = BinaryManager.newManager(this);
+		
+		try (final OutputStream out = openOutStream(path)) {
+			exporter.export(exportable, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	/**
+	 * Loads an {@link Exportable} value stored into the provided binary file.
+	 * 
+	 * @param exportable The exportable instance to save.
+	 * @param path		 The path for the file on the disk.
+	 */
+	public Exportable loadAsset(final String path) {
+		final BinaryManager importer = BinaryManager.newManager(this);
+		
+		try (final InputStream is = Files.newInputStream(Paths.get(locateInternal(path).getPath().substring(1)), StandardOpenOption.READ)) {
+			return importer.insert(is, Paths.get(locateInternal(path).getPath().substring(1)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		return null;
+	}
+	
+	/**
 	 * Loads a <code>Texture</code> from the specified file name.
 	 * It will search the asset internally and in every specified root folders.
 	 * If the asset isn't found it will return null.
@@ -72,12 +108,12 @@ public class AssetManager {
 	 * @return	   The texture object or null if not found.
 	 */
 	public Texture loadTexture(final String name) {
-		final Cleanable asset = cache.acquire(name);
+		final Asset asset = cache.acquire(name);
 		if(asset != null && asset instanceof Texture) {
-			return (Texture) asset;
+			return ((Texture) asset).copy();
 		}
 		
-		final Texture texture = new Texture(loadFXAsset(Image.class, name));
+		final Texture texture = new Texture(loadFXAsset(Image.class, name), name);
 		cache.cache(name, texture);
 		return texture;
 	}
@@ -91,13 +127,13 @@ public class AssetManager {
 	 * @return	   The image object or null if not found.
 	 */
 	public Image loadImage(final String name) {
-		final Cleanable asset = cache.acquire(name);
+		final Asset asset = cache.acquire(name);
 		if(asset != null && asset instanceof Texture) {
 			return ((Texture) asset).getImage();
 		}
 		
 		final Image image = loadFXAsset(Image.class, name);
-		cache.cache(name, new Texture(image));
+		cache.cache(name, new Texture(image, name));
 		return image;
 	}
 	
@@ -111,7 +147,7 @@ public class AssetManager {
 	 */
 	public ImageView loadIcon(final String name) {
 		try {
-			final InputStream is = openStream(name);
+			final InputStream is = openInStream(name);
 			if(is != null) {
 				return new ImageView(new Image(is, 16, 16, false, true));
 			}
@@ -132,12 +168,12 @@ public class AssetManager {
 	 * @return	   The loaded sound or null if not found.
 	 */
 	public Sound loadSound(final String name) {
-		final Cleanable asset = cache.acquire(name);
+		final Asset asset = cache.acquire(name);
 		if(asset != null && asset instanceof Sound) {
 			return (Sound) asset;
 		}
 		
-		final Sound sound = new Sound(loadFXAsset(AudioClip.class, name));
+		final Sound sound = new Sound(loadFXAsset(AudioClip.class, name), name);
 		cache.cache(name, sound);
 		return sound;
 	}
@@ -153,12 +189,12 @@ public class AssetManager {
 	 * @return	   The loaded sound or null if not found.
 	 */
 	public Music loadMusic(final String name) {
-		final Cleanable asset = cache.acquire(name);
+		final Asset asset = cache.acquire(name);
 		if(asset != null && asset instanceof Music) {
 			return (Music) asset;
 		}
 		
-		final Music music = new Music(loadFXAsset(Media.class, name));
+		final Music music = new Music(loadFXAsset(Media.class, name), name);
 		cache.cache(name, music);
 		return music;
 	}
@@ -183,16 +219,25 @@ public class AssetManager {
 		roots.add(Paths.get(root));
 	}
 	
-	private InputStream openStream(String name) throws IOException {
-		InputStream is = openStreamFromRoot(name);
+	private InputStream openInStream(String name) throws IOException {
+		InputStream is = openInStreamFromRoot(name);
 		if(is != null) {
 			return is;
 		} 
-		is = openStreamInternal(name);
+		is = openInStreamInternal(name);
 		return is;
 	}
 	
-	private InputStream openStreamInternal(String name) throws IOException {
+	private OutputStream openOutStream(String name) throws IOException {
+		OutputStream os = openOutStreamFromRoot(name);
+		if(os != null) {
+			return os;
+		} 
+		os = openOutStreamInternal(name);
+		return os;
+	}
+	
+	private InputStream openInStreamInternal(String name) throws IOException {
 		final URL url = locateInternal(name);
 		if(url != null) {
 			final URLConnection connection = url.openConnection();
@@ -202,7 +247,12 @@ public class AssetManager {
 		return null;
 	}
 	
-	private InputStream openStreamFromRoot(String name) throws IOException {
+	private OutputStream openOutStreamInternal(String name) throws IOException {
+		final URL url = locateInternal(name);
+		return Files.newOutputStream(Paths.get(url.getPath().substring(1)));	
+	}
+	
+	private InputStream openInStreamFromRoot(String name) throws IOException {
 		if(roots.isEmpty()) {
 			return null;
 		}
@@ -211,6 +261,20 @@ public class AssetManager {
 			final Path resolve = roots.get(i).resolve(name);
 			if(Files.exists(resolve)) {
 				return Files.newInputStream(resolve, StandardOpenOption.READ);		
+			}
+		}
+		return null;
+	}
+	
+	private OutputStream openOutStreamFromRoot(String name) throws IOException {
+		if(roots.isEmpty()) {
+			return null;
+		}
+		
+		for(int i = 0; i < roots.size(); i++) {
+			final Path resolve = roots.get(i).resolve(name);
+			if(Files.exists(resolve)) {
+				return Files.newOutputStream(resolve);		
 			}
 		}
 		return null;

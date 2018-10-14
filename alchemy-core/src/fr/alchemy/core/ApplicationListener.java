@@ -1,4 +1,4 @@
-package fr.alchemy.core.listener;
+package fr.alchemy.core;
 
 /**
  * <code>ApplicationListener</code> is an interface to represent a listener called

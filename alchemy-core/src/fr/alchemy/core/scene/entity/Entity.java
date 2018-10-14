@@ -1,10 +1,14 @@
 package fr.alchemy.core.scene.entity;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
+import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.component.Component;
 import fr.alchemy.core.scene.component.NameComponent;
 import fr.alchemy.core.scene.component.SimpleObjectComponent;
@@ -24,7 +28,7 @@ import javafx.beans.property.SimpleBooleanProperty;
  * 
  * @author GnosticOccultist
  */
-public class Entity {
+public class Entity implements Exportable {
 	
 	/**
 	 * The list of components defining the entity.
@@ -164,6 +168,30 @@ public class Entity {
 	}
 	
 	/**
+	 * Performs an action with the specified type of <code>Component</code> if it exists for the
+	 * <code>Entity</code> and ignore if the component is enabled or disabled.
+	 * 
+	 * @param type	 The type of component to perform the action with.
+	 * @param action The action to perform.
+	 * @return		 Whether the action has been performed.
+	 */
+	public final <T extends Component> boolean forcePerform(Class<T> type, VoidAction<T> action) {
+		final T component = getComponent(type);
+		if(component != null) {
+			action.perform(component);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * @return The enabled property of the <code>Entity</code>.
+	 */
+	public final BooleanProperty enabledProperty() {
+		return enabled;
+	}
+	
+	/**
 	 * @return Whether the <code>Entity</code> is enabled.
 	 */
 	public final boolean isEnabled() {
@@ -178,10 +206,6 @@ public class Entity {
 	 */
 	public final void setEnabled(final boolean enabled) {
 		this.enabled.set(enabled);
-		if(enabled)
-			components.stream().forEach(Component::enable);
-		else
-			components.stream().forEach(Component::disable);
 	}
 	
 	/**
@@ -212,5 +236,17 @@ public class Entity {
 		sb.append("Entity: ");
 		components.forEach(c -> sb.append(c.toString() + "\n"));
 		return sb.toString();
+	}
+
+	@Override
+	public void export(final BinaryWriter writer) throws IOException {
+		writer.write("enabled", enabled.get());
+		writer.write(components);
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		enabled.set(reader.readBoolean("enabled", true));
+		reader.attachComponents(this);
 	}
 }

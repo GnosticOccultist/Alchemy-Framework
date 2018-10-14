@@ -1,8 +1,12 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.core.util.Color;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Paint;
 
 /**
  * <code>NameComponent</code> allows the <code>Entity</code> to own a name 
@@ -22,18 +26,17 @@ public class NameComponent extends Component {
 	private Label nameLabel = new Label();
 	
 	public NameComponent() {
-		this("Unkown");
+		this("Unknown");
 	}
 	
 	public NameComponent(final String name) {
-		this(name, true);
+		this(name, false);
 	}
 	
 	public NameComponent(final String name, final boolean visible) {
 		setName(name);
 		setVisible(visible);
 		this.nameLabel.setLayoutY(-20);
-		
 	}
 	
 	@Override
@@ -48,6 +51,16 @@ public class NameComponent extends Component {
 		detachLabel();
 		
 		super.onDetached(entity);
+	}
+	
+	@Override
+	public void enable() {
+		setVisible(true);
+	}
+	
+	@Override
+	public void disable() {
+		setVisible(false);
 	}
 	
 	/**
@@ -100,7 +113,7 @@ public class NameComponent extends Component {
 	 * 
 	 * @param color The color for the name.
 	 */
-	public void setColor(final Paint color) {
+	public void setColor(final javafx.scene.paint.Color color) {
 		nameLabel.setTextFill(color);
 	}
 	
@@ -117,5 +130,23 @@ public class NameComponent extends Component {
 			return name.equals((String) obj);
 		}
 		return false;
+	}
+	
+	@Override
+	public void export(final BinaryWriter writer) throws IOException {
+		super.export(writer);
+		
+		writer.write("name", name);	
+		final Color color = Color.from((javafx.scene.paint.Color) nameLabel.getTextFill());
+		writer.write(color);
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		super.insert(reader);
+		
+		setName(reader.readString("name", "Unknown"));
+		final Color color = reader.readExportable(Color.class, new Color(1, 1, 1));
+		setColor(color.toFXColor());
 	}
 }

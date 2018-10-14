@@ -1,6 +1,10 @@
 package fr.alchemy.core.scene.component;
 
+import java.io.IOException;
+
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.binary.BinaryReader;
+import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.entity.Entity;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -247,9 +251,40 @@ public final class Transform extends Component {
 		setScale(getScaleX() + x, getScaleY() + y);
 	}
 	
+	/**
+	 * Sets the values of this <code>Transform</code> to the provided one.
+	 * 
+	 * @param other The transform to get the values from.
+	 */
+	public void set(final Transform other) {
+		setPosition(other.getPosX(), other.getPosY());
+		setRotation(other.getRotation());
+		setScale(other.getScaleX(), other.getScaleY());
+	}
+	
 	@Override
 	public String toString() {
 		return "[" + getClass().getSimpleName() + "]: " + "posX: " + posX + " posY: " + posY +
 				" rotation: " + rotation + " scaleX: " + scaleX + " scaleY: " + scaleY;
+	}
+	
+	@Override
+	public void export(final BinaryWriter writer) throws IOException {
+		super.export(writer);
+		
+		writer.write("posX", posX.get());
+		writer.write("posY", posY.get());
+		writer.write("rotation", rotation.get());
+		writer.write("scaleX", scaleX.get());
+		writer.write("scaleY", scaleY.get());
+	}
+	
+	@Override
+	public void insert(final BinaryReader reader) throws IOException {
+		super.insert(reader);
+		
+		setPosition(reader.readDouble("posX", 0), reader.readDouble("posY", 0));
+		setRotation(reader.readDouble("rotation", 0));
+		setScale(reader.readDouble("scaleX", 1), reader.readDouble("scaleY", 1));
 	}
 }
