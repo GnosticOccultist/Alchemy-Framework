@@ -88,6 +88,18 @@ public class Array<E> implements Collection<E> {
 		return (E[]) newArray;
     }
     
+    public E first() {
+    	return isEmpty() ? null : get(0);
+    }
+    
+    public E get(int index) {
+        if (index < 0 || index >= size()) {
+            throw new NoSuchElementException();
+        }
+        
+        return array[index];
+    }
+    
 	@Override
 	public boolean addAll(Collection<? extends E> objects) {
         if (objects.isEmpty()) {
