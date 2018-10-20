@@ -84,6 +84,12 @@ public final class Validator {
 		return value;
 	}
 	
+	/**
+	 * Validate a non-null and non-empty string as a method argument.
+	 * 
+	 * @param value	  					The value to validate (not null or empty)
+	 * @throws IllegalArgumentException If the value is null or empty.
+	 */
 	public static String nonEmpty(String value) {
 		nonNull(value);
 		
@@ -94,6 +100,13 @@ public final class Validator {
 		return value;
 	}
 	
+	/**
+	 * Validate a non-null and non-empty string as a method argument.
+	 * 
+	 * @param value	  					The value to validate (not null or empty)
+	 * @param message 					The message to be thrown with the exception.
+	 * @throws IllegalArgumentException If the value is null or empty, with the specified message.
+	 */
 	public static String nonEmpty(String value, String message) {
 		nonNull(value);
 		
@@ -104,6 +117,12 @@ public final class Validator {
 		return value;
 	}
 	
+	/**
+	 * Validate a non-null and non-empty array as a method argument.
+	 * 
+	 * @param value	  					The value to validate (not null or empty)
+	 * @throws IllegalArgumentException If the value is null or empty.
+	 */
 	public static <T> T[] nonEmpty(T[] value) {
 		nonNull(value);
 		
@@ -114,6 +133,13 @@ public final class Validator {
 		return value;
 	}
 	
+	/**
+	 * Validate a non-null and non-empty array as a method argument.
+	 * 
+	 * @param value	  					The value to validate (not null or empty)
+	 * @param message 					The message to be thrown with the exception.
+	 * @throws IllegalArgumentException If the value is null or empty, with the specified message.
+	 */
 	public static <T> T[] nonEmpty(T[] value, String message) {
 		nonNull(value, message);
 		
@@ -181,12 +207,24 @@ public final class Validator {
 		}
 	}
 	
+	/**
+	 * Validate a positive single-precision value as a method argument.
+	 * 
+	 * @param value   The value to validate (&gt;0).
+	 * @throws IllegalArgumentException If the value isn't positive.
+	 */
 	public static void positive(float value) {
 		if(!(value > 0f)) {
 			throw new IllegalArgumentException();
 		}
 	}
 	
+	/**
+	 * Validate a positive integer value as a method argument.
+	 * 
+	 * @param value   The value to validate (&gt;0).
+	 * @throws IllegalArgumentException If the value isn't positive.
+	 */
 	public static void positive(int value) {
 		if(!(value > 0)) {
 			throw new IllegalArgumentException();

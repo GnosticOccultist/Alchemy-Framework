@@ -35,7 +35,10 @@ public class TestApp extends AlchemyApplication {
 
 	@Override
 	protected void initialize() {
+		
 		Texture texture = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
+		
+		scene.setBackgroundRepeat(texture.getImage());
 		
 		entityTest = new Entity();
 		

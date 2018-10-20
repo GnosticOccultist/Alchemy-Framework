@@ -2,7 +2,9 @@ package fr.alchemy.core.scene;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.event.AlchemyEventManager;
@@ -13,8 +15,11 @@ import fr.alchemy.core.scene.entity.EntityView;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.paint.Color;
 
 /**
@@ -25,6 +30,10 @@ import javafx.scene.paint.Color;
  */
 public class AlchemyScene extends AbstractScene {
 
+	/**
+	 * The set containing all the scene layers.
+	 */
+	protected Set<SceneLayer> layers = new HashSet<SceneLayer>();
 	/**
 	 * The root for all the entities.
 	 */
@@ -82,6 +91,11 @@ public class AlchemyScene extends AbstractScene {
 		final EntityView view = entity.getComponent(VisualComponent.class).getView();
 		getRenderBatch(layer).getChildren().remove(view);
 		
+		if(getRenderBatch(layer).getChildren().isEmpty()) {
+			sceneRoot.getChildren().remove(getRenderBatch(layer));
+			layers.remove(layer);
+		}
+		
 		AlchemyEventManager.events().notify(AlchemySceneEvent.entityRemoved(entity));
 	}
 	
@@ -124,8 +138,18 @@ public class AlchemyScene extends AbstractScene {
 		getFXScene().setFill(color);
 		getRoot().setBackground(new Background(new BackgroundFill(color, null, null)));
 	}
+
+	/**
+	 * Repeats the provided image to be used as a background.
+	 * 
+	 * @param image The image to use as a background.
+	 */
+    public void setBackgroundRepeat(Image image) {
+        getRoot().setBackground(new Background(new BackgroundImage(image,
+                BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, null, null)));
+    }
 	
-	private Group getRenderBatch(final SceneLayer layer) {
+	protected Group getRenderBatch(final SceneLayer layer) {
 		Integer sceneLayer = layer.index();
 		
 		Group batch = null;
@@ -140,6 +164,7 @@ public class AlchemyScene extends AbstractScene {
 		if(batch == null) {
 			batch = new Group();
 			batch.setUserData(sceneLayer);
+			layers.add(layer);
 			sceneRoot.getChildren().add(batch);
 		}
 		
@@ -149,6 +174,10 @@ public class AlchemyScene extends AbstractScene {
 		sceneRoot.getChildren().setAll(tmpBatches);
 		
 		return batch;
+	}
+	
+	public Set<SceneLayer> getRenderLayers() {
+		return layers;
 	}
 	
 	/**

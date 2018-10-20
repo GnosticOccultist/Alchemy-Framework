@@ -6,6 +6,8 @@ import fr.alchemy.core.asset.Texture;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  * <code>SceneLayer</code> is a layer inside a scene used to group object for rendering.
@@ -39,6 +41,10 @@ public class SceneLayer implements Exportable {
 	 * The index of the layer.
 	 */
 	private int index;
+	/**
+	 * The visible property of the layer.
+	 */
+	private DoubleProperty visibility;
 	
 	/**
 	 * Internal use only for serialization.
@@ -52,9 +58,12 @@ public class SceneLayer implements Exportable {
 	public SceneLayer(final String name, final int index) {
 		this.name = name;
 		this.index = index;
+		this.visibility = new SimpleDoubleProperty(1.0D);
 	}
 	
 	/**
+	 * Return the name of the layer.
+	 * 
 	 * @return The name of the layer.
 	 */
 	public String name() {
@@ -62,10 +71,30 @@ public class SceneLayer implements Exportable {
 	}
 	
 	/**
-	 * @return The index value for the layer.
+	 * Return the index value of the layer.
+	 * 
+	 * @return The index value.
 	 */
 	public int index() {
 		return index;
+	}
+	
+	/**
+	 * Return the visibility property of the layer.
+	 * 
+	 * @return The visibility property.
+	 */
+	public DoubleProperty visibilityProperty() {
+		return visibility;
+	}
+	
+	/**
+	 * Return the layer visibility.
+	 * 
+	 * @return The layer visibility (0 &ge; visibility &le; 1).
+	 */
+	public double visibility() {
+		return visibility.get();
 	}
 	
 	/**

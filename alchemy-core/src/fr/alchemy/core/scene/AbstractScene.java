@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.utilities.Validator;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -78,6 +79,8 @@ public abstract class AbstractScene {
 	private double sizeRatio = 1.0;
 	
 	public AbstractScene(final AlchemyApplication application) {
+		Validator.nonNull(application);
+		
 		this.application = application;
 	}
 	

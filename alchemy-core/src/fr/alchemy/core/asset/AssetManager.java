@@ -19,7 +19,6 @@ import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.asset.cache.AssetCache;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 
@@ -145,11 +144,11 @@ public class AssetManager {
 	 * @param name The name of the image file.
 	 * @return	   The image object or null if not found.
 	 */
-	public ImageView loadIcon(final String name) {
+	public Image loadIcon(final String name) {
 		try {
 			final InputStream is = openInStream(name);
 			if(is != null) {
-				return new ImageView(new Image(is, 16, 16, false, true));
+				return new Image(is, 16, 16, false, true);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
