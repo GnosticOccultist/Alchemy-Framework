@@ -1,5 +1,6 @@
 package fr.alchemy.core.executor;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,11 +113,13 @@ public final class AlchemyExecutor {
 	 */
 	public void registerExecutor(final Class<? extends AlchemyTaskExecutor> type) {
 		try {
-			this.executorsMap.put(type, new AlchemyTaskExecutor[] {type.newInstance()});
+			this.executorsMap.put(type, new AlchemyTaskExecutor[] {type.getDeclaredConstructor().newInstance()});
 			logger().info("Registered a new executor: " + type.getSimpleName() + ".");
-		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			logger().error(e.getMessage(), e);
 		}
+		
 	}
 	
 	/**

@@ -145,9 +145,22 @@ public abstract class AlchemyApplication extends Application {
 		loop.start();
 	}
 	
+	/**
+	 * Called automatically when the close is requested. If you want to add an exiting task, use
+	 * {@link AlchemyApplication#registerListener(ApplicationListener)} to register an {@link ApplicationListener#exit()}
+	 * <p>
+	 * You can however call the method to manually quit the application.
+	 */
 	@Override
 	public final void stop() throws Exception {
 		super.stop();
+		
+		logger().info("Closing " + getClass().getSimpleName() + "...");
+		
+		listeners.perform(ApplicationListener::exit);	
+		AlchemyExecutor.executor().shutdown();
+		
+		logger().info("Closed " + getClass().getSimpleName() + " successfully!");
 	}
 	
 	/**
@@ -157,13 +170,7 @@ public abstract class AlchemyApplication extends Application {
 	 * You can however call the method to manually quit the application.
 	 */
 	public final void exit() {
-		logger().info("Closing " + getClass().getSimpleName() + "...");
-		
-		listeners.perform(ApplicationListener::exit);	
-		AlchemyExecutor.executor().shutdown();
 		Platform.exit();
-		
-		logger().info("Closed " + getClass().getSimpleName() + " successfully!");
 	}
 	
 	/**

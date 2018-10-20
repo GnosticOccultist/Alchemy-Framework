@@ -92,7 +92,7 @@ public final class BinaryManager {
 	@SuppressWarnings("unchecked")
 	public static <T extends Exportable> T createFromName(final String className) throws ReflectiveOperationException {
 		try {
-			return (T) Class.forName(className).newInstance();
+			return (T) Class.forName(className).getDeclaredConstructor().newInstance();
 		} catch (InstantiationException e) {
 			System.err.println("Error: Couldn't access constructor for the class: " + className + "! " + e.getMessage());
 			throw e;
