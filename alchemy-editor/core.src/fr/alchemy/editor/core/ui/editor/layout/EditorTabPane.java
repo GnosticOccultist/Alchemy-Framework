@@ -2,6 +2,7 @@ package fr.alchemy.editor.core.ui.editor.layout;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.api.editor.layout.EditorLayout;
+import fr.alchemy.editor.core.config.EditorConfig;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
@@ -30,16 +31,17 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 		if(component instanceof Pane) {
 			Pane pane = (Pane) component;
 			tab.setContent(pane);
-			tab.setOnCloseRequest(e -> components.remove(component));
+			tab.setOnCloseRequest(e -> detach(component));
 			pane.prefHeightProperty().bind(heightProperty());
 		}
 	
+		EditorConfig.config().addOpenedComponent(component.getClass().getName());
 		components.add(component);
 		getContent().getTabs().add(tab);
 		
 		return this;
 	}
-	
+
 	@Override
 	protected TabPane createLayout() {
 		return new TabPane();

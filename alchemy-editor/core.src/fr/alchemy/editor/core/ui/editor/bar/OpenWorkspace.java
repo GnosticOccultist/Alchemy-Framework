@@ -56,13 +56,6 @@ public class OpenWorkspace extends MenuItem {
 	 */
 	private void openWorkspace(Path workspace) {
 		EditorConfig config = EditorConfig.config();
-		Path currentWorkspace = config.getCurrentWorkspace();
-		
-		// TODO: Store the opened components in the config and check if the
-		// workspace one is opened. If not force the event.
-//		if(workspace.equals(currentWorkspace)) {
-//			return;
-//		}
 		
 		config.setCurrentWorkspace(workspace);
 		config.save();

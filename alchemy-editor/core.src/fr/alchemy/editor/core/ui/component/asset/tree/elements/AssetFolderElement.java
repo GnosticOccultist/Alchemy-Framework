@@ -62,7 +62,7 @@ public class AssetFolderElement extends AssetFileElement {
 		} catch (AccessDeniedException e) {
 			return false;
 		} catch (IOException e) {
-			EditorManager.editor().logger().error(e.getMessage(), e);
+			EditorManager.logger().error(e.getMessage(), e);
 		}
 		
 		return false;
@@ -104,7 +104,7 @@ public class AssetFolderElement extends AssetFileElement {
 			}
 			
 		} catch (IOException e) {
-			EditorManager.editor().logger().error(e.getMessage(), e);
+			EditorManager.logger().error(e.getMessage(), e);
 		}
 		
 		return elements;

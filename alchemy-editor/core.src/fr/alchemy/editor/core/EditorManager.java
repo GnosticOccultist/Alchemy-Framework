@@ -50,6 +50,15 @@ public class EditorManager {
 	}
 	
 	/**
+	 * Return the logger used by the editor.
+	 * 
+	 * @return The editor's logger.
+	 */
+	public static Logger logger() {
+		return editor().logger;
+	}
+	
+	/**
 	 * The asset manager used by the editor.
 	 */
 	private final AssetManager assetManager;
@@ -82,14 +91,5 @@ public class EditorManager {
 	 */
 	public AssetManager assetManager() {
 		return assetManager;
-	}
-	
-	/**
-	 * Return the logger used by the editor.
-	 * 
-	 * @return The editor's logger.
-	 */
-	public Logger logger() {
-		return logger;
 	}
 }

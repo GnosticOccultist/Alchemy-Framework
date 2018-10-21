@@ -1,14 +1,19 @@
 package fr.alchemy.editor.core.config;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.AlchemyEditor;
+import fr.alchemy.utilities.ByteUtils;
 
 /**
  * <code>EditorConfig</code> contains the configuration of the Alchemy Editor.
@@ -43,6 +48,7 @@ public class EditorConfig {
         return instance;
 	}
 	
+	private final List<String> openedComponents = new ArrayList<>();
 	/**
 	 * The currently used workspace folder.
 	 */
@@ -62,6 +68,13 @@ public class EditorConfig {
 	 */
 	private void initialize() {
 		currentWorkspace = get(PREF_CURRENT_WORKSPACE, null);
+		
+		byte[] byteArray = preferences().getByteArray(PREF_EDITOR_COMPONENTS, null);
+		if(byteArray == null) {
+			return;
+		}
+		
+		openedComponents.addAll(ByteUtils.deserialize(byteArray));
 	}
 	
 	/**
@@ -69,6 +82,9 @@ public class EditorConfig {
 	 */
 	public synchronized void save() {
 		put(PREF_CURRENT_WORKSPACE, currentWorkspace);
+		
+		preferences().putByteArray(PREF_EDITOR_COMPONENTS,
+                ByteUtils.serialize((Serializable) openedComponents));
 		
         try {
             preferences().flush();
@@ -150,5 +166,34 @@ public class EditorConfig {
 	 */
 	public void setCurrentWorkspace(Path currentWorkspace) {
 		this.currentWorkspace = currentWorkspace;
+	}
+	
+	/**
+	 * Return the opened {@link EditorComponent} class name.
+	 * 
+	 * @return The array of component's class name.
+	 */
+	public synchronized List<String> getOpenedComponents() {
+		return openedComponents;
+	}
+	
+	/**
+	 * Add an opened {@link EditorComponent} class name.
+	 * 
+	 * @param component The class name of the component.
+	 * @return 			The updated config.
+	 */
+	public void addOpenedComponent(String component) {
+		openedComponents.add(component);
+	}
+	
+	/**
+	 * Removes an opened {@link EditorComponent} class name.
+	 * 
+	 * @param component The class name of the component.
+	 * @return 			The updated config.
+	 */
+	public void removeOpenedComponent(String component) {
+		openedComponents.remove(component);
 	}
 }

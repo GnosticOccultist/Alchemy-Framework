@@ -1,6 +1,11 @@
 package fr.alchemy.utilities;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * <code>ByteUtils</code> provides utilities functions concerning byte format, mainly
@@ -196,5 +201,37 @@ public class ByteUtils {
         	+ ((((long) bytes[offset + 1]) & 0xFF) << 48) 
         	+ ((((long) bytes[offset + 0]) & 0xFF) << 56));
         return bits;
+    }
+   
+    
+    public static byte[] serialize(Serializable object) {
+
+    	ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
+        try (ObjectOutputStream out = new ObjectOutputStream(bout)) {
+            out.writeObject(object);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bout.toByteArray();
+    }
+
+    /**
+     * Convert the byte array to an object.
+     * 
+     * @param bytes The byte array.
+     * @return 		The result object.
+     */
+    @SuppressWarnings("unchecked")
+	public static <T> T deserialize(byte[] bytes) {
+
+    	ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+
+        try (ObjectInputStream in = new ObjectInputStream(bin)) {
+            return (T) in.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

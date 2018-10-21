@@ -35,6 +35,11 @@ public class AlchemyEditor extends AlchemyApplication  {
 	@Override
 	protected void update() {}
 	
+	@Override
+	public AlchemyEditorScene getScene() {
+		return (AlchemyEditorScene) scene;
+	}
+	
 	/**
 	 * Setup the <code>ApplicationListener</code> for the <code>AlchemyEditor</code>
 	 * 
@@ -45,6 +50,7 @@ public class AlchemyEditor extends AlchemyApplication  {
 		
 			@Override
 			public void exit() {
+				getScene().getTabPane().save();
 				EditorConfig.config().save();
 			}
 		};
