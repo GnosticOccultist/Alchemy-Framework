@@ -1,5 +1,8 @@
 package fr.alchemy.editor.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.alchemy.core.asset.AssetManager;
 import javafx.scene.image.Image;
 
@@ -10,6 +13,11 @@ import javafx.scene.image.Image;
  * @author GnosticOccultist
  */
 public class EditorManager {
+	
+	/**
+	 * The editor logger.
+	 */
+	private Logger logger = LoggerFactory.getLogger("alchemy.editor");
 	
 	/**
 	 * The single-instance of the editor manager.
@@ -74,5 +82,14 @@ public class EditorManager {
 	 */
 	public AssetManager assetManager() {
 		return assetManager;
+	}
+	
+	/**
+	 * Return the logger used by the editor.
+	 * 
+	 * @return The editor's logger.
+	 */
+	public Logger logger() {
+		return logger;
 	}
 }

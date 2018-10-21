@@ -3,6 +3,9 @@ package fr.alchemy.utilities.file;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
 
 import fr.alchemy.utilities.Validator;
 
@@ -31,6 +34,22 @@ public final class FileUtils {
         } else {
             return path.substring(index + 1).toLowerCase();
         }
+	}
+	
+	/**
+	 * Return the potential extension of the file, or
+	 * an empty string if null.
+	 * 
+	 * @param path The path of the file to get the extension.
+	 * @return	   The file's extension.
+	 */
+	public static String getExtension(Path path) {
+		
+		if(Files.isDirectory(path)) {
+			return "";
+		}
+		
+		return getExtension(Objects.toString(path.getFileName()));
 	}
 	
 	/**

@@ -5,7 +5,6 @@ import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
-import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.component.scene.LayerHierarchyComponent;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
@@ -64,12 +63,11 @@ public class AlchemyEditorScene extends AlchemyScene {
 		entity2.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Special", 100));
 		addEntity(entity2);
 		
-		tabPane.attach(new WorkspaceComponent());
 		tabPane.attach(new LayerHierarchyComponent(this).fillWithScene());
-		tabPane.prefHeightProperty().bind(root.heightProperty());
-		tabPane.setSide(Side.LEFT);
+		tabPane.getContent().prefHeightProperty().bind(root.heightProperty());
+		tabPane.getContent().setSide(Side.LEFT);
 
-		container.getItems().addAll(new VBox(tabPane), getContentRoot());
+		container.getItems().addAll(new VBox(tabPane.getContent()), getContentRoot());
 		container.prefHeightProperty().bind(root.heightProperty());
 		container.prefWidthProperty().bind(root.widthProperty());
 		

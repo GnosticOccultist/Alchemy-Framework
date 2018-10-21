@@ -92,10 +92,16 @@ public abstract class AbstractListCell<T> extends TextFieldListCell<T> {
 		
 		if(needVisibilityIcon() && visibilityIcon != null) {
 			
+			boolean visible = getOpacity(item) > 0D;
+			
 			visibilityIcon.setManaged(true);
 			visibilityIcon.setVisible(true);
-			visibilityIcon.setImage(EditorManager.editor().loadIcon("resources/icons/visible.png"));
-			visibilityIcon.setOpacity(getOpacity(item));
+			visibilityIcon.setImage(EditorManager.editor().loadIcon(
+					visible ? "resources/icons/visible.png" : "resources/icons/invisible.png"));
+			
+			if(getOpacity(item) > 0) {
+				visibilityIcon.setOpacity(getOpacity(item));
+			}
 		}
 		
 		text.setText(getName(item));

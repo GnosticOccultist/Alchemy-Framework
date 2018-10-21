@@ -1,8 +1,7 @@
 package fr.alchemy.editor.core.ui.editor.layout;
 
-import com.ss.rlib.common.util.array.Array;
-
 import fr.alchemy.editor.api.editor.EditorComponent;
+import fr.alchemy.editor.api.editor.layout.EditorLayout;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
@@ -16,19 +15,7 @@ import javafx.scene.layout.Pane;
  * 
  * @author GnosticOccultist
  */
-public class EditorTabPane extends TabPane {
-	
-	/**
-	 * The list of optional components present in the pane.
-	 */
-	private final Array<EditorComponent> components;
-	
-	/**
-	 * Instantiates a new <code>EditorTabPane</code>.
-	 */
-	public EditorTabPane() {
-		this.components = Array.ofType(EditorComponent.class);
-	}
+public class EditorTabPane extends EditorLayout<TabPane> {
 	
 	/**
 	 * Attaches the provided {@link EditorComponent} to the <code>EditorTabPane</code>.
@@ -48,16 +35,13 @@ public class EditorTabPane extends TabPane {
 		}
 	
 		components.add(component);
-		getTabs().add(tab);
+		getContent().getTabs().add(tab);
 		
 		return this;
 	}
 	
-	/**
-	 * Notify every {@link EditorComponent} that the <code>AlchemyEditorScene</code>
-	 * has finish its building.
-	 */
-	public void notifyFinishBuild() {
-		components.forEach(EditorComponent::finish);
+	@Override
+	protected TabPane createLayout() {
+		return new TabPane();
 	}
 }
