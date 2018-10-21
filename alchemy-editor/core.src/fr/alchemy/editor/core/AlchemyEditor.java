@@ -4,7 +4,6 @@ import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.ApplicationListener;
 import fr.alchemy.editor.core.config.EditorConfig;
-import fr.alchemy.editor.core.ui.IconManager;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 
 public class AlchemyEditor extends AlchemyApplication  {
@@ -23,8 +22,9 @@ public class AlchemyEditor extends AlchemyApplication  {
 	
 	@Override
 	protected void preInitialize() {
+		EditorManager.initialize(assetManager);
+		
 		scene = new AlchemyEditorScene(this);
-		IconManager.create(assetManager);
 	}
 	
 	@Override

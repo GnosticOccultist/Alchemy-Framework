@@ -1,6 +1,6 @@
 package fr.alchemy.editor.api;
 
-import fr.alchemy.editor.core.ui.IconManager;
+import fr.alchemy.editor.core.EditorManager;
 import javafx.scene.control.Label;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.ImageView;
@@ -94,7 +94,7 @@ public abstract class AbstractListCell<T> extends TextFieldListCell<T> {
 			
 			visibilityIcon.setManaged(true);
 			visibilityIcon.setVisible(true);
-			visibilityIcon.setImage(IconManager.icons().loadIcon("resources/icons/visible.png"));
+			visibilityIcon.setImage(EditorManager.editor().loadIcon("resources/icons/visible.png"));
 			visibilityIcon.setOpacity(getOpacity(item));
 		}
 		
