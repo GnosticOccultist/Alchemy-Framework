@@ -4,6 +4,8 @@ import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.editor.api.AbstractListCell;
 import fr.alchemy.editor.api.editor.EditorComponent;
+import fr.alchemy.editor.core.EditorManager;
+import fr.alchemy.editor.core.ui.component.TextSearchBar;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Validator;
 import javafx.scene.control.ListView;
@@ -30,12 +32,17 @@ public class LayerHierarchyComponent extends VBox implements EditorComponent {
 	 * The scene bounded to the hierarchy.
 	 */
 	private final AlchemyEditorScene scene;
+	/**
+	 * The search bar for filtering scene layers.
+	 */
+	private TextSearchBar<SceneLayer> searchBar;
 	
 	/**
 	 * Instantiates a new <code>LayerHierarchyComponent</code>.
 	 */
 	public LayerHierarchyComponent(AlchemyEditorScene scene) {
 		this.scene = scene;
+		
 		createComponents();
 	}
 	
@@ -44,15 +51,19 @@ public class LayerHierarchyComponent extends VBox implements EditorComponent {
 	 */
 	protected void createComponents() {
 		
+		searchBar = new TextSearchBar<>((str, l) -> l.name().toLowerCase().startsWith(str.toLowerCase()));
+		searchBar.prefWidthProperty().bind(widthProperty());
+		searchBar.setPrefHeight(60);
+		
 		layersView = new ListView<>();
 		layersView.setCellFactory(param -> new LayerListCell(this));
 		layersView.setEditable(false);
 		layersView.setFocusTraversable(true);
-		layersView.prefHeightProperty().bind(heightProperty());
 		layersView.prefWidthProperty().bind(widthProperty());
 		layersView.setFixedCellSize(26);
+		layersView.prefHeightProperty().bind(heightProperty().subtract(searchBar.heightProperty()));
 		
-		getChildren().add(layersView);
+		getChildren().addAll(layersView, searchBar);
 	}
 	
 	/**
@@ -89,7 +100,10 @@ public class LayerHierarchyComponent extends VBox implements EditorComponent {
 	 * @param layer The layer to fill.
 	 */
 	public LayerHierarchyComponent fill(SceneLayer layer) {
+		
 		layersView.getItems().add(layer);
+		searchBar.searchFor(layersView.getItems());
+		
 		return this;
 	}
 	
@@ -137,12 +151,15 @@ public class LayerHierarchyComponent extends VBox implements EditorComponent {
 				hide(layer);
 			}
 			
-			visibilityIcon.setOpacity(layer.visibility());
+			if(layer.visibility() > 0) {
+				visibilityIcon.setOpacity(layer.visibility());
+			}
+			
 			component.getEditorScene().layer(layer).setOpacity(layer.visibility());
 		}
 		
 		private void changeTransparency(SceneLayer layer) {
-			if(layer.visibility() >= 1.0D || layer.visibility() <= 0.0D) {
+			if(layer.visibility() != 0.3D) {
 				layer.visibilityProperty().set(0.3D);
 			} else if(layer.visibility() == 0.3D) {
 				layer.visibilityProperty().set(1.0D);
@@ -150,11 +167,17 @@ public class LayerHierarchyComponent extends VBox implements EditorComponent {
 		}
 
 		private void hide(SceneLayer layer) {
-			if(layer.visibility() <= 0.0D) {
-				layer.visibilityProperty().set(1.0D);
-			} else if(layer.visibility() > 0.0D) {
-				layer.visibilityProperty().set(0.0D);
+			
+			if(layer.visibility() > 0D) {
+				layer.visibilityProperty().set(0D);
+			} else if(layer.visibility() <= 0D) {
+				layer.visibilityProperty().set(1D);
 			}
+			
+			boolean visible = layer.visibility() > 0D;
+			
+			visibilityIcon.setImage(EditorManager.editor().loadIcon(
+					visible ? "resources/icons/visible.png" : "resources/icons/invisible.png"));
 		}
 		
 		@Override

@@ -2,10 +2,8 @@ package fr.alchemy.editor.core.ui.component;
 
 import java.nio.file.Path;
 
-import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.config.EditorConfig;
-import fr.alchemy.editor.core.event.ChangedCurrentWorkspaceEvent;
 import fr.alchemy.editor.core.ui.component.asset.tree.AssetTree;
 import fr.alchemy.utilities.Validator;
 import javafx.scene.layout.VBox;
