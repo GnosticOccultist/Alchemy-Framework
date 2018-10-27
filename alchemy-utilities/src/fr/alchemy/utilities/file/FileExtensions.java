@@ -9,6 +9,41 @@ package fr.alchemy.utilities.file;
 public interface FileExtensions {
 	
 	///////////////////////////////////////////////////////////
+	////////////		TEXTURE EXTENSION		//////////////
+	//////////////////////////////////////////////////////////
+	
+	/**
+	 * The PNG texture format.
+	 */
+	String PNG_FORMAT = "png";
+	/**
+	 * The JPG texture format.
+	 */
+	String JPG_FORMAT = "jpg";
+	/**
+	 * The JPEG texture format.
+	 */
+	String JPEG_FORMAT = "jpeg";
+	/**
+	 * The TGA texture format.
+	 */
+	String TGA_FORMAT = "tga";
+	/**
+	 * The HDR texture format.
+	 */
+	String HDR_FORMAT = "hdr";
+	/**
+	 * The BMP texture format.
+	 */
+	String BMP_FORMAT = "bmp";
+	
+	/**
+	 * The array containing all the texture related file extensions.
+	 */
+	String[] TEXTURE_FILE_EXTENSION = new String[] {PNG_FORMAT, JPG_FORMAT, JPEG_FORMAT, 
+			TGA_FORMAT, HDR_FORMAT, BMP_FORMAT};
+	
+	///////////////////////////////////////////////////////////
 	////////////		MODEL EXTENSION			//////////////
 	//////////////////////////////////////////////////////////
 	

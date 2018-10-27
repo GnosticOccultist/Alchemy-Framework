@@ -203,7 +203,12 @@ public class ByteUtils {
         return bits;
     }
    
-    
+    /**
+     * Converts a serializable object into a byte array.
+     * 
+     * @param object The object to serialize.
+     * @return		 A byte array corresponding to the serialized object.
+     */
     public static byte[] serialize(Serializable object) {
 
     	ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -218,10 +223,10 @@ public class ByteUtils {
     }
 
     /**
-     * Convert the byte array to an object.
+     * Converts the byte array to an object.
      * 
-     * @param bytes The byte array.
-     * @return 		The result object.
+     * @param bytes The byte array to deserialize.
+     * @return 		The result object from the byte array.
      */
     @SuppressWarnings("unchecked")
 	public static <T> T deserialize(byte[] bytes) {

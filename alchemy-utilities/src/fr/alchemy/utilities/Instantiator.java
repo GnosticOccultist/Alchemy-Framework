@@ -20,7 +20,19 @@ public class Instantiator {
 	 * @return			A new instance of the class or null if an error occured.
 	 */
 	public static <T> T fromName(String className) {
-		return fromName(className, null);
+		return fromNameWith(className, null, null);
+	}
+
+	/**
+	 * Creates a new instance with the provided class name.
+	 * <p>
+	 * The class name cannot be empty or null.
+	 * 
+	 * @param className The name to create the class from.
+	 * @return			A new instance of the class or null if an error occured.
+	 */
+	public static <T> T fromNameWith(String className, Object arg) {
+		return fromNameWith(className, null, arg);
 	}
 	
 	/**
@@ -34,13 +46,17 @@ public class Instantiator {
 	 * @return			A new instance of the class or null if an error occured.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T fromName(String className, Consumer<T> action) {
+	public static <T> T fromNameWith(String className, Consumer<T> action, Object arg) {
 		Validator.nonEmpty(className);
 		
 		T obj = null;
 		try {
 			Class<?> clazz = Class.forName(className);
-			obj = (T) clazz.getConstructor().newInstance();
+			if(arg != null) {
+				obj = (T) clazz.getConstructor(arg.getClass()).newInstance(arg);
+			} else {
+				obj = (T) clazz.getConstructor().newInstance();
+			}
 			
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to find the class: '" + className + "' !");
