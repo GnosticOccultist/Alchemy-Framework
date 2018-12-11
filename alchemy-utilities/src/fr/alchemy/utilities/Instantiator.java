@@ -1,6 +1,7 @@
 package fr.alchemy.utilities;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 /**
@@ -111,5 +112,25 @@ public class Instantiator {
 			action.accept(obj);
 		}
 		return obj;		
+	}
+	
+	/**
+	 * Invokes the specified {@link Method} contained in the given class instance using
+	 * the argument. The function also return whether the invokation has been successfully made. 
+	 * 
+	 * @param method		The method to invoke (should be accessible).
+	 * @param classInstance The instance of the class containing the method.
+	 * @param arg			The argument to use for the method.
+	 * @return				Whether the invokation has been successfully made.
+	 */
+	public static boolean invokeMethod(Method method, Object classInstance, Object arg) {
+		try {
+			method.invoke(classInstance, arg);
+			return true;
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+			System.err.println("Invokation of the method: " + method.getName() + " failed, for the specified class instance " 
+					+ classInstance.getClass().getSimpleName() + " and for the argument " + arg + "!");
+		}
+		return false;
 	}
 }

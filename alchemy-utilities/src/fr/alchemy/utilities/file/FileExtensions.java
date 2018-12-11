@@ -9,6 +9,19 @@ package fr.alchemy.utilities.file;
 public interface FileExtensions {
 	
 	///////////////////////////////////////////////////////////
+	////////////		 ALCHEMY FILES		    //////////////
+	//////////////////////////////////////////////////////////
+	
+	/**
+	 * The current version number for alchemy files format.
+	 */
+	int ALCHEMY_FILE_VERSION = 1;
+	/**
+	 * The alchemy binary file's header. Corresponding to "Alchemy Binary" as ASCII.
+	 */
+	byte[] ALCHEMY_FILE_HEADER = new byte[] {0x41, 0x6c, 0x63, 0x68, 0x65, 0x6d, 0x79, 0x20, 0x42, 0x69, 0x6e, 0x61, 0x72, 0x79, 0x0d, 0x0a};
+	
+	///////////////////////////////////////////////////////////
 	////////////		TEXTURE EXTENSION		//////////////
 	//////////////////////////////////////////////////////////
 	
