@@ -10,6 +10,7 @@ import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.event.ChangedCurrentWorkspaceEvent;
 import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
+import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
 import javafx.application.Platform;
@@ -26,8 +27,13 @@ public abstract class EditorLayout<T extends Region> {
 	 * The content layout.
 	 */
 	protected final T content;
+	/**
+	 * The editor main scene.
+	 */
+	protected final AlchemyEditorScene scene;
 	
-	protected EditorLayout() {
+	protected EditorLayout(AlchemyEditorScene scene) {
+		this.scene = scene;
 		this.content = createLayout();
 		this.components = Array.ofType(EditorComponent.class);
 		
@@ -80,7 +86,13 @@ public abstract class EditorLayout<T extends Region> {
 	 * @param className The class name of the component to build.
 	 */
 	protected void constructComponent(String className) {
-		EditorComponent component = Instantiator.fromName(className);
+		EditorComponent component = null;
+		try {
+			component = Instantiator.fromName(className);
+		} catch (Exception e) {
+			component = Instantiator.fromNameWith(className, scene);
+		}
+		
 		attach(component);
 		component.finish();
 	}

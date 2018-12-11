@@ -3,9 +3,9 @@ package fr.alchemy.editor.core.ui.component.scene;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.editor.api.AbstractListCell;
+import fr.alchemy.editor.api.TextSearchBar;
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.EditorManager;
-import fr.alchemy.editor.core.ui.component.TextSearchBar;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Validator;
 import javafx.scene.control.ListView;
@@ -36,7 +36,7 @@ public class LayerHierarchyComponent extends VBox implements EditorComponent {
 	 * The search bar for filtering scene layers.
 	 */
 	private TextSearchBar<SceneLayer> searchBar;
-	
+
 	/**
 	 * Instantiates a new <code>LayerHierarchyComponent</code>.
 	 */
@@ -105,6 +105,13 @@ public class LayerHierarchyComponent extends VBox implements EditorComponent {
 		searchBar.searchFor(layersView.getItems());
 		
 		return this;
+	}
+	
+	@Override
+	public void finish() {
+		if(scene != null) {
+			fillWithScene();
+		}
 	}
 	
 	/**

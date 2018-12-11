@@ -3,6 +3,7 @@ package fr.alchemy.editor.core.ui.component.asset.tree.filler;
 import java.util.List;
 
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
+import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetFolderElement;
 import javafx.scene.control.MenuItem;
 
 /**
@@ -16,6 +17,8 @@ public class AlchemyContextMenuFiller implements ContextMenuFiller {
 	@Override
 	public void fill(AssetElement element, List<MenuItem> items) {
 		
-		// TODO: Add actions here...
+		if(element instanceof AssetFolderElement) {
+			items.add(new NewFileMenu(element));
+		}
 	}
 }

@@ -41,7 +41,7 @@ public class AlchemyEditor extends AlchemyApplication  {
 	}
 	
 	/**
-	 * Setup the <code>ApplicationListener</code> for the <code>AlchemyEditor</code>
+	 * Setup the {@link ApplicationListener} for the <code>AlchemyEditor</code>.
 	 * 
 	 * @return The application listener to register.
 	 */

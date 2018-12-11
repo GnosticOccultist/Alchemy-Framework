@@ -5,11 +5,13 @@ import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.editor.core.ui.component.scene.LayerHierarchyComponent;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -23,6 +25,8 @@ public class AlchemyEditorScene extends AlchemyScene {
 	 * The layout of the editor.
 	 */
 	private final EditorTabPane tabPane;
+	
+	private final EditorTabPane scenePane;
 	/**
 	 * The container of the scene.
 	 */
@@ -31,7 +35,8 @@ public class AlchemyEditorScene extends AlchemyScene {
 	public AlchemyEditorScene(AlchemyApplication application) {
 		super(application);
 		
-		this.tabPane = new EditorTabPane();
+		this.tabPane = new EditorTabPane(this);
+		this.scenePane = new EditorTabPane(this);
 		this.container = new SplitPane();
 	}
 	
@@ -65,12 +70,19 @@ public class AlchemyEditorScene extends AlchemyScene {
 		entity2.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Special", 100));
 		addEntity(entity2);
 		
+		tabPane.attach(new LayerHierarchyComponent(this));
 		tabPane.construct();
+		
+		scenePane.getContent().prefHeightProperty().bind(root.heightProperty());
+		scenePane.getContent().setSide(Side.TOP);
+		Tab tab = new Tab("empty-scene");
+		tab.setContent(getContentRoot());
+		scenePane.getContent().getTabs().add(tab);
 		
 		tabPane.getContent().prefHeightProperty().bind(root.heightProperty());
 		tabPane.getContent().setSide(Side.LEFT);
 
-		container.getItems().addAll(tabPane.getContent(), getContentRoot());
+		container.getItems().addAll(tabPane.getContent(), scenePane.getContent());
 		container.prefHeightProperty().bind(root.heightProperty());
 		container.prefWidthProperty().bind(root.widthProperty());
 		

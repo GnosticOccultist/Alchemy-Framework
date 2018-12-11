@@ -1,9 +1,8 @@
 package fr.alchemy.editor.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.alchemy.core.asset.AssetManager;
+import fr.alchemy.utilities.logging.FactoryLogger;
+import fr.alchemy.utilities.logging.Logger;
 import javafx.scene.image.Image;
 
 /**
@@ -17,7 +16,7 @@ public class EditorManager {
 	/**
 	 * The editor logger.
 	 */
-	private Logger logger = LoggerFactory.getLogger("alchemy.editor");
+	private Logger logger = FactoryLogger.getLogger("alchemy.editor");
 	
 	/**
 	 * The single-instance of the editor manager.
