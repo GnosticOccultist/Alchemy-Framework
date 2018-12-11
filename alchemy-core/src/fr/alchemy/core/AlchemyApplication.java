@@ -1,15 +1,13 @@
 package fr.alchemy.core;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.input.InputManager;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.util.NanoTimer;
 import fr.alchemy.utilities.collections.Array;
+import fr.alchemy.utilities.logging.FactoryLogger;
+import fr.alchemy.utilities.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,7 +29,7 @@ public abstract class AlchemyApplication extends Application {
 	/**
 	 * The application logger.
 	 */
-	private Logger logger = LoggerFactory.getLogger("alchemy.app");
+	protected static Logger logger = FactoryLogger.getLogger("alchemy.app");
 	/**
 	 * The main loop timer.
 	 */
@@ -46,7 +44,7 @@ public abstract class AlchemyApplication extends Application {
 				
 				internalUpdate(internalTime);
 			} catch (Throwable t) {
-				logger().error("A fatal error has occured !", t);
+				logger.error("A fatal error has occured !", t);
 				exit();
 			}
 		}
@@ -82,7 +80,7 @@ public abstract class AlchemyApplication extends Application {
 	
 	@Override
 	public final void start(Stage primaryStage) throws Exception {
-		logger().info("Starting " + getClass().getSimpleName());
+		logger.info("Starting " + getClass().getSimpleName());
 		
 		final AlchemySettings settings = AlchemySettings.settings();
 		
@@ -155,12 +153,12 @@ public abstract class AlchemyApplication extends Application {
 	public final void stop() throws Exception {
 		super.stop();
 		
-		logger().info("Closing " + getClass().getSimpleName() + "...");
+		logger.info("Closing " + getClass().getSimpleName() + "...");
 		
 		listeners.perform(ApplicationListener::exit);	
 		AlchemyExecutor.executor().shutdown();
 		
-		logger().info("Closed " + getClass().getSimpleName() + " successfully!");
+		logger.info("Closed " + getClass().getSimpleName() + " successfully!");
 	}
 	
 	/**
@@ -274,12 +272,5 @@ public abstract class AlchemyApplication extends Application {
 	 */
 	public NanoTimer getTimer() {
 		return timer;
-	}
-	
-	/**
-	 * @return The logger of the <code>AlchemyApplication</code>.
-	 */
-	protected Logger logger() {
-		return logger;
 	}
 }

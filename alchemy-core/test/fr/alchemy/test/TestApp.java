@@ -2,8 +2,11 @@ package fr.alchemy.test;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
+import fr.alchemy.core.annotation.AlchemyEvent;
 import fr.alchemy.core.asset.Music;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.event.AlchemyEventManager;
+import fr.alchemy.core.event.AlchemySceneEvent;
 import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.physic.BoundingCircle;
 import fr.alchemy.core.scene.SceneLayer;
@@ -68,11 +71,30 @@ public class TestApp extends AlchemyApplication {
 			musicTest.play();
 		});	
 		
-		assetManager.saveAsset(entityTest, "resources/entity/entity.ecs");
-		Entity clone = (Entity) assetManager.loadAsset("resources/entity/entity.ecs");
+		//assetManager.saveAsset(entityTest, "resources/entity/entity.ecs");
+		//Entity clone = (Entity) assetManager.loadAsset("resources/entity/entity.ecs");
 
-		clone.getComponent(Transform.class).setPosition(0, 50);
-		scene.addEntity(clone);
+//		clone.getComponent(Transform.class).setPosition(0, 50);
+//		scene.addEntity(clone);
+	
+		AlchemyEventManager.events().registerEventHandler(AlchemySceneEvent.ENTITY_ADDED, (event) -> { System.out.println("Notified"); event.consume(); });
+		AlchemyEventManager.events().handleClass(this);
+		
+		scene.removeEntity(entityTest);
+		scene.addEntity(entityTest);
+		
+	}
+	
+	@AlchemyEvent(eventType="ENTITY_ADDED")
+	public void entityAdded(AlchemySceneEvent event) {
+		System.out.println("A new entity has been added! (1)");
+		event.consume();
+	}
+	
+	@AlchemyEvent(eventType="ENTITY_ADDED")
+	public void entityAdded2(AlchemySceneEvent event) {
+		System.out.println("A new entity has been added! (2)");
+		event.consume();
 	}
 
 	@Override

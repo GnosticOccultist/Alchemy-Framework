@@ -10,13 +10,12 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.AlchemySettings;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.logging.FactoryLogger;
+import fr.alchemy.utilities.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -46,7 +45,7 @@ public abstract class AbstractScene {
 	/**
 	 * The scene logger.
 	 */
-	private Logger logger = LoggerFactory.getLogger("alchemy.scene");
+	private Logger logger = FactoryLogger.getLogger("alchemy.scene");
 	/**
 	 * The application.
 	 */

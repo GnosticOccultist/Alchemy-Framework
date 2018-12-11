@@ -7,7 +7,7 @@ import javafx.scene.Node;
 
 /**
  * <code>AlchemySceneEvent</code> contains all the events related to the <code>AlchemyScene</code>,
- * such as adding or removing an {@link Entity}.
+ * such as adding or removing an {@link Entity} or UI components.
  * 
  * @author GnosticOccultist
  */
