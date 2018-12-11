@@ -9,10 +9,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.alchemy.core.AlchemyApplication;
+import fr.alchemy.utilities.logging.FactoryLogger;
+import fr.alchemy.utilities.logging.Logger;
 
 /**
  * <code>AlchemyExecutor</code> represents the manager of all tge {@link AlchemyTaskExecutor}.
@@ -27,7 +26,7 @@ public final class AlchemyExecutor {
 	/**
 	 * The executor manager logger.
 	 */
-	private Logger logger = LoggerFactory.getLogger("alchemy.executor");
+	private Logger logger = FactoryLogger.getLogger("alchemy.executor");
 	/**
 	 * The table of all the task executors stored by type.
 	 */
