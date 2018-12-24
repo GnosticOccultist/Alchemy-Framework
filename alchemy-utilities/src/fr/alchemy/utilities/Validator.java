@@ -34,7 +34,7 @@ public final class Validator {
 	public static final String DEFAULT_POSITIVE_MESSAGE = "The provided value must be strictly positive (>0)!";
 	
 	/**
-	 * No instance of this class.
+	 * Private constructor to inhibit instantiation of <code>Validator</code>.
 	 */
 	private Validator() {}
 	

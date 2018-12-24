@@ -9,7 +9,7 @@ import java.nio.file.Paths;
  * 
  * @author GnosticOccultist
  */
-public class SystemUtils {
+public final class SystemUtils {
 	
 	/**
 	 * Return the currently operating system name.
