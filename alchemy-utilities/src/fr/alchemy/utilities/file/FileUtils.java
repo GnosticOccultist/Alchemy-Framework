@@ -77,14 +77,14 @@ public final class FileUtils {
 	}
 	
 	/**
-	 * Open a {@link BufferedReader} from the provided path of a file.
+	 * Open a {@link InputStreamReader} from the provided path of a file.
 	 * <p>
 	 * The path cannot be null or empty.
 	 * 
 	 * @param path The path of the file to get the buffered reader.
-	 * @return	   The buffered reader from the file.
+	 * @return	   The input stream reader from the file.
 	 */
-	public static BufferedReader read(String path) {
+	public static InputStreamReader readStream(String path) {
 		Validator.nonEmpty(path, 
 				"The path for the file cannot be null or empty!");
 		
@@ -92,7 +92,26 @@ public final class FileUtils {
 			file.changePath(path);
 		}
 		
-		return new BufferedReader(new InputStreamReader(openStream(path)));
+		return new InputStreamReader(openStream(path));
+	}
+	
+	/**
+	 * Open a {@link BufferedReader} from the provided path of a file.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param path The path of the file to get the buffered reader.
+	 * @return	   The buffered reader from the file.
+	 */
+	public static BufferedReader readBuffered(String path) {
+		Validator.nonEmpty(path, 
+				"The path for the file cannot be null or empty!");
+		
+		if(!file.getPath().equals(path)) {
+			file.changePath(path);
+		}
+		
+		return new BufferedReader(readStream(path));
 	}
 	
 	/**

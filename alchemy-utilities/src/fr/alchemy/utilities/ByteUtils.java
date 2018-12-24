@@ -3,6 +3,7 @@ package fr.alchemy.utilities;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -110,6 +111,22 @@ public class ByteUtils {
     }
     
     /**
+     * Reads the specified amount of bytes in the provided {@link InputStream}.
+     * 
+     * @param inputStream The input stream to read bytes from.
+     * @param length      The amount of bytes to read.
+     * @return			  The readed byte array.
+     */
+    public static byte[] readBytes(final InputStream inputStream, final int length) throws IOException {
+    	final byte[] byteArray = new byte[length];
+
+        // Read the bytes in the provided length.
+        inputStream.read(byteArray);
+        
+        return byteArray;
+    }
+    
+    /**
      * Reads the specified interval of bytes (1 byte for a boolean value)
      * and converts it into a boolean value.
      * 
@@ -119,6 +136,12 @@ public class ByteUtils {
      */
     public static boolean readBoolean(final byte[] byteArray, final int offset) {
         return byteArray[offset] != 0;
+    }
+    
+    public static short readShort(byte[] byteArray, int offset) {
+        // Convert it to a short
+        short number = (short) ((byteArray[offset+1] & 0xFF) + ((byteArray[offset+0] & 0xFF) << 8));
+        return number;
     }
     
     /**
@@ -140,6 +163,23 @@ public class ByteUtils {
     }
     
     /**
+     * Reads the specified interval of bytes (x bytes defined by length)
+     * and converts it into a string value.
+     * 
+     * @param inputStream The input stream to read the bytes from.
+     * @param length 	  The length of the bytes to read.
+     * @return		 	  The string value of the corresponding readed bytes array.
+     */
+    public static String readString(final InputStream inputStream, final int length) throws IOException {
+        final byte[] byteArray = new byte[length];
+
+        // Read the string in the provided length bytes.
+        inputStream.read(byteArray);
+
+        return new String(byteArray);
+    }
+    
+    /**
      * Reads the specified interval of bytes (4 bytes for a integer value)
      * and converts it into a integer value.
      * 
@@ -153,6 +193,24 @@ public class ByteUtils {
         	+ ((byteArray[offset + 1] & 0xFF) << 16) 
         	+ ((byteArray[offset + 2] & 0xFF) << 8)
         	+ (byteArray[offset + 3] & 0xFF);
+        return number;
+    }
+    
+    /**
+     * Reads the specified interval of bytes (4 bytes for a integer value)
+     * from the provided {@link InputStream}.
+     * 
+     * @param inputStream The input stream to read the bytes from.
+     * @return The integer value of the corresponding readed bytes array.
+     */
+    public static int readInteger(final InputStream inputStream) throws IOException {
+        final byte[] byteArray = new byte[4];
+
+        // Read the integer in the next 4 bytes.
+        inputStream.read(byteArray);
+
+        int number = readInteger(byteArray, 0);
+
         return number;
     }
     
@@ -238,5 +296,17 @@ public class ByteUtils {
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static byte[] rightAlignBytes(byte[] bytes, int width) {
+        if (bytes.length != width) {
+            byte[] rVal = new byte[width];
+            for (int x = width - bytes.length; x < width; x++) {
+                rVal[x] = bytes[x - (width - bytes.length)];
+            }
+            return rVal;
+        }
+            
+        return bytes;
     }
 }

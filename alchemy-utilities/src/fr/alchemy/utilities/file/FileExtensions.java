@@ -19,7 +19,35 @@ public interface FileExtensions {
 	/**
 	 * The alchemy binary file's header. Corresponding to "Alchemy Binary" as ASCII.
 	 */
-	byte[] ALCHEMY_FILE_HEADER = new byte[] {0x41, 0x6c, 0x63, 0x68, 0x65, 0x6d, 0x79, 0x20, 0x42, 0x69, 0x6e, 0x61, 0x72, 0x79, 0x0d, 0x0a};
+	byte[] ALCHEMY_FILE_HEADER = new byte[] {0x41, 0x6c, 0x63, 0x68, 0x65, 0x6d, 0x79, 0x20, 0x42, 0x69, 0x6e, 0x61, 0x72, 0x79};
+	
+	///////////////////////////////////////////////////////////
+	////////////	 DATA FORMAT EXTENSION		//////////////
+	//////////////////////////////////////////////////////////
+	
+	/**
+	 * The 'JavaScript Object Notation' JSON, derived from the notation of objects in JavaScript.
+	 */
+	String JSON_FORMAT = "json";
+	/**
+	 * The 'Extensible Markup Language' XML format with strong support via Unicode, easily
+	 * showing a hierarchy of data structures.
+	 */
+	String XML_FORMAT = "xml";
+	/**
+	 * The Comma-seperated values format (CSV), values are seperated by ',' or ';'
+	 * (columns) and lines (rows).
+	 */
+	String CSV_FORMAT = "csv";
+	/**
+	 * The Tab-seperated values format (TSV), values are seperated by 'tabs'
+	 * (columns) and lines (rows).
+	 */
+	String TSV_FORMAT = "csv";
+	/**
+	 * The 'Ain't Markup Language' YAML format is a minimal syntax language.
+	 */
+	String[] YAML_FORMAT = new String[] { "yaml", "yml" };
 	
 	///////////////////////////////////////////////////////////
 	////////////		TEXTURE EXTENSION		//////////////
