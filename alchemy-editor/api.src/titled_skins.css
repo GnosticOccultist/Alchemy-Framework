@@ -1,0 +1,18 @@
+.titled-node-header {
+	-fx-padding: 2 5 2 5;
+	-fx-background-color: linear-gradient(rgb(0, 50, 60), rgb(0, 80, 80));
+	-fx-border-width: 0 0 1 0;
+	-fx-border-color: rgba(160, 160, 160, 0.8);
+	-fx-opacity: 0.9;
+}
+
+.titled-node-background {
+	-fx-background-color: rgba(240, 235, 242, 0.9);
+	-fx-background-insets: 1;
+	-fx-border-width: 0;	
+}
+
+.titled-node-title {
+	-fx-font-size: 11;
+	-fx-text-fill: white;
+}

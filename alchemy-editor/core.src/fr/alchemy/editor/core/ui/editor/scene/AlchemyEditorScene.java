@@ -5,8 +5,13 @@ import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.core.scene.component.VisualComponent;
 import fr.alchemy.core.scene.entity.Entity;
+import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
+import fr.alchemy.editor.api.editor.graph.element.GraphNode;
 import fr.alchemy.editor.core.ui.component.scene.LayerHierarchyComponent;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
+import fr.alchemy.editor.core.ui.editor.graph.SimpleGraphNodeEditor;
+import fr.alchemy.editor.core.ui.editor.graph.element.BaseGraphNode;
+import fr.alchemy.editor.core.ui.editor.graph.skin.TitledGraphNodeSkin;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
 import javafx.geometry.Side;
 import javafx.scene.Group;
@@ -76,8 +81,14 @@ public class AlchemyEditorScene extends AlchemyScene {
 		scenePane.getContent().prefHeightProperty().bind(root.heightProperty());
 		scenePane.getContent().setSide(Side.TOP);
 		Tab tab = new Tab("empty-scene");
-		tab.setContent(getContentRoot());
 		scenePane.getContent().getTabs().add(tab);
+		SimpleGraphNodeEditor editor = new SimpleGraphNodeEditor();
+		TitledGraphNodeSkin titled = new TitledGraphNodeSkin(new BaseGraphNode());
+		titled.getElement().getConnectors().add(new GraphConnector() {
+		});
+		titled.initialize();
+		editor.getView().add(titled);
+		tab.setContent(editor.getView());
 		
 		tabPane.getContent().prefHeightProperty().bind(root.heightProperty());
 		tabPane.getContent().setSide(Side.LEFT);

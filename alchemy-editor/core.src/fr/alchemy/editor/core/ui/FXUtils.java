@@ -8,13 +8,16 @@ import java.util.stream.Stream;
 import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
+import fr.alchemy.utilities.Validator;
 import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.MouseEvent;
 
 public class FXUtils {
 
@@ -90,5 +93,23 @@ public class FXUtils {
 
     	final ObservableList<Node> nodes = ((Parent) node).getChildrenUnmodifiable();
     	nodes.forEach(child -> fillComponents(container, child, type));
+    }
+    
+    /**
+     * Return the position of the cursor relative to the provided {@link Node}.
+     * 
+     * @param event The mouse event storing the cursor position.
+     * @param node	The node to get the relative position from.
+     * @return		The cursor's position relative to the node origin.
+     */
+    public static Point2D cursorPosition(MouseEvent event, Node node) {
+    	Validator.nonNull(event, "The mouse event can't be null");
+    	Validator.nonNull(node, "The node can't be null");
+    	
+        final double sceneX = event.getSceneX();
+        final double sceneY = event.getSceneY();
+
+        final Point2D containerScene = node.localToScene(0, 0);
+        return new Point2D(sceneX - containerScene.getX(), sceneY - containerScene.getY());
     }
 }
