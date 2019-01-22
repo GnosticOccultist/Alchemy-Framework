@@ -2,9 +2,11 @@ package fr.alchemy.utilities.logging;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+
 
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
@@ -24,11 +26,11 @@ import fr.alchemy.utilities.Validator;
  */
 public final class FactoryLogger {
 	
-	/**
+	/**	
 	 * The table with all created loggers.
 	 */
 	private static final Map<String, Logger> LOGGERS = 
-			new HashMap<>();
+			Collections.synchronizedMap(new HashMap<String, Logger>());
 	/**
 	 * The current logger type.
 	 */

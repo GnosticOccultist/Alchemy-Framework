@@ -24,7 +24,7 @@ public final class AlchemyLogger implements Logger {
 	 * Internal use only. Please use {@link FactoryLogger#getLogger(String)} to create
 	 * a new <code>AlchemyLogger</code>.
 	 */
-	protected AlchemyLogger() {
+	public AlchemyLogger() {
 		this.name = "unknown";
 		this.activities = new Boolean[LoggerLevel.values().length];
 	}
