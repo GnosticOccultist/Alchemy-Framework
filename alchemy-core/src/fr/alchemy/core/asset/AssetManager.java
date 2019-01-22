@@ -14,7 +14,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.alchemy.core.asset.binary.BinaryManager;
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.asset.cache.AssetCache;
@@ -72,7 +73,7 @@ public class AssetManager {
 	 * @param path		 The path for the file on the disk.
 	 */
 	public void saveAsset(final Exportable exportable, final String path) {
-		final BinaryManager exporter = BinaryManager.newManager(this);
+		final BinaryExporter exporter = BinaryExporter.getInstance();
 		
 		try (final OutputStream out = openOutStream(path)) {
 			exporter.export(exportable, out);
@@ -88,10 +89,9 @@ public class AssetManager {
 	 * @param path		 The path for the file on the disk.
 	 */
 	public Exportable loadAsset(final String path) {
-		final BinaryManager importer = BinaryManager.newManager(this);
 		
 		try (final InputStream is = Files.newInputStream(Paths.get(locateInternal(path).getPath().substring(1)), StandardOpenOption.READ)) {
-			return importer.insert(is, Paths.get(locateInternal(path).getPath().substring(1)));
+			return new BinaryImporter().load(is, Paths.get(locateInternal(path).getPath().substring(1)), null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 

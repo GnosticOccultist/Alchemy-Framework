@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
-import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.scene.component.VisualComponent;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -128,18 +129,21 @@ public final class EntityView extends Parent implements Exportable {
 	}
 
 	@Override
-	public void export(final BinaryWriter writer) throws IOException {
+	public void export(final BinaryExporter exporter) throws IOException {
+		final BinaryWriter writer = exporter.getCapsule(this);
 		final List<Texture> textures = getTextures();
-		writer.write("views", textures);
+		//writer.write("views", textures);
 	}
 
 	@Override
-	public void insert(final BinaryReader reader) throws IOException {
-		final Asset[] assets = reader.readAssetArray("views", null);
-		for(int i = 0; i < assets.length; i++) {
-			if(assets[i] instanceof Texture) {
-				addNodes((Texture) assets[i]);
-			}
-		}
+	public void insert(final BinaryImporter importer) throws IOException {
+		final BinaryReader reader = importer.getCapsule(this);
+		
+//		final Asset[] assets = reader.readAssetArray("views", null);
+//		for(int i = 0; i < assets.length; i++) {
+//			if(assets[i] instanceof Texture) {
+//				addNodes((Texture) assets[i]);
+//			}
+//		}
 	}
 }

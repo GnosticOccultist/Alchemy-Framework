@@ -3,8 +3,10 @@ package fr.alchemy.editor.core.ui.component.asset.tree.filler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import com.ss.rlib.common.util.array.Array;
+import com.ss.rlib.common.util.array.ArrayFactory;
+
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
-import fr.alchemy.utilities.collections.Array;
 import javafx.scene.control.MenuItem;
 
 /**
@@ -31,7 +33,7 @@ public class ContextMenuFillerRegistry {
 	/**
 	 * The array of context menu fillers available in the registry.
 	 */
-	private final Array<ContextMenuFiller> fillers = Array.newEmptyArray(ContextMenuFiller.class);
+	private final Array<ContextMenuFiller> fillers = ArrayFactory.newArray(ContextMenuFiller.class);
 	
 	/**
 	 * Don't instantiate a new registry.

@@ -1,11 +1,13 @@
 package fr.alchemy.core;
 
+import com.ss.rlib.common.util.array.Array;
+import com.ss.rlib.common.util.array.ArrayFactory;
+
 import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.core.input.InputManager;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.util.NanoTimer;
-import fr.alchemy.utilities.collections.Array;
 import fr.alchemy.utilities.logging.FactoryLogger;
 import fr.alchemy.utilities.logging.Logger;
 import javafx.animation.AnimationTimer;
@@ -72,7 +74,7 @@ public abstract class AlchemyApplication extends Application {
 	/**
 	 * The application listeners.
 	 */
-	private Array<ApplicationListener> listeners = Array.newEmptyArray(ApplicationListener.class);
+	private Array<ApplicationListener> listeners = ArrayFactory.newArray(ApplicationListener.class);
 	/**
 	 * Whether the application has been correctly started.
 	 */
@@ -130,7 +132,7 @@ public abstract class AlchemyApplication extends Application {
 	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#pause()}
 	 */
 	public final void pause() {	
-		listeners.perform(ApplicationListener::pause);	
+		listeners.forEach(ApplicationListener::pause);	
 		loop.stop();
 	}
 	
@@ -139,7 +141,7 @@ public abstract class AlchemyApplication extends Application {
 	 * use {@link #registerListener(ApplicationListener)} to register an {@link ApplicationListener#resume()}
 	 */
 	public final void resume() {
-		listeners.perform(ApplicationListener::resume);	
+		listeners.forEach(ApplicationListener::resume);	
 		loop.start();
 	}
 	
@@ -155,7 +157,7 @@ public abstract class AlchemyApplication extends Application {
 		
 		logger.info("Closing " + getClass().getSimpleName() + "...");
 		
-		listeners.perform(ApplicationListener::exit);	
+		listeners.forEach(ApplicationListener::exit);	
 		AlchemyExecutor.executor().shutdown();
 		
 		logger.info("Closed " + getClass().getSimpleName() + " successfully!");

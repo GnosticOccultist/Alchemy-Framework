@@ -2,8 +2,11 @@ package fr.alchemy.core.scene.component;
 
 import java.io.IOException;
 
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
+import fr.alchemy.core.asset.binary.Exportable;
 import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.core.util.Color;
 import javafx.scene.control.Label;
@@ -133,20 +136,22 @@ public class NameComponent extends Component {
 	}
 	
 	@Override
-	public void export(final BinaryWriter writer) throws IOException {
-		super.export(writer);
+	public void export(final BinaryExporter exporter) throws IOException {
+		super.export(exporter);
+		final BinaryWriter writer = exporter.getCapsule(this);
 		
-		writer.write("name", name);	
+		writer.write(name, "name", "Unnamed");
 		final Color color = Color.from((javafx.scene.paint.Color) nameLabel.getTextFill());
-		writer.write(color);
+		writer.write(color, "color", Color.from(javafx.scene.paint.Color.WHITE));
 	}
 	
 	@Override
-	public void insert(final BinaryReader reader) throws IOException {
-		super.insert(reader);
+	public void insert(final BinaryImporter importer) throws IOException {
+		super.insert(importer);
+		final BinaryReader reader = importer.getCapsule(this);
 		
-		setName(reader.readString("name", "Unknown"));
-		final Color color = reader.readExportable(Color.class, new Color(1, 1, 1));
-		setColor(color.toFXColor());
+		setName(reader.readString("name", "Unnamed"));
+		final Exportable color = reader.readExportable("color", new Color(1, 1, 1));
+		setColor(((Color) color).toFXColor());
 	}
 }

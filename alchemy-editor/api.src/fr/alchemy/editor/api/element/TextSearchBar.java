@@ -1,4 +1,4 @@
-package fr.alchemy.editor.api;
+package fr.alchemy.editor.api.element;
 
 import java.util.List;
 import java.util.function.BiPredicate;

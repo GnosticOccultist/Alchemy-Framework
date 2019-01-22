@@ -1,7 +1,9 @@
 package fr.alchemy.core.asset.binary;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.alchemy.core.asset.Texture;
@@ -16,48 +18,32 @@ import fr.alchemy.utilities.ByteUtils;
  */
 public final class BinaryWriter {
 	
-	/**
-	 * The binary manager.
-	 */
-	private final BinaryManager manager;
-	/**
-	 * The output stream.
-	 */
-	private final OutputStream os;
-	
-	public BinaryWriter(final BinaryManager ex, final OutputStream os) {
-		this.manager = ex;
-		this.os = os;
-	}
+    public static final int NULL_OBJECT = -1;
+    public static final int DEFAULT_OBJECT = -2;
+    public static byte[] NULL_BYTES = new byte[] { (byte) -1 };
+    public static byte[] DEFAULT_BYTES = new byte[] { (byte) -2 };
 	
 	/**
-	 * Writes the provided object value and its name if the <code>BinaryWriter</code> can
-	 * into a byte array.
-	 * 
-	 * @param name	The name of the value.
-	 * @param value The object value to write.
-	 * @throws IOException
+	 * The byte array output stream.
 	 */
-	public void write(final String name, final Object value) throws IOException {
-		if(value instanceof Boolean) {
-			write(name, (Boolean) value);
-		} else if(value instanceof Integer) {
-			write(name, (Integer) value);
-		} else if(value instanceof Float) {
-			write(name, (Float) value);
-		} else if(value instanceof Long) {
-			write(name, (Long) value);
-		} else if(value instanceof Double) {
-			write(name, (Double) value);
-		} else if(value instanceof String) {
-			write(name, (String) value);
-		} else if(value instanceof Exportable) {
-			write(name, (Exportable) value);
-		} else if(value instanceof Asset) {
-			write(name, (Asset) value);
-		} else {
-			System.err.println("Unable to write the specified value type: " + value.getClass().getName());
-		}
+	protected ByteArrayOutputStream baos;
+	/**
+	 * The bytes array written.
+	 */
+	protected byte[] bytes;
+	/**
+	 * The binary exporter.
+	 */
+	private final BinaryExporter exporter;
+	/**
+	 * The class object in binary form.
+	 */
+	private final BinaryClassObject binaryObject;
+	
+	public BinaryWriter(final BinaryExporter exporter, final BinaryClassObject bco) {
+		this.baos = new ByteArrayOutputStream();
+		this.exporter = exporter;
+		this.binaryObject = bco;
 	}
 	
 	/**
@@ -67,14 +53,25 @@ public final class BinaryWriter {
 	 * @param value The boolean value to write.
 	 * @throws IOException
 	 */
-	public void write(final String name, final boolean value) throws IOException {
-		if(name == null || name.isEmpty()) {
-			throw new IOException("Name for '" + value + "' cannot be null or empty!");
-		}
-		
-		writeName(name);
-		writeValue(ByteUtils.toBytes(value));
-	}
+    public void write(boolean value, String name, boolean defVal) throws IOException {
+        if (value == defVal)
+            return;
+        writeAlias(name, BinaryClassField.BOOLEAN);
+        write(value);
+    }
+    
+    public void write(int value, String name, int defVal) throws IOException {
+        if (value == defVal) {
+        	return;
+        }
+            
+        writeAlias(name, BinaryClassField.INT);
+        write(value);
+    }
+
+    protected void write(boolean value) throws IOException {
+        baos.write(ByteUtils.toBytes(value));
+    }
 	
 	/**
 	 * Writes the provided integer value and its name into a byte array.
@@ -92,6 +89,22 @@ public final class BinaryWriter {
 		writeValue(ByteUtils.toBytes(value));
 	}
 	
+    protected void write(int value) throws IOException {
+        baos.write(deflate(ByteUtils.toBytes(value)));
+    }
+	
+    protected void write(String value) throws IOException {
+        if (value == null) {
+            write(NULL_OBJECT);
+            return;
+        }
+        
+        // write our output as UTF-8. Java misspells UTF-8 as UTF8 for official use in java.lang
+        byte[] bytes = value.getBytes("UTF8");
+        write(bytes.length);
+        baos.write(bytes);
+    }
+    
 	/**
 	 * Writes the provided float value and its name into a byte array.
 	 * 
@@ -131,14 +144,31 @@ public final class BinaryWriter {
 	 * @param value The double value to write.
 	 * @throws IOException
 	 */
-	public void write(final String name, final double value) throws IOException {
-		if(name == null || name.isEmpty()) {
-			throw new IOException("Name for '" + value + "' cannot be null or empty!");
-		}
-		
-		writeName(name);
-		writeValue(ByteUtils.toBytes(value));
-	}
+    public void write(double value, String name, double defVal) throws IOException {
+        if (value == defVal) {
+        	return;
+        }
+           
+        writeAlias(name, BinaryClassField.DOUBLE);
+        write(value);
+    }
+    
+    public void write(float value, String name, float defVal) throws IOException {
+    	if (value == defVal) {
+    		return;
+    	}
+    	
+        writeAlias(name, BinaryClassField.FLOAT);
+        write(value);
+    }
+    
+    protected void write(double value) throws IOException {
+        baos.write(ByteUtils.toBytes(value));
+    }
+    
+    protected void write(float value) throws IOException {
+        baos.write(ByteUtils.toBytes(value));
+    }
 	
 	/**
 	 * Writes the provided string value and its name into a byte array.
@@ -147,20 +177,12 @@ public final class BinaryWriter {
 	 * @param value The string value to write.
 	 * @throws IOException
 	 */
-	public void write(final String name, final String value) throws IOException {
-		if(name == null || name.isEmpty()) {
-			throw new IOException("Name for '" + value + "' cannot be null or empty!");
-		}
-		
-		writeName(name);
-		
-		if(value == null || value.isEmpty()) {
-			throw new IOException("Value '" + value + "' cannot be null or empty!");
-		}
-		
-		writeValue(ByteUtils.toBytes(value.length()));
-		writeValue(ByteUtils.toBytes(value));
-	}
+    public void write(String value, String name, String defVal) throws IOException {
+        if (value == null ? defVal == null : value.equals(defVal))
+            return;
+        writeAlias(name, BinaryClassField.STRING);
+        write(value);
+    }
 	
 	/**
 	 * Writes the provided exportable value and its class name into a byte array.
@@ -169,28 +191,60 @@ public final class BinaryWriter {
 	 * @param value The exportable value to write.
 	 * @throws IOException
 	 */
-	public void write(final Exportable value) throws IOException {
-		if(value == null) {
-			throw new IOException("Name for '" + value + "' cannot be null or empty!");
-		}
-		
-		writeName(value.getClass().getName());
-		value.export(this);
-	}
+    protected void write(Exportable object) throws IOException {
+        if (object == null) {
+            write(NULL_OBJECT);
+            return;
+        }
+        
+        int id = exporter.writeClassObject(object);
+        write(id);
+    }
 	
+    public void writeSavableArrayList(ArrayList<?> array, String name, ArrayList<?> defVal) throws IOException {
+        if (array == defVal)
+            return;
+        writeAlias(name, BinaryClassField.SAVABLE_ARRAYLIST);
+        writeSavableArrayList(array);
+    }
+    
+    public void write(Exportable object, String name, Exportable defVal) throws IOException {
+        if (object == defVal)
+            return;
+        
+        writeAlias(name, BinaryClassField.SAVABLE);
+        write(object);
+    }
+	
+    protected void writeAlias(String name, byte fieldType) throws IOException {
+        if (binaryObject.nameFields.get(name) == null)
+            generateAlias(name, fieldType);
+
+        byte alias = binaryObject.nameFields.get(name).alias;
+        write(alias);
+    }
+    
+    protected void generateAlias(String name, byte type) {
+        byte alias = (byte) binaryObject.nameFields.size();
+        binaryObject.nameFields.put(name, new BinaryClassField(name, alias, type));
+    }
+    
 	/**
 	 * Writes the provided {@link Exportable} array.
 	 *
 	 * @param values The texture array to write.
 	 * @throws IOException
 	 */
-	public void write(final List<? extends Exportable> values) throws IOException {
-		write("size", values.size());
-		
-		for(int i = 0; i < values.size(); i++) {
-			write(values.get(i));
-		}
-	}
+    public void writeSavableArrayList(ArrayList<?> array) throws IOException {
+        if (array == null) {
+            write(NULL_OBJECT);
+            return;
+        }
+        write(array.size());
+        for (Object bs : array) {
+            write((Exportable) bs);
+        }
+    }
 	
 	/**
 	 * Writes the provided {@link Texture} path and its class name into a byte array.
@@ -210,6 +264,8 @@ public final class BinaryWriter {
 		writeValue(ByteUtils.toBytes(path.length()));
 		writeValue(ByteUtils.toBytes(path));
 	}
+	
+  
 	
 	/**
 	 * Writes the provided {@link Texture} array and its name into a byte array.
@@ -243,14 +299,48 @@ public final class BinaryWriter {
 	 * @param name The name to write.
 	 * @throws IOException
 	 */
-	private void writeValue(final byte[] bytes) throws IOException {
-		os.write(bytes);
+	protected void writeValue(final byte value) throws IOException {
+		baos.write(value);
 	}
 	
 	/**
-	 * @return The binary manager.
+	 * Writes the name and the name's length to the {@link OutputStream}.
+	 * 
+	 * @param name The name to write.
+	 * @throws IOException
 	 */
-	public BinaryManager manager() {
-		return manager;
+	protected void writeValue(final byte[] bytes) throws IOException {
+		write(bytes.length);
+		baos.write(bytes);
+	}
+	
+    protected static byte[] deflate(byte[] bytes) {
+        int size = bytes.length;
+        if (size == 4) {
+            int possibleMagic = ByteUtils.readInteger(bytes, 0);
+            if (possibleMagic == NULL_OBJECT)
+                return NULL_BYTES;
+            else if (possibleMagic == DEFAULT_OBJECT)
+                return DEFAULT_BYTES;
+        }
+        for (int x = 0; x < bytes.length; x++) {
+            if (bytes[x] != 0)
+                break;
+            size--;
+        }
+        if (size == 0)
+            return new byte[1];
+
+        byte[] rVal = new byte[1 + size];
+        rVal[0] = (byte) size;
+        for (int x = 1; x < rVal.length; x++)
+            rVal[x] = bytes[bytes.length - size - 1 + x];
+
+        return rVal;
+    }
+
+	public void finish() {
+		bytes = baos.toByteArray();
+		baos = null;
 	}
 }

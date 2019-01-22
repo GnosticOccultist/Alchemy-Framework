@@ -2,7 +2,7 @@ package fr.alchemy.editor.core.ui.component.asset.tree.filler;
 
 import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.core.EditorManager;
-import fr.alchemy.editor.core.event.EmptySceneCreationEvent;
+import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
@@ -22,6 +22,6 @@ public class NewFileMenu extends Menu {
 	}
 	
 	private void execute(ActionEvent event) {
-		AlchemyEventManager.events().notify(new EmptySceneCreationEvent());
+		AlchemyEventManager.events().notify(AlchemyEditorEvent.newSceneCreationEvent());
 	}
 }

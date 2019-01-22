@@ -3,6 +3,8 @@ package fr.alchemy.core.scene.component;
 import java.io.IOException;
 
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.entity.Entity;
@@ -269,19 +271,21 @@ public final class Transform extends Component {
 	}
 	
 	@Override
-	public void export(final BinaryWriter writer) throws IOException {
-		super.export(writer);
+	public void export(final BinaryExporter exporter) throws IOException {
+		super.export(exporter);
+		final BinaryWriter writer = exporter.getCapsule(this);
 		
-		writer.write("posX", posX.get());
-		writer.write("posY", posY.get());
-		writer.write("rotation", rotation.get());
-		writer.write("scaleX", scaleX.get());
-		writer.write("scaleY", scaleY.get());
+		writer.write(posX.get(), "posX", 0);
+		writer.write(posY.get(), "posY", 0);
+		writer.write(rotation.get(), "rotation", 0);
+		writer.write(scaleX.get(), "scaleX", 1);
+		writer.write(scaleY.get(), "scaleY", 1);
 	}
 	
 	@Override
-	public void insert(final BinaryReader reader) throws IOException {
-		super.insert(reader);
+	public void insert(final BinaryImporter importer) throws IOException {
+		super.insert(importer);
+		final BinaryReader reader = importer.getCapsule(this);
 		
 		setPosition(reader.readDouble("posX", 0), reader.readDouble("posY", 0));
 		setRotation(reader.readDouble("rotation", 0));

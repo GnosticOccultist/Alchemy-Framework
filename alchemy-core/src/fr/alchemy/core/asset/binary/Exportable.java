@@ -14,16 +14,16 @@ public interface Exportable {
 	 * Exports the instance of the class implementing this interface into a file
 	 * of a specified format.
 	 * 
-	 * @param writer	   The writer to write to the output stream.
+	 * @param exporter The exporter to write to the output stream.
 	 * @throws IOException 
 	 */
-	void export(final BinaryWriter writer) throws IOException;
+	void export(final BinaryExporter exporter) throws IOException;
 	
 	/**
 	 * Imports from a file an exportable assets which can be load into the application.
 	 * 
-	 * @param reader	   The reader to read the input stream.
+	 * @param importer The importer to read the input stream.
 	 * @throws IOException
 	 */
-	void insert(final BinaryReader reader) throws IOException;
+	void insert(final BinaryImporter importer) throws IOException;
 }

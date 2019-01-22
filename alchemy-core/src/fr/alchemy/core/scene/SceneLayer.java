@@ -3,6 +3,8 @@ package fr.alchemy.core.scene;
 import java.io.IOException;
 
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
@@ -128,14 +130,16 @@ public class SceneLayer implements Exportable {
 	}
 
 	@Override
-	public void export(final BinaryWriter writer) throws IOException {
-		writer.write("name", name);
-		writer.write("index", index);
+	public void export(final BinaryExporter exporter) throws IOException {
+		final BinaryWriter writer = exporter.getCapsule(this);
+		writer.write(name, "name", "Undefined");
+		writer.write(index, "index", SceneLayer.DEFAULT.index());
 	}
 
 	@Override
-	public void insert(final BinaryReader reader) throws IOException {
-		name = reader.readString("name", "undefined");
+	public void insert(final BinaryImporter importer) throws IOException {
+		final BinaryReader reader = importer.getCapsule(this);
+		name = reader.readString("name", "Undefined");
 		index = reader.readInteger("index", SceneLayer.DEFAULT.index());
 	}
 }
