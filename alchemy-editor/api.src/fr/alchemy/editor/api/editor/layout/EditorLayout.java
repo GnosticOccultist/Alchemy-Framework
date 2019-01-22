@@ -8,7 +8,7 @@ import com.ss.rlib.common.util.array.Array;
 import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.config.EditorConfig;
-import fr.alchemy.editor.core.event.ChangedCurrentWorkspaceEvent;
+import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
@@ -39,7 +39,7 @@ public abstract class EditorLayout<T extends Region> {
 		
 		// TODO: Maybe add an event for adding or removing components from the layout
 		AlchemyEventManager.events().registerEventHandler(
-				ChangedCurrentWorkspaceEvent.CURRENT_WORKSPACE, event -> handleSwitchWorkspace());
+				AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, event -> handleSwitchWorkspace());
 	}
 	
 	/**
