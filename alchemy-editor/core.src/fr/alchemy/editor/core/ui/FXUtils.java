@@ -8,6 +8,11 @@ import java.util.stream.Stream;
 import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
+import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
+import fr.alchemy.editor.api.editor.graph.element.GraphNode;
+import fr.alchemy.editor.api.editor.graph.skin.GraphConnectorSkin;
+import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
+import fr.alchemy.editor.core.ui.editor.graph.skin.SkinManager;
 import fr.alchemy.utilities.Validator;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -102,7 +107,7 @@ public class FXUtils {
      * @param node	The node to get the relative position from.
      * @return		The cursor's position relative to the node origin.
      */
-    public static Point2D cursorPosition(MouseEvent event, Node node) {
+    public static Point2D cursorPosition(final MouseEvent event, final Node node) {
     	Validator.nonNull(event, "The mouse event can't be null");
     	Validator.nonNull(node, "The node can't be null");
     	
@@ -111,5 +116,38 @@ public class FXUtils {
 
         final Point2D containerScene = node.localToScene(0, 0);
         return new Point2D(sceneX - containerScene.getX(), sceneY - containerScene.getY());
+    }
+    
+    public static Point2D getConnectorPosition(final GraphConnector connector, final SkinManager skinManager) {
+        final GraphConnectorSkin connectorSkin = skinManager.lookupConnector(connector);
+        final GraphNode parent = connector.getParent();
+
+        final GraphNodeSkin nodeSkin = skinManager.lookupNode(parent);
+        if (nodeSkin == null) {
+            return null;
+        }
+
+        nodeSkin.layoutConnectors();
+
+        final double nodeX = nodeSkin.getRoot().getLayoutX();
+        final double nodeY = nodeSkin.getRoot().getLayoutY();
+
+        final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
+
+        final double connectorX = connectorPosition.getX();
+        final double connectorY = connectorPosition.getY();
+
+        return new Point2D(moveOnPixel(nodeX + connectorX), moveOnPixel(nodeY + connectorY));
+    }
+    
+    /**
+     * Moves an X or Y position value on-pixel.
+     * Lines drawn off-pixel look blurry. They should therefore have integer X and Y values.
+     * 
+     * @param position The position to move on-pixel.
+     * @return		   The position rounded to the nearest integer.
+     */
+    public static double moveOnPixel(final double position) {
+    	return Math.ceil(position);
     }
 }

@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 
 import fr.alchemy.editor.api.editor.graph.GraphNodeEditor;
 import fr.alchemy.editor.api.editor.graph.element.GraphElement;
+import fr.alchemy.utilities.Validator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -156,6 +157,17 @@ public abstract class GraphSkin<E extends GraphElement> {
 	 */
 	protected GraphNodeEditor getGraphEditor() {
 		return editor;
+	}
+	
+	/**
+	 * Sets the {@link GraphNodeEditor} that the <code>GraphSkin</code> is a part of.
+	 * The provided editor can't be null.
+	 * 
+	 * @param editor The graph editor that the graph skin is a part of.
+	 */
+	public void setGraphEditor(GraphNodeEditor editor) {
+		Validator.nonNull(editor);
+		this.editor = editor;
 	}
 	
 	/**

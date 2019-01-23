@@ -3,26 +3,15 @@ package fr.alchemy.editor.core.ui.editor.scene;
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.scene.SceneLayer;
-import fr.alchemy.core.scene.component.VisualComponent;
-import fr.alchemy.core.scene.entity.Entity;
-import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
-import fr.alchemy.editor.api.editor.graph.element.GraphNode;
-import fr.alchemy.editor.core.ui.component.scene.LayerHierarchyComponent;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
 import fr.alchemy.editor.core.ui.editor.graph.SimpleGraphNodeEditor;
-import fr.alchemy.editor.core.ui.editor.graph.element.BaseGraphNode;
-import fr.alchemy.editor.core.ui.editor.graph.skin.TitledGraphNodeSkin;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 
 public class AlchemyEditorScene extends AlchemyScene {
 	
@@ -58,24 +47,6 @@ public class AlchemyEditorScene extends AlchemyScene {
 		AlchemyEditorBar bar = new AlchemyEditorBar();
 		bar.prefWidthProperty().bind(root.widthProperty());
 		
-		getContentRoot().prefWidthProperty().bind(root.widthProperty());
-		getContentRoot().prefHeightProperty().bind(root.heightProperty());
-		getContentRoot().setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-		
-		Entity entity = new Entity();
-		Circle circle = new Circle(20, 20, 25);
-		circle.setFill(Color.RED);
-		entity.perform(VisualComponent.class, v -> v.getView().addNode(circle));
-		addEntity(entity);
-		
-		Entity entity2 = new Entity();
-		Circle circle2 = new Circle(500, 500, 500);
-		circle2.setFill(Color.BLUE);
-		entity2.perform(VisualComponent.class, v -> v.getView().addNode(circle2));
-		entity2.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Special", 100));
-		addEntity(entity2);
-		
-		tabPane.attach(new LayerHierarchyComponent(this));
 		tabPane.construct();
 		
 		scenePane.getContent().prefHeightProperty().bind(root.heightProperty());
@@ -83,12 +54,10 @@ public class AlchemyEditorScene extends AlchemyScene {
 		Tab tab = new Tab("empty-scene");
 		scenePane.getContent().getTabs().add(tab);
 		SimpleGraphNodeEditor editor = new SimpleGraphNodeEditor();
-		TitledGraphNodeSkin titled = new TitledGraphNodeSkin(new BaseGraphNode());
-		titled.getElement().getConnectors().add(new GraphConnector() {
-		});
-		titled.initialize();
-		editor.getView().add(titled);
+		editor.newNode();
+		editor.newNode();
 		tab.setContent(editor.getView());
+		editor.reload();
 		
 		tabPane.getContent().prefHeightProperty().bind(root.heightProperty());
 		tabPane.getContent().setSide(Side.LEFT);

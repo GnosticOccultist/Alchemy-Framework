@@ -1,5 +1,7 @@
 package fr.alchemy.editor.api.editor.region;
 
+import fr.alchemy.editor.api.editor.graph.event.GraphEventManager;
+import fr.alchemy.editor.api.editor.graph.event.GraphInputGesture;
 import fr.alchemy.editor.core.ui.FXUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -57,9 +59,11 @@ public class DraggableBox extends StackPane {
 			return;
 		}
 		
-		final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
-        storeClick(cursorPosition.getX(), cursorPosition.getY());
-        event.consume();
+		if(GraphEventManager.instance().canActivate(GraphInputGesture.MOVE, event)) {
+			final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
+	        storeClick(cursorPosition.getX(), cursorPosition.getY());
+	        event.consume();
+		}
 	}
 	
 	/**
@@ -90,9 +94,13 @@ public class DraggableBox extends StackPane {
 			return;
 		}
 		
-        final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
-        handleDrag(cursorPosition.getX(), cursorPosition.getY());
-        event.consume();
+		GraphEventManager manager = GraphEventManager.instance();
+		if(manager.canActivate(GraphInputGesture.MOVE, event)) {
+			final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
+			handleDrag(cursorPosition.getX(), cursorPosition.getY());
+			manager.activateInputGesture(GraphInputGesture.MOVE);
+			event.consume();
+		}   
 	}
 	
 	/**
@@ -148,7 +156,9 @@ public class DraggableBox extends StackPane {
 	}
 	
 	protected void handleMouseReleased(final MouseEvent event) {
-		//event.consume();
+		if(GraphEventManager.instance().finishInputGesture(GraphInputGesture.MOVE)) {
+			event.consume();
+		}
 	}
 	
 	/**

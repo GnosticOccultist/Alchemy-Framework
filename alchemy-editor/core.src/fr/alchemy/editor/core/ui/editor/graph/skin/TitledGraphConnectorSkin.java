@@ -3,11 +3,14 @@ package fr.alchemy.editor.core.ui.editor.graph.skin;
 import fr.alchemy.editor.api.editor.graph.GraphConnectorStyle;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
 import fr.alchemy.editor.api.editor.graph.skin.GraphConnectorSkin;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
 public class TitledGraphConnectorSkin extends GraphConnectorSkin {
 
+	private static final PseudoClass PSEUDO_CLASS_SELECTED = PseudoClass.getPseudoClass("selected");
+	
 	/**
 	 * The default size of the connector (width & height).
 	 */
@@ -30,9 +33,8 @@ public class TitledGraphConnectorSkin extends GraphConnectorSkin {
 		root.setMinSize(SIZE, SIZE);
 		root.setPrefSize(SIZE, SIZE);
 		root.setMaxSize(SIZE, SIZE);
+		root.getStyleClass().setAll("titled-connector");
 		root.setPickOnBounds(false);
-		
-		
 	}
 
 	@Override
@@ -58,7 +60,10 @@ public class TitledGraphConnectorSkin extends GraphConnectorSkin {
 
 	@Override
 	protected void selectionChanged(boolean selected) {
-		// TODO Auto-generated method stub
-
+		if(isSelected()) {
+			root.pseudoClassStateChanged(PSEUDO_CLASS_SELECTED, true);
+		} else {
+			root.pseudoClassStateChanged(PSEUDO_CLASS_SELECTED, false);
+		}
 	}
 }

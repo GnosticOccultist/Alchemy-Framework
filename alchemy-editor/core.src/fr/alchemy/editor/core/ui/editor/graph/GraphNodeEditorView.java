@@ -1,7 +1,12 @@
 package fr.alchemy.editor.core.ui.editor.graph;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.alchemy.editor.api.editor.graph.GraphNodeEditor;
+import fr.alchemy.editor.api.editor.graph.element.GraphNode;
 import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
+import fr.alchemy.editor.api.editor.graph.skin.GraphTailSkin;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
@@ -30,6 +35,8 @@ public class GraphNodeEditorView extends Region {
 
     private static final String STYLE_CLASS_CONNECTION_LAYER = "graph-editor-connection-layer";
 	
+    
+    private final List<GraphNode> nodes = new ArrayList<>();
 	/**
 	 * The layer for graph nodes.
 	 */
@@ -69,9 +76,21 @@ public class GraphNodeEditorView extends Region {
 	public void add(final GraphNodeSkin nodeSkin) {
 		if(nodeSkin != null) {
 			nodeLayer.getChildren().add(nodeSkin.getRoot());
+			nodes.add(nodeSkin.getElement());
 		}
 	}
 	
+	public void add(final GraphTailSkin tailSkin) {
+		if(tailSkin != null) {
+			connectionLayer.getChildren().add(tailSkin.getRoot());
+		}
+	}
+	
+	public void remove(final GraphTailSkin tailSkin) {
+		if(tailSkin != null) {
+			connectionLayer.getChildren().remove(tailSkin.getRoot());
+		}
+	}
 	
 	@Override
 	protected void layoutChildren() {
@@ -88,5 +107,9 @@ public class GraphNodeEditorView extends Region {
 	public void clear() {
 		nodeLayer.getChildren().clear();
 		connectionLayer.getChildren().clear();
+	}
+	
+	public List<GraphNode> getNodes() {
+		return nodes;
 	}
 }
