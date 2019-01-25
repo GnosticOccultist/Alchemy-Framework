@@ -1,13 +1,16 @@
 package fr.alchemy.editor.api.editor.graph.skin;
 
+import java.util.List;
 import java.util.Map;
 
 import fr.alchemy.editor.api.editor.graph.GraphNodeEditor;
+import fr.alchemy.editor.api.editor.graph.GraphSkinDictionary;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnection;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
+import fr.alchemy.editor.api.editor.graph.element.GraphJoint;
 import fr.alchemy.editor.core.ui.FXUtils;
-import fr.alchemy.editor.core.ui.editor.graph.skin.SkinManager;
 import javafx.geometry.Point2D;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Line;
 
 /**
@@ -44,6 +47,17 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
 	}
 	
 	/**
+	 * Sets the {@link GraphJointSkin} for all {@link GraphJoint} inside the <code>GraphConnectionSkin</code>.
+	 * <p>
+	 * This will be called as the connection skin is created. The connection skin can manipulate its joint skin
+	 * if it chooses. For example a 'rectangular' connection skin may restrict the movement of the first and last 
+	 * joints to the X direction only.
+	 * 
+	 * @param jointSkins The list of all joint's skins associated to the connection.
+	 */
+	public abstract void setJointSkins(final List<GraphJointSkin> jointSkins);
+	
+	/**
 	 * Draws the <code>GraphConnectionSkin</code>. This is called every time the {@link GraphConnection}'s
 	 * position could change, for example if one of its connectors is moved, after {@link #update()}.
 	 * <p>
@@ -52,7 +66,7 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
 	 * 
 	 * @param allConnections The lists of points for all connections (can be ingored in a simple skin).
 	 */
-	public void draw(final Map<GraphConnectorSkin, Point2D[]> allConnections) {
+	public void draw(final Map<GraphConnectionSkin, Point2D[]> allConnections) {
 		if(getRoot() != null && getRoot().getParent() != null) {
 			connectionIndex = getRoot().getParent().getChildrenUnmodifiable().indexOf(getRoot());
 		} else {
@@ -85,7 +99,7 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
 	 */
 	public Point2D[] update() {
 		final GraphConnection element = getElement();
-        final SkinManager skinManager = getGraphEditor() == null ? null : getGraphEditor().getSkinManager();
+        final GraphSkinDictionary skinManager = getGraphEditor() == null ? null : getGraphEditor().getSkinDictionary();
         if(element == null || skinManager == null) {
         	points = null;
         } else if(element.getJoints().isEmpty()) {
@@ -99,7 +113,28 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
         	
         	this.points = points;
         } else {
-        	throw new UnsupportedOperationException("No joints available for now!");
+        	final int length = element.getJoints().size() + 2;
+            final Point2D[] points = new Point2D[length];
+            
+            // Create the joint positions.
+            for (int i = 0; i < element.getJoints().size(); i++) {
+            	final GraphJoint joint = element.getJoints().get(i);
+            	final GraphJointSkin jointSkin = skinManager.retrieveJoint(joint);
+                final Region region = jointSkin.getRoot();
+
+                final double x = region.getLayoutX() + jointSkin.getWidth() / 2;
+                final double y = region.getLayoutY() + jointSkin.getHeight() / 2;
+            	
+            	points[i + 1] = new Point2D(x, y);
+            }
+            
+            // Create the start position aka the source connector position.
+        	points[0] = FXUtils.getConnectorPosition(element.getSource(), skinManager);
+        	
+        	// Create the end position aka the target connector position.
+        	points[length - 1] = FXUtils.getConnectorPosition(element.getTarget(), skinManager);
+        	
+        	this.points = points;
         }
         
         return points;

@@ -58,3 +58,38 @@
 	-fx-fill: derive(rgba(240, 235, 242, 0.9), 50%);
 	-fx-effect: dropshadow(one-pass-box, rgb(220, 220, 220), 5, 0, 1, 1);
 }
+
+.default-connection {
+	-fx-stroke-width: 1;
+	-fx-stroke: rgba(160, 160, 160, 0.8);
+	-fx-effect: dropshadow(one-pass-box, rgba(180, 180, 180), 5, 0, 1, 1);
+}
+
+.default-connection-background {
+	-fx-stroke-width: 7;
+	-fx-stroke: transparent;
+}
+
+.default-joint {
+	/* Invisible by default but make sure it has the exact same dimensions as for hover and pressed effects. */
+	-fx-border-width: 1;
+	-fx-border-color: transparent;
+	-fx-border-style: solid inside;
+	-fx-background-color: transparent;
+	-fx-border-radius: 0;
+	-fx-background-radius: 0;
+}
+
+.default-joint:hover, .default-joint:selected:hover {
+	-fx-border-color: rgba(160, 160, 160, 0.8);
+	-fx-background-color: white;
+	-fx-opacity: 0.6;
+	-fx-effect: dropshadow(one-pass-box, rgba(180, 180, 180), 5, 0, 1, 1);
+}
+
+.default-joint:pressed, .default-joint:selected, .default-joint:selected:pressed {
+	-fx-border-color: rgba(160, 160, 160, 0.8);
+	-fx-background-color: derive(white, -4%);
+	-fx-opacity: 0.6;
+	-fx-effect: dropshadow(one-pass-box, rgba(180, 180, 180), 5, 0, 1, 1);
+}

@@ -20,6 +20,8 @@ import javafx.scene.layout.StackPane;
  */
 public class DraggableBox extends StackPane {
 	
+	private static final double DEFAULT_ALIGNMENT_THRESHOLD = 5;
+	
 	/**
 	 * Used for internal storing of the layout X-coordinate.
 	 */
@@ -36,6 +38,26 @@ public class DraggableBox extends StackPane {
 	 * Used for internal storing of the mouse Y-coordinate.
 	 */
 	double lastMouseY;
+	/**
+     * The alignment targets for the X-axis.
+     */
+    private double[] alignmentTargetsX;
+    /**
+     * The alignment targets for the Y-axis.
+     */
+    private double[] alignmentTargetsY;
+    /**
+     * The threshold value for the alignment.
+     */
+    private double alignmentThreshold = DEFAULT_ALIGNMENT_THRESHOLD;
+	/**
+     * The box dependency for the X-axis.
+     */
+    private DraggableBox dependencyX;
+    /**
+     * The box dependency for the Y-axis.
+     */
+    private DraggableBox dependencyY;
 	
 	/**
 	 * Instantiates a new empty <code>DraggableBox</code>.
@@ -48,6 +70,50 @@ public class DraggableBox extends StackPane {
 		addEventHandler(MouseEvent.MOUSE_DRAGGED, this::handleMouseDragged);
 		addEventHandler(MouseEvent.MOUSE_RELEASED, this::handleMouseReleased);
 	}
+	
+	/**
+	 * Sets a dependent <code>DraggableBox</code> that will be moved on the X-axis when
+	 * this draggable box is moved on the X-axis.
+	 * 
+	 * @param dependencyX The dependent box for the X-axis.
+	 */
+	public void bindLayoutX(DraggableBox dependencyX) {
+		this.dependencyX = dependencyX;
+	}
+	
+	/**
+	 * Sets a dependent <code>DraggableBox</code> that will be moved on the Y-axis when
+	 * this draggable box is moved on the Y-axis.
+	 * 
+	 * @param dependencyY The dependent box for the Y-axis.
+	 */
+	public void bindLayoutY(DraggableBox dependencyY) {
+		this.dependencyY = dependencyY;
+	}
+	
+	/**
+	 * Sets the set of X-axis values that the <code>DraggableBox</code> will align to when dragged close enough.
+	 * <p>
+	 * This mechanism will be active if the list isn't null and not empty. If both this mechanism and
+     * snap-to-grid are active, snap-to-grid will take priority.
+	 * 
+	 * @param pAlignmentTargetsX A list of X-axis values to align the box to, or null to ignore.
+	 */
+	public void setAlignmentTargetsX(final double[] pAlignmentTargetsX) {
+       this.alignmentTargetsX = pAlignmentTargetsX;
+    }
+	
+	/**
+	 * Sets the set of Y-axis values that the <code>DraggableBox</code> will align to when dragged close enough.
+	 * <p>
+	 * This mechanism will be active if the list isn't null and not empty. If both this mechanism and
+     * snap-to-grid are active, snap-to-grid will take priority.
+	 * 
+	 * @param pAlignmentTargetsX A list of Y-axis values to align the box to, or null to ignore.
+	 */
+	public void setAlignmentTargetsY(final double[] pAlignmentTargetsY) {
+       this.alignmentTargetsY = pAlignmentTargetsY;
+    }
 	
 	/**
 	 * Handles the mouse-pressed events of the <code>DraggableBox</code>.
@@ -129,11 +195,19 @@ public class DraggableBox extends StackPane {
         // Even if snap-to-grid is off, we use Math.round to ensure drawing 'on-pixel' when zoomed in past 100%.
         newLayoutX = Math.round(newLayoutX);
         
+        if(alignmentTargetsX != null) {
+        	newLayoutX = align(newLayoutX, alignmentTargetsX);
+        }
+        
         if(newLayoutX > maxLayoutX) {
         	newLayoutX = maxLayoutX;
         }
         
         setLayoutX(newLayoutX);
+        
+        if(dependencyX != null) {
+        	dependencyX.setLayoutX(newLayoutX);
+        }
 	}
 
 	private void handleDragY(double y) {
@@ -148,13 +222,40 @@ public class DraggableBox extends StackPane {
         // Even if snap-to-grid is off, we use Math.round to ensure drawing 'on-pixel' when zoomed in past 100%.
         newLayoutY = Math.round(newLayoutY);
         
+        if(alignmentTargetsY != null) {
+        	newLayoutY = align(newLayoutY, alignmentTargetsY);
+        }
+        
         if(newLayoutY > maxLayoutY) {
         	newLayoutY = maxLayoutY;
         }
         
         setLayoutY(newLayoutY);
+        
+        if(dependencyY != null) {
+        	dependencyY.setLayoutX(newLayoutY);
+        }
 	}
 	
+	/**
+	 * Aligns the given position to the first alignment value that is closer than the alignment threshold
+	 * for the <code>DraggableBox</code>.
+     * <p>
+     * Returns the original position if no alignment values are nearby.
+	 * 
+	 * @param position	      The position to be aligned.
+	 * @param alignmentValues The list of alignment values.
+	 * @return				  The new position after alignment.
+	 */
+	private double align(final double position, final double[] alignmentValues) {
+		for(final double alignmentValue : alignmentValues) {
+			if(Math.abs(alignmentValue - position) <= alignmentThreshold) {
+				return alignmentValue;
+			}
+		}
+		return position;
+	}
+
 	protected void handleMouseReleased(final MouseEvent event) {
 		if(GraphEventManager.instance().finishInputGesture(GraphInputGesture.MOVE)) {
 			event.consume();

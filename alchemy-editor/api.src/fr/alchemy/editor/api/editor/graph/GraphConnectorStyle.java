@@ -9,10 +9,16 @@ import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
  * @author GnosticOccultist
  */
 public enum GraphConnectorStyle {
-	
+	/**
+	 * The default connector style.
+	 */
 	DEFAULT,
-	
+	/**
+	 * The connector style for allowed connection.
+	 */
 	DRAG_OVER_ALLOWED,
-	
+	/**
+	 * The connector style for forbidden connection.
+	 */
 	DRAG_OVER_FORBIDDEN;
 }
