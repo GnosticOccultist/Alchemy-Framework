@@ -93,6 +93,13 @@ public class GraphNodeEditorView extends Region {
 		}
 	}
 	
+	public void remove(final GraphNodeSkin nodeSkin) {
+		if(nodeSkin != null) {
+			nodeLayer.getChildren().remove(nodeSkin.getRoot());
+			nodes.remove(nodeSkin.getElement());
+		}
+	}
+	
 	public void add(final GraphConnectionSkin connectionSkin) {
 		if(connectionSkin != null) {
 			connectionLayer.getChildren().add(0, connectionSkin.getRoot());

@@ -16,6 +16,7 @@ import fr.alchemy.editor.api.editor.graph.element.GraphNode;
 import fr.alchemy.editor.api.editor.graph.skin.GraphConnectorSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphSkin;
+import fr.alchemy.editor.core.ui.component.asset.tree.filler.ContextMenuFillerRegistry;
 import fr.alchemy.utilities.Validator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
@@ -25,7 +26,6 @@ import javafx.event.WeakEventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -145,9 +145,10 @@ public class SelectionManager {
 
     	if (event.getButton() == MouseButton.SECONDARY) {
     		ContextMenu menu = new ContextMenu();
-    		menu.getItems().add(new MenuItem("Create new node"));
+    		ContextMenuFillerRegistry.filler().fill(nodeSkin, menu.getItems());
 			
-			menu.show(nodeSkin.getRoot(), Side.BOTTOM, 0, -50);	
+    		// TODO: We should keep track of the context menus to actually hide them at some points.
+			menu.show(nodeSkin.getRoot(), Side.BOTTOM, 0, 0);	
 		}
 
         // First update the selection:
@@ -165,7 +166,7 @@ public class SelectionManager {
 	 */
     private void handleSelectionClick(final MouseEvent event, final GraphSkin<?> skin) {
 
-        if (!MouseButton.PRIMARY.equals(event.getButton())) {
+        if (!MouseButton.PRIMARY.equals(event.getButton()) && !MouseButton.SECONDARY.equals(event.getButton())) {
             return;
         }
         

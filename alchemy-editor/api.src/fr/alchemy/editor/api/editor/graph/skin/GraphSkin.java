@@ -155,7 +155,7 @@ public abstract class GraphSkin<E extends GraphElement> {
 	 * 
 	 * @return The graph editor that the graph skin is a part of.
 	 */
-	protected GraphNodeEditor getGraphEditor() {
+	public GraphNodeEditor getGraphEditor() {
 		return editor;
 	}
 	

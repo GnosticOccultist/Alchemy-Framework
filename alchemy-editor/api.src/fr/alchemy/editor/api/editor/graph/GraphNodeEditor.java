@@ -65,4 +65,11 @@ public interface GraphNodeEditor {
 	 * @param skin The graph skin implementation to redraw.
 	 */
 	void redraw(GraphSkin skin);
+
+	/**
+	 * Remove the specified {@link GraphSkin} from the <code>GraphNodeEditor</code>'s view.
+	 * 
+	 * @param skin The graph skin to remove.
+	 */
+	void remove(GraphSkin skin);
 }

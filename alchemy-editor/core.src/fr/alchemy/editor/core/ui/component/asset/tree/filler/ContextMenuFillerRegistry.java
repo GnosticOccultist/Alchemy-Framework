@@ -7,14 +7,15 @@ import com.ss.rlib.common.util.array.Array;
 import com.ss.rlib.common.util.array.ArrayFactory;
 
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
+import fr.alchemy.editor.core.ui.editor.graph.selection.SelectedGraphSkinFiller;
 import javafx.scene.control.MenuItem;
 
 /**
- * <code>ContextMenuFillerRegistry</code> is the registry containing all the {@link ContextMenuFiller}
+ * <code>ContextMenuFillerRegistry</code> is the registry containing all the {@link ContextMenuFiller}.
  * 
  * @author GnosticOccultist
  */
-public class ContextMenuFillerRegistry {
+public final class ContextMenuFillerRegistry {
 	
 	/**
 	 * The single instance of this registry.
@@ -40,7 +41,8 @@ public class ContextMenuFillerRegistry {
 	 * Use {@link #filler()} to get the single instance.
 	 */
 	private ContextMenuFillerRegistry() {
-		register(AlchemyContextMenuFiller.class);
+		register(AssetContextMenuFiller.class);
+		register(SelectedGraphSkinFiller.class);
 	}
 	
 	/**
@@ -71,10 +73,18 @@ public class ContextMenuFillerRegistry {
 	 * @param element The element to fill with items.
 	 * @param items   The list to add items to.
 	 */
-	public void fill(AssetElement element, List<MenuItem> items) {
+	@SuppressWarnings("unchecked")
+	public <E> void fill(E element, List<MenuItem> items) {
 		
-		for(ContextMenuFiller filler : fillers) {
-			filler.fill(element, items);
+		for(ContextMenuFiller<E> filler : fillers) {
+			try {
+				filler.fill(element, items);
+			} catch (ClassCastException ex) {
+				// If the provided element can't be cast to the filler just continue...
+				// TODO: We might have to add a type checker for choosing a correct filler in the future.
+				continue;
+			}
+			
 		}
 	}
 }

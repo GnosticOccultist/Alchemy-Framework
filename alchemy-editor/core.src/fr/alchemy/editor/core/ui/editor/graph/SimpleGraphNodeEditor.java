@@ -108,4 +108,11 @@ public class SimpleGraphNodeEditor implements GraphNodeEditor {
 			view.redrawConnection((GraphConnectionSkin) skin);
 		}
 	}
+
+	@Override
+	public void remove(GraphSkin skin) {
+		if(skin instanceof GraphNodeSkin) {
+			view.remove((GraphNodeSkin) skin);
+		}	
+	}
 }
