@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import fr.alchemy.utilities.pool.FastReusablePool;
-
 /**
  * <code>LocalVars</code> is the container with multiple <code>ReusablePoolObject</code>
  * registered from which the user can retrieve an object specific to a thread.
@@ -19,6 +17,8 @@ public final class LocalVars {
 	 */
 	private static final ThreadLocal<LocalVars> THREAD_LOCAL = 
 			ThreadLocal.withInitial(LocalVars::new);
+	
+	private static final int DEFAULT_SIZE = 20;
 
 	/**
 	 * Return the thread-local vars.
@@ -29,7 +29,7 @@ public final class LocalVars {
 		return THREAD_LOCAL.get();
 	}
 	
-	private final Map<Class<?>, FastReusablePool<?>> buffers;
+	private final Map<Class<?>, ReusablePoolObject<?>> buffers;
 	
 	public LocalVars() {
 		this.buffers = new HashMap<>();
@@ -37,22 +37,36 @@ public final class LocalVars {
 	
 	/**
 	 * Register a new <code>ReusablePoolObject</code> with the specified
-	 * type and factory. The size is 10 objects.
+	 * type and factory. The size is 20 objects.
 	 * 
-	 * @param type The type of object to store.
+	 * @param type	  The type of object.
+	 * @param factory The factory to create the object.
 	 */
-	public <T> void register(Class<T> type) {
+	public <T> void register(Class<T> type, Supplier<T> factory) {
 		if(!buffers.containsKey(type)) {
-			buffers.put(type, new FastReusablePool<>(type));
+			buffers.put(type, new ReusablePoolObject<>(type, DEFAULT_SIZE, factory));
 		}
 	}
 	
 	/**
-	 * Acquire the next object from the specified type or null if it isn't register.
-	 * <p>
-	 * You can register a new type of object by calling {@link #register(Class)}.
+	 * Register a new <code>ReusablePoolObject</code> with the specified
+	 * type, size and factory.
 	 * 
-	 * @see #acquireNext(Class, Supplier)
+	 * @param type	  The type of object.
+	 * @param size    The size of the pool.
+	 * @param factory The factory to create the object.
+	 */
+	public <T> void register(Class<T> type, int size, Supplier<T> factory) {
+		if(!buffers.containsKey(type)) {
+			buffers.put(type, new ReusablePoolObject<>(type, size, factory));
+		}
+	}
+	
+	/**
+	 * Acquire the next object from the specified type or null if it 
+	 * isn't register.
+	 * <p>
+	 * You can register a new type of object by calling {@link #register(Class, Supplier)}.
 	 * 
 	 * @param type The type of object to get.
 	 * @return	   A new object from the pool.
@@ -60,26 +74,7 @@ public final class LocalVars {
 	@SuppressWarnings("unchecked")
 	public <T> T acquireNext(Class<T> type) {
 		if(buffers.containsKey(type)) {
-			FastReusablePool pool = buffers.get(type);
-			return (T) pool.take();
-		}
-		return null;
-	}
-	
-	/**
-	 * Acquire the next object from the specified type or null if it isn't register. If no object 
-	 * is stored in the pool it will use the given supplier to instantiate a new object.
-	 * <p>
-	 * You can register a new type of object by calling {@link #register(Class)}.
-	 * 
-	 * @param type The type of object to get.
-	 * @return	   A new object from the pool.
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> T acquireNext(Class<T> type, Supplier<T> factory) {
-		if(buffers.containsKey(type)) {
-			FastReusablePool pool = buffers.get(type);
-			return (T) pool.take(factory);
+			return (T) buffers.get(type).acquireNext();
 		}
 		return null;
 	}
