@@ -1,12 +1,17 @@
 package fr.alchemy.editor.core.ui.editor.graph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.alchemy.editor.api.editor.graph.GraphNodeEditor;
+import fr.alchemy.editor.api.editor.graph.element.GraphConnection;
 import fr.alchemy.editor.api.editor.graph.element.GraphNode;
+import fr.alchemy.editor.api.editor.graph.skin.GraphConnectionSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphTailSkin;
+import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
@@ -37,6 +42,8 @@ public class GraphNodeEditorView extends Region {
 	
     
     private final List<GraphNode> nodes = new ArrayList<>();
+    
+    private final List<GraphConnection> connections = new ArrayList<>();
 	/**
 	 * The layer for graph nodes.
 	 */
@@ -46,11 +53,17 @@ public class GraphNodeEditorView extends Region {
 	 */
 	private final Pane connectionLayer = new Pane();
 	
+	private final GraphNodeEditor editor;
+	
+	private final Map<GraphConnectionSkin, Point2D[]> connectionPoints = new HashMap<>();
+	
 	/**
 	 * Instantiates a new <code>GraphNodeEditorView</code> to which skin instances can be 
 	 * added and removed.
 	 */
-	public GraphNodeEditorView() {
+	public GraphNodeEditorView(GraphNodeEditor editor) {
+		this.editor = editor;
+		
 		getStyleClass().addAll(STYLE_CLASS);
 		
 		setMaxWidth(Double.MAX_VALUE);
@@ -80,6 +93,13 @@ public class GraphNodeEditorView extends Region {
 		}
 	}
 	
+	public void add(final GraphConnectionSkin connectionSkin) {
+		if(connectionSkin != null) {
+			connectionLayer.getChildren().add(0, connectionSkin.getRoot());
+			connections.add(connectionSkin.getElement());
+		}
+	}
+	
 	public void add(final GraphTailSkin tailSkin) {
 		if(tailSkin != null) {
 			connectionLayer.getChildren().add(tailSkin.getRoot());
@@ -89,6 +109,50 @@ public class GraphNodeEditorView extends Region {
 	public void remove(final GraphTailSkin tailSkin) {
 		if(tailSkin != null) {
 			connectionLayer.getChildren().remove(tailSkin.getRoot());
+		}
+	}
+	
+	public void redrawConnection(final GraphConnectionSkin connectionSkin) {
+		if(connectionPoints.isEmpty()) {
+			// We need all points of all connection first.
+			redrawAll();
+		}
+		
+		try {
+			redrawSingleConnection(connectionSkin);
+		} catch (Exception ex) {
+			System.err.println("Couldn't redraw dirty connection skin: " + connectionSkin + ". " + ex);
+		}
+	}
+
+	private void redrawSingleConnection(GraphConnectionSkin connectionSkin) {
+	
+        if (connectionSkin != null) {
+
+            final Point2D[] points = connectionSkin.update();
+            if (points != null) {
+                connectionPoints.put(connectionSkin, points);
+            }
+
+            connectionSkin.draw(connectionPoints);
+        }
+	}
+
+	private void redrawAll() {
+		connectionPoints.clear();
+		
+		for(final GraphConnection connection : getConnections()) {
+			final GraphConnectionSkin connectionSkin = editor.getSkinDictionary().retrieveConnection(connection);
+			if(connectionSkin != null) {
+				final Point2D[] points = connectionSkin.update();
+				if(points != null) {
+					connectionPoints.put(connectionSkin, points);
+				}
+			}
+		}
+		
+		for(final GraphConnectionSkin skin : connectionPoints.keySet()) {
+			skin.draw(connectionPoints);
 		}
 	}
 	
@@ -111,5 +175,9 @@ public class GraphNodeEditorView extends Region {
 	
 	public List<GraphNode> getNodes() {
 		return nodes;
+	}
+	
+	public List<GraphConnection> getConnections() {
+		return connections;
 	}
 }
