@@ -40,7 +40,7 @@ public class SimpleGraphNodeEditor implements GraphNodeEditor {
 		
 		this.skinManager = new GraphSkinManager(this);
 		this.view = new GraphNodeEditorView(this);
-		this.selectionManager = new SelectionManager(skinManager, view);
+		this.selectionManager = new SelectionManager(this, view);
 		this.connectorDragManager = new ConnectorDragManager(skinManager, view);
 		
 		view.getStylesheets().clear();
