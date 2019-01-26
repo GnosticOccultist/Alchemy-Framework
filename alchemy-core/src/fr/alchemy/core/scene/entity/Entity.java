@@ -3,9 +3,10 @@ package fr.alchemy.core.scene.entity;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.List;
 
 import fr.alchemy.core.annotation.CoreComponent;
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
@@ -33,7 +34,7 @@ public class Entity implements Exportable {
 	/**
 	 * The list of components defining the entity.
 	 */
-	private List<Component> components = new ArrayList<>();
+	private ArrayList<Component> components = new ArrayList<>();
 	/**
 	 * Whether the entity is enabled.
 	 */
@@ -202,7 +203,7 @@ public class Entity implements Exportable {
 	 * Sets whether the <code>Entity</code> should be enabled.
 	 * It also enable/disable all of its components.
 	 * 
-	 * @param enabled Whether the entity is enabled.
+o	 * @param enabled Whether the entity is enabled.
 	 */
 	public final void setEnabled(final boolean enabled) {
 		this.enabled.set(enabled);
@@ -239,14 +240,18 @@ public class Entity implements Exportable {
 	}
 
 	@Override
-	public void export(final BinaryWriter writer) throws IOException {
-		writer.write("enabled", enabled.get());
-		writer.write(components);
+	public void export(final BinaryExporter exporter) throws IOException {
+		final BinaryWriter writer = exporter.getCapsule(this);
+		
+		writer.write(enabled.get(), "enabled", true);
+		writer.writeSavableArrayList(components, "components", new ArrayList<>());
 	}
 	
 	@Override
-	public void insert(final BinaryReader reader) throws IOException {
+	public void insert(final BinaryImporter importer) throws IOException {
+		final BinaryReader reader = importer.getCapsule(this);
+		
 		enabled.set(reader.readBoolean("enabled", true));
-		reader.attachComponents(this);
+		ArrayList<?> components = reader.readSavableArrayList("components", null);
 	}
 }

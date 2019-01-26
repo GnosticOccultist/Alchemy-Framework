@@ -41,14 +41,14 @@ public class TestApp extends AlchemyApplication {
 		
 		Texture texture = assetManager.loadTexture("resources/icons/logo_colored_x32.png");
 		
-		scene.setBackgroundRepeat(texture.getImage());
+		//scene.setBackgroundRepeat(texture.getImage());
 		
 		entityTest = new Entity();
 		
 		entityTest.forcePerform(VisualComponent.class, v -> v.getView().addNode(texture));
 		entityTest.getComponent(VisualComponent.class).setSceneLayer(new SceneLayer("Test", 20));
 		
-		entityTest.attach(new NameComponent("Test"));
+		entityTest.attach(new NameComponent("TestEntity"));
 		entityTest.getComponent(NameComponent.class).setColor(Color.RED);
 		
 		Entity entity = new Entity();
@@ -71,11 +71,10 @@ public class TestApp extends AlchemyApplication {
 			musicTest.play();
 		});	
 		
-		//assetManager.saveAsset(entityTest, "resources/entity/entity.ecs");
-		//Entity clone = (Entity) assetManager.loadAsset("resources/entity/entity.ecs");
-
-//		clone.getComponent(Transform.class).setPosition(0, 50);
-//		scene.addEntity(clone);
+		assetManager.saveAsset(entityTest, "resources/entity/entity.ecs");
+		Entity clone = (Entity) assetManager.loadAsset("resources/entity/entity.ecs");
+		
+		scene.addEntity(clone);
 	
 		AlchemyEventManager.events().registerEventHandler(AlchemySceneEvent.ENTITY_ADDED, (event) -> { System.out.println("Notified"); event.consume(); });
 		AlchemyEventManager.events().handleClass(this);

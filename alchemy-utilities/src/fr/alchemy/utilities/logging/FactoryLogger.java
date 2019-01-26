@@ -2,20 +2,35 @@ package fr.alchemy.utilities.logging;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
 
-public class FactoryLogger {
+/**
+ * <code>FactoryLogger</code> is a utility class to manage and store each instantiated
+ * {@link Logger}.
+ * <p>
+ * By default the factory uses the {@link AlchemyLogger} as its base implementation but you can change it 
+ * by calling {@link #changeToType(Class)} to your own logger if you have defined one.
+ * <p>
+ * A logger can be registered or retrieved at any time using {@link #getLogger(Class)} or {@link #getLogger(String)},
+ * and then be used to write something in the console using the printing function, by default this is <code>System.err::println</code> 
+ * but this can be changed with {@link #changePrinter(Consumer)}.
+ * 
+ * @author GnosticOccultist
+ */
+public final class FactoryLogger {
 	
-	/**
+	/**	
 	 * The table with all created loggers.
 	 */
 	private static final Map<String, Logger> LOGGERS = 
-			new HashMap<>();
+			Collections.synchronizedMap(new HashMap<String, Logger>());
 	/**
 	 * The current logger type.
 	 */
@@ -55,6 +70,14 @@ public class FactoryLogger {
 		FactoryLogger.printer = printer;
 	}
 	
+	/**
+	 * Writes the provided message at the specified {@link LoggerLevel} and with the given name 
+	 * using the registered printer (by default: <code>System.err.println</code>).
+	 * 
+	 * @param level   The levek to print the message at.
+	 * @param name	  The name to print with.
+	 * @param message The message to print to the console.
+	 */
 	public static void print(LoggerLevel level, String name, String message) {
 
 		String date = TIME_FORMATTER.format(LocalTime.now());

@@ -3,6 +3,12 @@ package fr.alchemy.utilities.logging;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * <code>AlchemyLogger</code> is an implementation of {@link Logger} for the <code>Alchemy-Framework</code>,
+ * and can be reused over multiple projects.
+ * 
+ * @author GnosticOccultist
+ */
 public final class AlchemyLogger implements Logger {
 
 	/**
@@ -14,6 +20,10 @@ public final class AlchemyLogger implements Logger {
 	 */
 	private String name;
 	
+	/**
+	 * Internal use only. Please use {@link FactoryLogger#getLogger(String)} to create
+	 * a new <code>AlchemyLogger</code>.
+	 */
 	public AlchemyLogger() {
 		this.name = "unknown";
 		this.activities = new Boolean[LoggerLevel.values().length];

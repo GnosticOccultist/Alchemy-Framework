@@ -57,11 +57,11 @@ public class Window {
 		mainStage.focusedProperty().addListener((observable, oldValue, newValue) -> {
 			if(newValue.equals(Boolean.TRUE) && application.hasStarted()) {
 				application.resume();
-				application.getListeners().perform(ApplicationListener::show);	
+				application.getListeners().forEach(ApplicationListener::show);	
 			} else if (newValue.equals(Boolean.FALSE) && application.hasStarted()) {
 				application.pause();
 				for(int i = 0; i < application.getListeners().size(); i++) {
-					application.getListeners().perform(ApplicationListener::hide);	
+					application.getListeners().forEach(ApplicationListener::hide);	
 				}
 			}
 		});

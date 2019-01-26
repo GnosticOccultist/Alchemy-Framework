@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import fr.alchemy.core.annotation.CoreComponent;
 import fr.alchemy.core.asset.Texture;
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.scene.SceneLayer;
@@ -246,19 +248,21 @@ public final class VisualComponent extends Component {
 	}
 	
 	@Override
-	public void export(final BinaryWriter writer) throws IOException {
-		super.export(writer);
+	public void export(final BinaryExporter exporter) throws IOException {
+		super.export(exporter);
+		final BinaryWriter writer = exporter.getCapsule(this);
 	
-		writer.write(sceneLayer);
-		writer.write(view);
+	//	writer.write(sceneLayer, "sceneLayer", SceneLayer.DEFAULT);
+//		writer.write(view, "entityView", null);
 	}
 	
 	@Override
-	public void insert(final BinaryReader reader) throws IOException {
-		super.insert(reader);
+	public void insert(final BinaryImporter importer) throws IOException {
+		super.insert(importer);
+		final BinaryReader reader = importer.getCapsule(this);
 		
-		setSceneLayer(reader.readExportable(SceneLayer.class, SceneLayer.DEFAULT));
-		setView(reader.readExportable(EntityView.class, view));
+		//setSceneLayer((SceneLayer) reader.readExportable("sceneLayer", SceneLayer.DEFAULT));
+//		setView((EntityView) reader.readExportable("entityView", view));
 		// TODO: Store the constant scene layer if needed.
 	}
 }

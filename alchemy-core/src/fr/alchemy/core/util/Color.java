@@ -2,6 +2,8 @@ package fr.alchemy.core.util;
 
 import java.io.IOException;
 
+import fr.alchemy.core.asset.binary.BinaryExporter;
+import fr.alchemy.core.asset.binary.BinaryImporter;
 import fr.alchemy.core.asset.binary.BinaryReader;
 import fr.alchemy.core.asset.binary.BinaryWriter;
 import fr.alchemy.core.asset.binary.Exportable;
@@ -198,15 +200,17 @@ public final class Color implements Exportable {
 	}
 
 	@Override
-	public void export(final BinaryWriter writer) throws IOException {
-		writer.write("red", r);
-		writer.write("green", g);
-		writer.write("blue", b);
-		writer.write("alpha", alpha);
+	public void export(final BinaryExporter exporter) throws IOException {
+		final BinaryWriter writer = exporter.getCapsule(this);
+		writer.write(r, "red", 1.0f);
+		writer.write(g, "green", 1.0f);
+		writer.write(b, "blue", 1.0f);
+		writer.write(alpha, "alpha", 1.0f);
 	}
 
 	@Override
-	public void insert(final BinaryReader reader) throws IOException {
+	public void insert(final BinaryImporter importer) throws IOException {
+		final BinaryReader reader = importer.getCapsule(this);
 		reader.readFloat("red", 1.0f);
 		reader.readFloat("green", 1.0f);
 		reader.readFloat("blue", 1.0f);
