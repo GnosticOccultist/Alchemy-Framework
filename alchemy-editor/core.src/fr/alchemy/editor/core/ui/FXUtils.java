@@ -8,11 +8,11 @@ import java.util.stream.Stream;
 import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
+import fr.alchemy.editor.api.editor.graph.GraphSkinDictionary;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
 import fr.alchemy.editor.api.editor.graph.element.GraphNode;
 import fr.alchemy.editor.api.editor.graph.skin.GraphConnectorSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
-import fr.alchemy.editor.core.ui.editor.graph.skin.SkinManager;
 import fr.alchemy.utilities.Validator;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -118,11 +118,11 @@ public class FXUtils {
         return new Point2D(sceneX - containerScene.getX(), sceneY - containerScene.getY());
     }
     
-    public static Point2D getConnectorPosition(final GraphConnector connector, final SkinManager skinManager) {
-        final GraphConnectorSkin connectorSkin = skinManager.lookupConnector(connector);
+    public static Point2D getConnectorPosition(final GraphConnector connector, final GraphSkinDictionary skinManager) {
+        final GraphConnectorSkin connectorSkin = skinManager.retrieveConnector(connector);
         final GraphNode parent = connector.getParent();
 
-        final GraphNodeSkin nodeSkin = skinManager.lookupNode(parent);
+        final GraphNodeSkin nodeSkin = skinManager.retrieveNode(parent);
         if (nodeSkin == null) {
             return null;
         }
@@ -149,5 +149,17 @@ public class FXUtils {
      */
     public static double moveOnPixel(final double position) {
     	return Math.ceil(position);
+    }
+    
+    /**
+     * Moves an X or Y position value off-pixel.
+     * This is useful for a 1-pixel-wide stroke with a stroke-type of centered. The X and Y
+     * coordinates need to be off-pixel so that the stroke is on-pixel.
+     * 
+     * @param position The position to move on-pixel.
+     * @return		   The position rounded to the nearest integer.
+     */
+    public static double moveOffPixel(final double position) {
+    	return Math.ceil(position) - 0.5D;
     }
 }
