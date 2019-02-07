@@ -1,11 +1,16 @@
 package fr.alchemy.editor.core.ui.editor.scene;
 
+import java.nio.file.Path;
+
 import fr.alchemy.core.AlchemyApplication;
+import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.core.scene.AlchemyScene;
 import fr.alchemy.core.scene.SceneLayer;
+import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
-import fr.alchemy.editor.core.ui.editor.graph.SimpleGraphNodeEditor;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
+import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
+import fr.alchemy.utilities.file.FileUtils;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.control.SplitPane;
@@ -32,8 +37,28 @@ public class AlchemyEditorScene extends AlchemyScene {
 		this.tabPane = new EditorTabPane(this);
 		this.scenePane = new EditorTabPane(this);
 		this.container = new SplitPane();
+		AlchemyEventManager.events().registerEventHandler(AlchemyEditorEvent.OPEN_FILE, this::openFile);
 	}
 	
+	private void openFile(AlchemyEditorEvent event) {
+		Path file = event.getPath("file");
+		String ext = FileUtils.getExtension(file);
+		
+		if(ext.equals("properties")) {
+			
+			PropertiesEditor editor = new PropertiesEditor();
+			editor.open(file);
+			
+			Tab tab = new Tab(editor.getName());
+			scenePane.getContent().getTabs().add(tab);
+			tab.setContent(editor.getRoot());
+			
+			scenePane.getContent().getSelectionModel().select(tab);
+			editor.dirtyProperty().addListener((observable, oldValue, newValue) ->
+            tab.setText(newValue == Boolean.TRUE ? "*" + editor.getName() : editor.getName()));
+		}
+	}
+
 	@Override
 	public void initialize(double width, double height) {
 		super.initialize(width, height);
@@ -51,13 +76,6 @@ public class AlchemyEditorScene extends AlchemyScene {
 		
 		scenePane.getContent().prefHeightProperty().bind(root.heightProperty());
 		scenePane.getContent().setSide(Side.TOP);
-		Tab tab = new Tab("empty-scene");
-		scenePane.getContent().getTabs().add(tab);
-		SimpleGraphNodeEditor editor = new SimpleGraphNodeEditor();
-		editor.newNode();
-		editor.newNode();
-		tab.setContent(editor.getView());
-		editor.reload();
 		
 		tabPane.getContent().prefHeightProperty().bind(root.heightProperty());
 		tabPane.getContent().setSide(Side.LEFT);

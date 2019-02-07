@@ -29,7 +29,7 @@ public final class EventBus {
 	/**
 	 * The logger for homonculus events.
 	 */
-	private static final Logger logger = FactoryLogger.getLogger("homonculus.events");
+	private static final Logger logger = FactoryLogger.getLogger("alchemy.events");
 	/**
 	 * The single-instance of this event bus.
 	 */
@@ -92,7 +92,10 @@ public final class EventBus {
 		deliver(null, event, all);
 		
 		EventType<? super E> superType = type.getSuperType();
-		deliver(superType, event, getListeners(superType));
+		if(superType != null) {
+			deliver(superType, event, getListeners(superType));
+		}
+		
 		boolean delivered = deliver(type, event, getListeners(type));
 		
 		if(!delivered) {

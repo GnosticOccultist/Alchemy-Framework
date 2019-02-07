@@ -5,23 +5,23 @@ import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 
-public class NewFileMenu extends Menu {
+public class OpenFileMenu extends MenuItem {
 	
-	public NewFileMenu(AssetElement element) {
-		setText("New file");
+	private AssetElement element;
+	
+	public OpenFileMenu(AssetElement element) {
 		
-		MenuItem item = new MenuItem("Empty scene");
-		item.setOnAction(this::execute);
-		item.setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/save.png")));
+		this.element = element;
 		
-		getItems().add(item);
+		setText("Open file");
+		setOnAction(this::execute);
+		setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/save.png")));
 	}
 	
 	private void execute(ActionEvent event) {
-		AlchemyEventManager.events().notify(AlchemyEditorEvent.newSceneCreationEvent());
+		AlchemyEventManager.events().notify(AlchemyEditorEvent.newOpenFileEvent(element.getFile()));
 	}
 }

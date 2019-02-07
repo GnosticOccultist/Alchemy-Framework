@@ -13,11 +13,11 @@ import com.ss.rlib.common.util.array.Array;
  * 
  * @author GnosticOccultist
  */
-public interface FileEditorComponent extends EditorComponent {
+public interface FileEditor extends EditorComponent {
 	
 	/**
 	 * Open the provided file and set it as the currently edited
-	 * one for this <code>FileEditor</code>
+	 * one for this <code>FileEditor</code>.
 	 * 
 	 * @param file The path of the file to open.
 	 * @return     Whether the opening process has been successful.
