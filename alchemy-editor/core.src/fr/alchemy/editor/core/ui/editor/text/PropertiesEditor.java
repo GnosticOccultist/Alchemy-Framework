@@ -10,6 +10,7 @@ import java.util.Properties;
 import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.editor.api.editor.AbstractFileEditor;
+import fr.alchemy.editor.api.element.ToolbarEditorElement;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.file.FileUtils;
@@ -48,6 +49,10 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 	 * Instantiates a new <code>PropertiesEditor</code>.
 	 */
 	public PropertiesEditor() {
+		super();
+		
+		elements.add(new ToolbarEditorElement(this));
+		construct(root);
 		
 		root.setEditable(true);
 		root.setFocusTraversable(true);

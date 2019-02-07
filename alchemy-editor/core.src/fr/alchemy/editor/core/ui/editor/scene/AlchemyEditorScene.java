@@ -51,7 +51,7 @@ public class AlchemyEditorScene extends AlchemyScene {
 			
 			Tab tab = new Tab(editor.getName());
 			scenePane.getContent().getTabs().add(tab);
-			tab.setContent(editor.getRoot());
+			tab.setContent(editor.getUIPage());
 			
 			scenePane.getContent().getSelectionModel().select(tab);
 			editor.dirtyProperty().addListener((observable, oldValue, newValue) ->

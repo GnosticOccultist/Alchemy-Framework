@@ -18,7 +18,7 @@ public class OpenFileMenu extends MenuItem {
 		
 		setText("Open file");
 		setOnAction(this::execute);
-		setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/save.png")));
+		setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/visible.png")));
 	}
 	
 	private void execute(ActionEvent event) {

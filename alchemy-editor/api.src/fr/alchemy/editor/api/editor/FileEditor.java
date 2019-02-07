@@ -4,6 +4,9 @@ import java.nio.file.Path;
 
 import com.ss.rlib.common.util.array.Array;
 
+import javafx.beans.binding.BooleanExpression;
+import javafx.scene.layout.Region;
+
 /**
  * <code>FileEditor</code> is an implementation of an {@link EditorComponent}, specially
  * designed to visually edit a physical file present on the disk.
@@ -44,6 +47,20 @@ public interface FileEditor extends EditorComponent {
 	 * @return The supported extensions of files.
 	 */
 	Array<String> getSupportedExtensions();
+	
+	/**
+	 * Return the dirty property of the edited file by the <code>FileEditor</code>. 
+	 * 
+	 * @return The dirty property of the edited file.
+	 */
+	BooleanExpression dirtyProperty();
+	
+	/**
+	 * Return the root pane of the <code>FileEditor</code>. 
+	 * 
+	 * @return The root pane of the editor.
+	 */
+	Region getRoot();
 	
 	/**
 	 * Return the currently edited file name.

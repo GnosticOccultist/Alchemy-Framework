@@ -2,11 +2,16 @@ package fr.alchemy.editor.api.editor;
 
 import java.nio.file.Path;
 
+import fr.alchemy.editor.api.element.ToolbarEditorElement;
+import fr.alchemy.utilities.array.Array;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * <code>AbstractFileEditor</code> is an abstract implementation of {@link FileEditor} which should be used by every file editor implementations.
@@ -18,6 +23,10 @@ import javafx.scene.layout.Region;
  */
 public abstract class AbstractFileEditor<R extends Region> implements FileEditor {
 
+	/**
+	 * The UI elements composing the file editor.
+	 */
+	protected final Array<EditorElement> elements = Array.ofType(EditorElement.class);
 	/**
 	 * The root region used for the editor.
 	 */
@@ -37,8 +46,6 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	protected AbstractFileEditor() {
 		this.dirty = new SimpleBooleanProperty(this, "dirty", false);
 		this.root = createRoot();
-		
-		construct(root);
 	}
 	
 	/**
@@ -55,6 +62,22 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	 * @param root The root region to construct the editing view from.
 	 */
 	protected void construct(R root) {
+
+        VBox container = new VBox();
+        StackPane page = new StackPane(container);
+        page.setPickOnBounds(true);
+        
+        elements.forEach(element -> element.constructUI(container));
+        
+        ToolbarEditorElement toolbar = getElement(ToolbarEditorElement.class);
+        // If there is no toolbar we can take the whole height of the container.
+        if(toolbar == null) {
+        	root.prefHeightProperty().bind(container.heightProperty());
+        }
+        
+        root.prefWidthProperty().bind(container.widthProperty());
+        container.getChildren().add(root);
+        
 		root.setOnKeyPressed(this::processKeyPressed);
 	}
 	
@@ -122,11 +145,33 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	}
 	
 	/**
-	 * Return the root region of the <code>AbstractFileEditor</code>.
+	 * Return the UI-page of the <code>AbstractFileEditor</code>.
 	 * 
-	 * @return The root region of the file editor.
+	 * @return The UI-page of the file editor.
 	 */
-	public R getRoot() {
+	public Pane getUIPage() {
+		return (Pane) root.getParent().getParent();
+	}
+	
+	@Override
+	public Region getRoot() {
 		return root;
+	}
+	
+	/**
+	 * Return an {@link EditorElement} matching the given element type if any
+	 * is present in the <code>AbstractFileEditor</code>.
+	 * 
+	 * @param type The type of editor element to get.
+	 * @return	   The editor element or null if none.
+	 */
+	@SuppressWarnings("unchecked")
+	public <E extends EditorElement> E getElement(Class<E> type) {
+		for(EditorElement element : elements) {
+			if(type.isAssignableFrom(element.getClass())) {
+				return (E) element;
+			}
+		}
+		return null;
 	}
 }
