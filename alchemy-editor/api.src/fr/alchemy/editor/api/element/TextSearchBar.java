@@ -2,14 +2,9 @@ package fr.alchemy.editor.api.element;
 
 import java.util.function.Predicate;
 
-import javax.swing.GroupLayout.Alignment;
-
-import com.sun.imageio.stream.CloseableDisposerRecord;
-
 import fr.alchemy.editor.core.EditorManager;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.TableView;
@@ -22,7 +17,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -186,7 +180,6 @@ public class TextSearchBar<T> extends HBox {
 		}
 		
 		filteredList.setPredicate(filter);
-		filteredList.forEach(System.out::println);
 		
 		if(filteredList.isEmpty()) {
 			searchField.setBackground(new Background(new BackgroundFill(Color.INDIANRED, null, null)));

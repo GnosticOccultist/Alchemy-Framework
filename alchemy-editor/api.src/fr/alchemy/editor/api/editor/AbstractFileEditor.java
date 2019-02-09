@@ -165,11 +165,10 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	 * @param type The type of editor element to get.
 	 * @return	   The editor element or null if none.
 	 */
-	@SuppressWarnings("unchecked")
 	public <E extends EditorElement> E getElement(Class<E> type) {
 		for(EditorElement element : elements) {
 			if(type.isAssignableFrom(element.getClass())) {
-				return (E) element;
+				return type.cast(element);
 			}
 		}
 		return null;

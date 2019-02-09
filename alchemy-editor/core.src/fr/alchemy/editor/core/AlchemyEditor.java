@@ -50,7 +50,7 @@ public class AlchemyEditor extends AlchemyApplication  {
 		
 			@Override
 			public void exit() {
-				getScene().getTabPane().save();
+				getScene().save();
 				EditorConfig.config().save();
 			}
 		};

@@ -1,9 +1,9 @@
 package fr.alchemy.editor.api.editor.layout;
 
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Optional;
-
-import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.api.editor.EditorComponent;
@@ -13,12 +13,17 @@ import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.array.Array;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.layout.Region;
 
 public abstract class EditorLayout<T extends Region> {
 	
+	/**
+	 * The name of the editor layout.
+	 */
+	protected String name;
 	/**
 	 * The list of optional components present in the pane.
 	 */
@@ -32,14 +37,29 @@ public abstract class EditorLayout<T extends Region> {
 	 */
 	protected final AlchemyEditorScene scene;
 	
-	protected EditorLayout(AlchemyEditorScene scene) {
+	/**
+	 * Instantiates a new <code>EditorLayout</code> with the provided name and scene.
+	 * 
+	 * @param name  The name of the editor layout.
+	 * @param scene The scene on which to attach the layout.
+	 */
+	protected EditorLayout(String name, AlchemyEditorScene scene) {
+		Validator.nonEmpty(name, "The name can't be empty or null!");
+		Validator.nonNull(scene, "The scene can't be null");
+		
+		this.name = name;
 		this.scene = scene;
 		this.content = createLayout();
 		this.components = Array.ofType(EditorComponent.class);
 		
-		// TODO: Maybe add an event for adding or removing components from the layout
-		AlchemyEventManager.events().registerEventHandler(
-				AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, event -> handleSwitchWorkspace());
+		// TODO: Add a better support to filter the components/editors supported by the layout.
+		if(name.contains("components")) {
+			AlchemyEventManager.events().registerEventHandler(
+					AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, event -> handleSwitchWorkspace());
+		} else if(name.contains("editors")) {
+			AlchemyEventManager.events().registerEventHandler(
+					AlchemyEditorEvent.OPEN_FILE, event -> openFile(event.getPath("file")));
+		}
 	}
 	
 	/**
@@ -47,8 +67,12 @@ public abstract class EditorLayout<T extends Region> {
 	 * the last opened {@link EditorComponent}.
 	 */
 	public void construct() {
-		EditorConfig.config().getOpenedComponents()
-				.forEach(t -> Platform.runLater(() -> constructComponent(t)));
+		
+		EditorConfig.config().getOpenedComponents(name)
+			.forEach(t -> Platform.runLater(() -> constructComponent(t)));
+		
+		EditorConfig.config().getOpenedFiles(name)
+			.forEach(f -> Platform.runLater(() -> openFile(Paths.get(f))));
 	}
 	
 	/**
@@ -70,22 +94,12 @@ public abstract class EditorLayout<T extends Region> {
 	}
 	
 	/**
-	 * Constructs the {@link EditorComponent} with the specified class.
-	 * 
-	 * @param clazz The class of the component to build.
-	 */
-	protected <E extends EditorComponent> void constructComponent(Class<E> clazz) {
-		EditorComponent component = Instantiator.fromClass(clazz);
-		attach(component);
-		component.finish();
-	}
-	
-	/**
 	 * Constructs the {@link EditorComponent} with the specified class name.
 	 * 
 	 * @param className The class name of the component to build.
 	 */
 	protected void constructComponent(String className) {
+		
 		EditorComponent component = null;
 		try {
 			component = Instantiator.fromName(className);
@@ -111,17 +125,22 @@ public abstract class EditorLayout<T extends Region> {
 	 * @param component The component to add to the layout.
 	 * @return			The updated layout.
 	 */
-	protected abstract EditorLayout<T> attach(EditorComponent component);
+	protected abstract T attach(EditorComponent component);
+	
+	/**
+	 * Opens the provided file on this <code>EditorLayout</code>.
+	 * 
+	 * @param file The file which was requested for opening.
+	 */
+	protected abstract void openFile(Path file);
 	
 	/**
 	 * Detaches the provided {@link EditorComponent} to the <code>EditorLayout</code>.
 	 * 
 	 * @param component The component to remove from the layout.	
+	 * @return			The updated layout.
 	 */
-	protected void detach(EditorComponent component) {
-		components.remove(component);
-		EditorConfig.config().removeOpenedComponent(component.getClass().getName());
-	}
+	protected abstract T detach(EditorComponent component);
 	
 	/**
 	 * Return the action to create the layout for the editor.
@@ -135,7 +154,7 @@ public abstract class EditorLayout<T extends Region> {
 	 * so each of them can be reload during next startup time.
 	 */
 	public void save() {
-		List<String> componentClasses = EditorConfig.config().getOpenedComponents();
+		ArrayList<String> componentClasses = EditorConfig.config().getOpenedComponents(name);
 		componentClasses.clear();
 		
 		components.forEach(c -> componentClasses.add(c.getClass().getName()));

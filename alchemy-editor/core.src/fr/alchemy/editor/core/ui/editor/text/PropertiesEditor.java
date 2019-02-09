@@ -46,14 +46,15 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 	 * The column containing the value of each property.
 	 */
 	private TableColumn<PropertyPair, String> valueColumn;
+	private ToolbarEditorElement<PropertyPair> toolbar;
 	
 	/**
 	 * Instantiates a new <code>PropertiesEditor</code>.
 	 */
 	public PropertiesEditor() {
 		super();
-
-		elements.add(new ToolbarEditorElement<PropertyPair>(this));
+		toolbar = new ToolbarEditorElement<PropertyPair>(this);
+		elements.add(toolbar);
 		construct(root);
 	}
 	
@@ -146,10 +147,9 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 			pairs.add(pair);
 		}
 		
-		if(elements.get(0) instanceof ToolbarEditorElement) {
-			((ToolbarEditorElement<PropertyPair>) elements.get(0)).getSearchBar().bindTo(pairs);
-			((ToolbarEditorElement<PropertyPair>) elements.get(0)).getSearchBar().filter(root);
-		}
+		// Bind the search bar to the loaded list.
+		toolbar.getSearchBar().bindTo(pairs);
+		toolbar.getSearchBar().filter(root);
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import com.ss.rlib.common.util.array.Array;
 
 import javafx.beans.binding.BooleanExpression;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 /**
@@ -61,6 +62,8 @@ public interface FileEditor extends EditorComponent {
 	 * @return The root pane of the editor.
 	 */
 	Region getRoot();
+	
+	Pane getUIPage();
 	
 	/**
 	 * Return the currently edited file name.
