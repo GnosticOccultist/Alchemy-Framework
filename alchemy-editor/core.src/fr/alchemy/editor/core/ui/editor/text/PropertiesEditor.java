@@ -15,6 +15,8 @@ import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -50,14 +52,23 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 	 */
 	public PropertiesEditor() {
 		super();
-		
-		elements.add(new ToolbarEditorElement(this));
+
+		elements.add(new ToolbarEditorElement<PropertyPair>(this));
 		construct(root);
+	}
+	
+	@Override
+	protected void construct(TableView<PropertyPair> root) {
+		super.construct(root);
 		
 		root.setEditable(true);
 		root.setFocusTraversable(true);
+		
 		keyColumn = new TableColumn<>("Key");
 		valueColumn = new TableColumn<>("Value");
+
+		keyColumn.prefWidthProperty().bind(root.widthProperty().divide(2));
+		valueColumn.prefWidthProperty().bind(root.widthProperty().divide(2));
 		
 		keyColumn.setCellFactory(param -> new EditingCell()); 
 		valueColumn.setCellFactory(param -> new EditingCell()); 
@@ -128,9 +139,16 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 	}
 
 	private void loadFromProperties() {
+		
+		ObservableList<PropertyPair> pairs = FXCollections.observableArrayList();
 		for(Entry<Object, Object> entry : properties.entrySet()) {
 			PropertyPair pair = new PropertyPair(entry.getKey().toString(), entry.getValue().toString());
-			root.getItems().add(pair);
+			pairs.add(pair);
+		}
+		
+		if(elements.get(0) instanceof ToolbarEditorElement) {
+			((ToolbarEditorElement<PropertyPair>) elements.get(0)).getSearchBar().bindTo(pairs);
+			((ToolbarEditorElement<PropertyPair>) elements.get(0)).getSearchBar().filter(root);
 		}
 	}
 	
@@ -212,6 +230,11 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 		public void setValue(String value) {
 			Validator.nonNull(value, "The value can't be null");
 			this.value.set(value);
+		}
+		
+		@Override
+		public String toString() {
+			return key.get();
 		}
 	}
 	

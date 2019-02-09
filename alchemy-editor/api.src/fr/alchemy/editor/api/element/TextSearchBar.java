@@ -1,12 +1,18 @@
 package fr.alchemy.editor.api.element;
 
-import java.util.List;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
+
+import javax.swing.GroupLayout.Alignment;
+
+import com.sun.imageio.stream.CloseableDisposerRecord;
 
 import fr.alchemy.editor.core.EditorManager;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -16,6 +22,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -52,17 +60,20 @@ public class TextSearchBar<T> extends HBox {
 	 */
 	private final ImageView cancelIcon;
 	/**
-	 * The store for the list without filter.
-	 */
-	private ObservableList<T> store = FXCollections.observableArrayList();
-	/**
-	 * The list to filter.
-	 */
-	private ObservableList<T> list;
-	/**
 	 * The filtering action.
 	 */
-	private BiPredicate<String, T> filter;	
+	private Predicate<T> filter;	
+	/**
+	 * The list providing the filtering action.
+	 */
+	private FilteredList<T> filteredList;
+	
+	/**
+	 * Instantiates a new <code>TextSearchBar</code> with no filtering action.
+	 */
+	public TextSearchBar() {
+		this(null);
+	}
 	
 	/**
 	 * Instantiates a new <code>TextSearchBar</code> with the provided
@@ -70,7 +81,7 @@ public class TextSearchBar<T> extends HBox {
 	 * 
 	 * @param filter The filtering action.
 	 */
-	public TextSearchBar(BiPredicate<String, T> filter) {
+	public TextSearchBar(Predicate<T> filter) {
 		this.searchField = new TextField();
 		this.content = new HBox();
 		this.cancelIcon = new ImageView();
@@ -83,39 +94,37 @@ public class TextSearchBar<T> extends HBox {
 	 * Construct the components of the <code>TextSearchBar</code>.
 	 */
 	protected void construct() {
+		
+		searchField.focusedProperty().addListener((observable, oldValue, newValue) -> handleFocus(newValue));
+		searchField.setOnKeyReleased(this::processEvent);
+		searchField.textProperty().addListener((observable, oldValue, newValue) -> search());
+		searchField.setPromptText(searchBarText());
+		
+		StackPane clearPane = new StackPane();
+		clearPane.setCursor(Cursor.DEFAULT);
+		clearPane.setAlignment(Pos.CENTER_LEFT);
 		cancelIcon.setImage(EditorManager.editor().loadIcon("resources/icons/cancel.png"));
 		cancelIcon.setOnMouseReleased(this::processEvent);
 		cancelIcon.setPickOnBounds(true);
+		clearPane.getChildren().add(cancelIcon);
 		
-		searchField.setOnKeyReleased(this::processEvent);
-		searchField.textProperty().addListener((observable, oldValue, newValue) -> search());
-		searchField.setText(searchBarText());
-		searchField.setFont(searchBarFont());
-		
-		content.getChildren().addAll(cancelIcon, searchField);
+		content.getChildren().addAll(clearPane, searchField);
 		getChildren().add(content);
 	}
-	
+
 	/**
 	 * Process the provided {@link KeyEvent#KEY_RELEASED} by searching and filtering
 	 * the provided list.
 	 * <p>
-	 * If the search field is empty it will {@link #reset()} the field to its initial value.
+	 * If the search field is empty and the {@link KeyCode#ENTER} is pressed, it will {@link #reset()} 
+	 * the field to its initial value.
 	 * 
 	 * @param event The key event to process.
 	 */
 	protected void processEvent(KeyEvent event) {
 		event.consume();
 		
-		if(event.getCode().equals(KeyCode.ENTER)) {
-			// Prevent useless searching and automatically reset the search field.
-			if(searchField.getText().isEmpty()) {
-				reset();
-				return;
-			}
-			
-			search();
-		}
+		search();
 	}
 	
 	/**
@@ -132,37 +141,58 @@ public class TextSearchBar<T> extends HBox {
 		}
 	}
 	
-	/**
-	 * Sets the list to search the matching fields in.
-	 * 
-	 * @param list The list to filter.
-	 */
-	public void searchFor(ObservableList<T> list) {
-		this.store.setAll(list);
-		this.list = list;
+	protected void handleFocus(Boolean focused) {
+		if(!focused && filteredList.isEmpty()) {
+			reset();
+		}
 	}
 	
 	/**
-	 * Search the matching fields from the list using the provided filtering action and
-	 * updates the children list according to the result. 
-	 * You can set the list to search in, by calling {@link #searchFor(ObservableList)}.
+	 * Sets the {@link ObservableList} to search the matching fields in. 
 	 * <p>
-	 * It also set the background to red, if no fields are matching the filter.
+	 * The function will wrap a {@link FilteredList} around the provided list and will contains all its
+	 * elements until a predicate is set using {@link #setFilterAction(Predicate)} method.
+	 * 
+	 * @param list The observable list to use the filtering for.
+	 */
+	public void bindTo(ObservableList<T> list) {
+		filteredList = new FilteredList<T>(list);
+	}
+	
+	/**
+	 * Sets the items of the provided {@link TableView} to the one of the {@link FilteredList} of the
+	 * <code>TextSearchBar</code> meaning it will only show up the elements which pass the predicate test.
+	 * 
+	 * @param table The table view to set the items for.
+	 */
+	public void filter(TableView<T> table) {
+		table.setItems(filteredList);
+	}
+	
+	/**
+	 * Search the matching fields by setting the predicate property of the {@link FilteredList} to the one
+	 * registered with the {@link #setFilterAction(Predicate)} method. The method will be performed only if the search field
+	 * isn't empty.
+	 * <p>
+	 * It also set the background to red, if no fields are matching the filter or white if at least one of the field matches.
 	 */
 	protected void search() {
-		if(searchField.getText().equals(SEARCH_BAR_INITIAL_TEXT) || list == null) {
+		if(filteredList == null || searchField.getText() == null) {
+			return;
+		}
+		if(searchField.getText().isEmpty()) {
+			reset();
 			return;
 		}
 		
-		List<T> filtered = store.stream().filter(t -> filter.test(searchField.getText(), t)).collect(Collectors.toList());
-			
-		if(filtered.isEmpty()) {
+		filteredList.setPredicate(filter);
+		filteredList.forEach(System.out::println);
+		
+		if(filteredList.isEmpty()) {
 			searchField.setBackground(new Background(new BackgroundFill(Color.INDIANRED, null, null)));
-			list.setAll(filtered);
 		} else {
 			searchField.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-			list.setAll(filtered);
-		}	
+		}
 	}
 	
 	/**
@@ -170,10 +200,9 @@ public class TextSearchBar<T> extends HBox {
 	 * the background color and setting the text and font of the initial text.
 	 */
 	protected void reset() {
-		searchField.setText(searchBarText());
-		searchField.setFont(searchBarFont());
 		searchField.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-		list.setAll(store);
+		searchField.setText(null);
+		filteredList.setPredicate(null);
 	}
 	
 	/**
@@ -182,9 +211,18 @@ public class TextSearchBar<T> extends HBox {
 	 * @param filter The filtering action.
 	 * @return		 The updated search bar.
 	 */
-	public final TextSearchBar<T> setFilterAction(BiPredicate<String, T> filter) {
+	public final TextSearchBar<T> setFilterAction(Predicate<T> filter) {
 		this.filter = filter;
 		return this;
+	}
+	
+	/**
+	 * Return the search {@link TextField} of the <code>TextSearchBar</code>.
+	 * 
+	 * @return The search field of the search bar.
+	 */
+	public TextField getSearchField() {
+		return searchField;
 	}
 	
 	/**
