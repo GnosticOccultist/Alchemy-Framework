@@ -31,6 +31,8 @@ hs_err_pid*
 .settings/
 metadata/
 **/.plugins/
+.gradle/
+build/
 bin/
 target/
 .metadata/.plugins/
