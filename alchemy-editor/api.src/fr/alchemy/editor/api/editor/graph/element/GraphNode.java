@@ -11,6 +11,13 @@ import com.ss.rlib.common.util.array.Array;
 public interface GraphNode extends GraphElement {
 	
 	/**
+	 * Return the attributed ID to this <code>GraphNode</code>.
+	 * 
+	 * @return The attributed ID of the node.
+	 */
+	int id();
+	
+	/**
 	 * Return the X-axis coordinate of this <code>GraphNode</code>.
 	 * 
 	 * @return The X coordinate of the node.

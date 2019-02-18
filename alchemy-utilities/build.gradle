@@ -1,0 +1,24 @@
+
+repositories {
+	 mavenCentral()
+   	 jcenter()
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+
+group = 'fr.alchemy'
+version = '0.1.0'
+
+dependencies {
+
+}
+
+jar {
+	manifest {
+		attributes('Implementation-Title': 'AlchemyUtilities', 
+				   'Implementation-Version': version)
+	}
+}
+

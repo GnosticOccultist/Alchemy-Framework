@@ -9,7 +9,6 @@ import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -29,11 +28,11 @@ public class AlchemyEditorScene extends AlchemyScene {
 	public AlchemyEditorScene(AlchemyApplication application) {
 		super(application);
 		
-		this.tabPane = new EditorTabPane(this);
-		this.scenePane = new EditorTabPane(this);
+		this.tabPane = new EditorTabPane("components.tab.pane", this);
+		this.scenePane = new EditorTabPane("editors.tab.pane", this);
 		this.container = new SplitPane();
 	}
-	
+
 	@Override
 	public void initialize(double width, double height) {
 		super.initialize(width, height);
@@ -48,20 +47,21 @@ public class AlchemyEditorScene extends AlchemyScene {
 		bar.prefWidthProperty().bind(root.widthProperty());
 		
 		tabPane.construct();
+		scenePane.construct();
 		
-		scenePane.getContent().prefHeightProperty().bind(root.heightProperty());
-		scenePane.getContent().setSide(Side.TOP);
-		Tab tab = new Tab("empty-scene");
-		scenePane.getContent().getTabs().add(tab);
 		SimpleGraphNodeEditor editor = new SimpleGraphNodeEditor();
 		editor.newNode();
 		editor.newNode();
-		tab.setContent(editor.getView());
 		editor.reload();
+		scenePane.attach(editor);
+		
+		scenePane.getContent().prefHeightProperty().bind(root.heightProperty());
+		scenePane.getContent().setSide(Side.TOP);
 		
 		tabPane.getContent().prefHeightProperty().bind(root.heightProperty());
 		tabPane.getContent().setSide(Side.LEFT);
 
+		container.setDividerPosition(0, 0);
 		container.getItems().addAll(tabPane.getContent(), scenePane.getContent());
 		container.prefHeightProperty().bind(root.heightProperty());
 		container.prefWidthProperty().bind(root.widthProperty());
@@ -75,7 +75,8 @@ public class AlchemyEditorScene extends AlchemyScene {
 		return getRenderBatch(layer);
 	}
 	
-	public EditorTabPane getTabPane() {
-		return tabPane;
+	public void save() {
+		tabPane.save();
+		scenePane.save();
 	}
 }

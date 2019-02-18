@@ -1,5 +1,14 @@
 package fr.alchemy.editor.core.ui.editor.graph;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import com.ss.rlib.common.util.array.Array;
+
+import fr.alchemy.editor.api.editor.AbstractFileEditor;
 import fr.alchemy.editor.api.editor.graph.GraphNodeEditor;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
 import fr.alchemy.editor.api.editor.graph.element.GraphElement;
@@ -7,9 +16,11 @@ import fr.alchemy.editor.api.editor.graph.element.GraphNode;
 import fr.alchemy.editor.api.editor.graph.skin.GraphConnectionSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphSkin;
+import fr.alchemy.editor.core.export.XMLExporter;
 import fr.alchemy.editor.core.ui.editor.graph.connections.ConnectorDragManager;
 import fr.alchemy.editor.core.ui.editor.graph.element.BaseGraphConnector;
 import fr.alchemy.editor.core.ui.editor.graph.element.BaseGraphNode;
+import fr.alchemy.editor.core.ui.editor.graph.selection.SelectionManager;
 
 /**
  * <code>SimpleGraphNodeEditor</code> is a basic implementation of {@link GraphNodeEditor}.
@@ -17,12 +28,9 @@ import fr.alchemy.editor.core.ui.editor.graph.element.BaseGraphNode;
  * 
  * @author GnosticOccultist
  */
-public class SimpleGraphNodeEditor implements GraphNodeEditor {
+public class SimpleGraphNodeEditor extends AbstractFileEditor<GraphNodeEditorView> implements GraphNodeEditor {
 	
-	/**
-	 * The graph node editor view.
-	 */
-	private final GraphNodeEditorView view;
+	private final AtomicInteger idGenerator = new AtomicInteger(0);
 	/**
 	 * The skin manager of the graph elements.
 	 */
@@ -39,12 +47,13 @@ public class SimpleGraphNodeEditor implements GraphNodeEditor {
 	public SimpleGraphNodeEditor() {
 		
 		this.skinManager = new GraphSkinManager(this);
-		this.view = new GraphNodeEditorView(this);
-		this.selectionManager = new SelectionManager(this, view);
-		this.connectorDragManager = new ConnectorDragManager(skinManager, view);
+		this.selectionManager = new SelectionManager(this, root);
+		this.connectorDragManager = new ConnectorDragManager(skinManager, root);
 		
-		view.getStylesheets().clear();
-		view.getStylesheets().add("titled_skins.css");
+		root.getStylesheets().clear();
+		root.getStylesheets().add("titled_skins.css");
+
+		construct(root);
 	}
 	
 	public void addNode(GraphNode node) {
@@ -53,12 +62,12 @@ public class SimpleGraphNodeEditor implements GraphNodeEditor {
 			GraphNodeSkin skin = skinManager.retrieveNode(node);
 			
 			skin.initialize();
-			view.add(skin);
+			root.add(skin);
 		}
 	}
 	
 	public void newNode() {
-		GraphNode node = new BaseGraphNode();
+		GraphNode node = new BaseGraphNode(acquireNextID());
 		
 		final GraphConnector input = new BaseGraphConnector();
 		node.getConnectors().add(input);
@@ -89,7 +98,7 @@ public class SimpleGraphNodeEditor implements GraphNodeEditor {
 	 * @return The view containing the entire graph editor.
 	 */
 	public GraphNodeEditorView getView() {
-		return view;
+		return root;
 	}
 	
 	@Override
@@ -105,14 +114,50 @@ public class SimpleGraphNodeEditor implements GraphNodeEditor {
 	@Override
 	public void redraw(GraphSkin skin) {
 		if(skin instanceof GraphConnectionSkin) {
-			view.redrawConnection((GraphConnectionSkin) skin);
+			root.redrawConnection((GraphConnectionSkin) skin);
 		}
 	}
 
 	@Override
 	public void remove(GraphSkin skin) {
 		if(skin instanceof GraphNodeSkin) {
-			view.remove((GraphNodeSkin) skin);
+			root.remove((GraphNodeSkin) skin);
 		}	
+	}
+	
+	@Override
+	public boolean save() {
+		System.out.println("saving");
+		try(OutputStream stream = Files.newOutputStream(Paths.get(System.getProperty("user.dir") + "/graph-node-test.xml"))) {
+			XMLExporter exporter = new XMLExporter(this, root);
+			exporter.save(stream);
+			return true;
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+
+	@Override
+	public Array<String> getSupportedExtensions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected GraphNodeEditorView createRoot() {
+		return new GraphNodeEditorView(this);
+	}
+
+	@Override
+	public int acquireNextID() {
+		return idGenerator.getAndIncrement();
+	}
+
+	@Override
+	public GraphNode getRootNode() {
+		return root.getRootNode();
 	}
 }

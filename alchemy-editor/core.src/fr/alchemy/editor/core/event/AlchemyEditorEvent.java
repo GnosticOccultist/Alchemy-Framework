@@ -30,7 +30,7 @@ public class AlchemyEditorEvent extends Event {
 	 * The event type to notify about a requested scene's creation, use {@link #newSceneCreationEvent}
 	 * to create an event of this type.
 	 */
-	public static final EventType<AlchemyEditorEvent> SCENE_CREATION = new EventType<>(EDITOR, "SCENE_CREATION");
+	public static final EventType<AlchemyEditorEvent> OPEN_FILE = new EventType<>(EDITOR, "OPEN_FILE");
 	
 	/**
 	 * The table mapping the objects concerned by an event.
@@ -61,12 +61,12 @@ public class AlchemyEditorEvent extends Event {
 	}
 	
 	/**
-	 * Instantiates a new <code>AlchemyEditorEvent</code> of {@link #SCENE_CREATION} type.
+	 * Instantiates a new <code>AlchemyEditorEvent</code> of {@link #OPEN_FILE} type.
 	 * 
-	 * @return A new instance of an editor event to notify about a requested scene creation.
+	 * @return A new instance of an editor event to notify about a requested open file.
 	 */
-	public static AlchemyEditorEvent newSceneCreationEvent() {
-		return new AlchemyEditorEvent(CHANGED_CURRENT_WORKSPACE);
+	public static AlchemyEditorEvent newOpenFileEvent(Path path) {
+		return new AlchemyEditorEvent(OPEN_FILE).setPath("file", path);
 	}
 	
 	/**

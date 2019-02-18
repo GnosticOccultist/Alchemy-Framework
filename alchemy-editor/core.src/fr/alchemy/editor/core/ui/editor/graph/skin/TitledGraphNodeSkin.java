@@ -23,7 +23,7 @@ import javafx.scene.shape.Rectangle;
 public class TitledGraphNodeSkin extends GraphNodeSkin {
 
     private VBox contentRoot = new VBox();
-
+    
     private HBox header = new HBox();
 
     private Label title = new Label();
@@ -48,7 +48,6 @@ public class TitledGraphNodeSkin extends GraphNodeSkin {
 	public TitledGraphNodeSkin(final GraphNode element) {
 		super(element);
 		
-		
 		border.getStyleClass().setAll("titled-node-border");
         border.widthProperty().bind(getRoot().widthProperty());
         border.heightProperty().bind(getRoot().heightProperty());
@@ -64,7 +63,7 @@ public class TitledGraphNodeSkin extends GraphNodeSkin {
 	@Override
 	public void initialize() {
 		super.initialize();
-		 title.setText("Node");
+		title.setText("Node");
 	}
 
 	private void createContent() {
@@ -78,7 +77,7 @@ public class TitledGraphNodeSkin extends GraphNodeSkin {
         HBox.setHgrow(filler, Priority.ALWAYS);
         
         header.getChildren().addAll(title, filler);
-        contentRoot.getChildren().add(header);
+        contentRoot.getChildren().addAll(header);
         getRoot().getChildren().add(contentRoot);
         
         contentRoot.minWidthProperty().bind(getRoot().widthProperty());
@@ -90,7 +89,6 @@ public class TitledGraphNodeSkin extends GraphNodeSkin {
 
         contentRoot.setLayoutX(BORDER_WIDTH);
         contentRoot.setLayoutY(BORDER_WIDTH);
-        
         contentRoot.getStyleClass().setAll("titled-node-background");
 	}
 
@@ -111,7 +109,7 @@ public class TitledGraphNodeSkin extends GraphNodeSkin {
 
             final double layoutX = FXUtils.moveOnPixel(0 - inputSkin.getWidth() / 2);
             final double layoutY = FXUtils.moveOnPixel((i + 1) * inputOffsetY - inputSkin.getHeight() / 2);
-
+            
             connectorRoot.setLayoutX(layoutX);
             connectorRoot.setLayoutY(layoutY + HEADER_HEIGHT);
         }

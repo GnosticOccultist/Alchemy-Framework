@@ -2,7 +2,7 @@ package fr.alchemy.core.asset;
 
 import fr.alchemy.core.asset.cache.Asset;
 import fr.alchemy.core.scene.entity.Entity;
-import fr.alchemy.utilities.functions.ModifierAction;
+import fr.alchemy.utilities.actions.ModifierAction;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;

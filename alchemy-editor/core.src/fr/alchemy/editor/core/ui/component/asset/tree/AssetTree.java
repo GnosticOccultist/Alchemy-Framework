@@ -19,6 +19,7 @@ import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetFoldersEleme
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.LoadingElement;
 import fr.alchemy.editor.core.ui.component.asset.tree.filler.ContextMenuFiller;
 import fr.alchemy.editor.core.ui.component.asset.tree.filler.ContextMenuFillerRegistry;
+import fr.alchemy.editor.core.ui.component.asset.tree.filler.OpenFileMenu;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -487,6 +488,11 @@ public class AssetTree extends TreeView<AssetElement> {
 				}
 				
 				menu.show(this, Side.BOTTOM, 0, 0);	
+				
+			}  else if ((treeView.isOnlyFolders() || !(item instanceof AssetFolderElement)) 
+					&& event.getButton() == MouseButton.PRIMARY && event.getClickCount() > 1) {
+				
+				new OpenFileMenu(item).getOnAction().handle(null);
 			}
 		}
 		

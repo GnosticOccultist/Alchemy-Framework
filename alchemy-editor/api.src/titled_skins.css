@@ -29,6 +29,14 @@
 	-fx-text-fill: white;
 }
 
+.titled-node-text {
+	-fx-font-size: 11;
+	-fx-padding: 2 7 50 7;
+	-fx-alignment: center;
+	-fx-opacity: 0.9;
+	-fx-border-width: 2;
+}
+
 .titled-connector {
 	-fx-border-color: rgba(160, 160, 160, 0.8);
 	-fx-border-width: 1;
