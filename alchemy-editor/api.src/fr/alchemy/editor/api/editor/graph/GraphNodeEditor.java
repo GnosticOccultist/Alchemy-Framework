@@ -1,5 +1,6 @@
 package fr.alchemy.editor.api.editor.graph;
 
+import fr.alchemy.editor.api.editor.FileEditor;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnection;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
 import fr.alchemy.editor.api.editor.graph.element.GraphElement;
@@ -27,7 +28,7 @@ import javafx.scene.layout.Region;
  * 
  * @author GnosticOccultist
  */
-public interface GraphNodeEditor {
+public interface GraphNodeEditor extends FileEditor {
 	
 	/**
 	 * Return whether the specified {@link GraphElement} is selected in 
@@ -72,4 +73,19 @@ public interface GraphNodeEditor {
 	 * @param skin The graph skin to remove.
 	 */
 	void remove(GraphSkin skin);
+	
+	/**
+	 * Acquires the next available ID for a {@link GraphNode} to be registered to the
+	 * <code>GraphNodeEditor</code>.
+	 * 
+	 * @return The next available ID for a graph node.
+	 */
+	int acquireNextID();
+	
+	/**
+	 * Return the root {@link GraphNode} used by the <code>GraphNodeEditor</code>.
+	 * 
+	 * @return The root graph node.
+	 */
+	GraphNode getRootNode();
 }

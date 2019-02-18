@@ -67,8 +67,8 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 				tab.setText(newValue == Boolean.TRUE ? "*" + editor.getName() : editor.getName()));
 			
 			editor.getUIPage().prefHeightProperty().bind(heightProperty());
-			EditorConfig.config().addOpenedFile(name, editor.getFile().toString());
-			openedEditors.put(editor.getFile(), tab);
+			//EditorConfig.config().addOpenedFile(name, editor.getFile().toString());
+			//openedEditors.put(editor.getFile(), tab);
 		}
 	
 		components.add(component);

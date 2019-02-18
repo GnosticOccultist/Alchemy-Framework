@@ -70,6 +70,6 @@ public interface FileEditor extends EditorComponent {
 	 */
 	@Override
 	default String getName() {
-		return getFile().getFileName().toString();
+		return getFile() != null ? getFile().getFileName().toString() : "";
 	}
 }

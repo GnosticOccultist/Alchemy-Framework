@@ -92,6 +92,8 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 		if(event.getCode() == KeyCode.S && event.isControlDown() && isDirty()) {
 			save();
 		}
+		
+		event.consume();
 	}
 	
 	@Override

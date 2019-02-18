@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ss.rlib.common.util.dictionary.ObjectDictionary;
+
 import fr.alchemy.editor.api.editor.graph.GraphNodeEditor;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnection;
 import fr.alchemy.editor.api.editor.graph.element.GraphNode;
@@ -12,6 +14,9 @@ import fr.alchemy.editor.api.editor.graph.skin.GraphConnectionSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphTailSkin;
 import javafx.geometry.Point2D;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
@@ -30,10 +35,6 @@ import javafx.scene.layout.Region;
  */
 public class GraphNodeEditorView extends Region {
 	
-	public static final String STYLESHEET_VIEW = "view.css";
-
-    public static final String STYLESHEET_DEFAULTS = "defaults.css";
-	
 	private static final String STYLE_CLASS = "graph-editor";
 	
 	private static final String STYLE_CLASS_NODE_LAYER = "graph-editor-node-layer";
@@ -41,7 +42,7 @@ public class GraphNodeEditorView extends Region {
     private static final String STYLE_CLASS_CONNECTION_LAYER = "graph-editor-connection-layer";
 	
     
-    private final List<GraphNode> nodes = new ArrayList<>();
+    private final ObjectDictionary<Integer, GraphNode> nodes = ObjectDictionary.ofType(Integer.class, GraphNode.class);
     
     private final List<GraphConnection> connections = new ArrayList<>();
 	/**
@@ -55,6 +56,10 @@ public class GraphNodeEditorView extends Region {
 	
 	private final GraphNodeEditor editor;
 	
+	private GraphNode root;
+	
+	private final ContextMenu menu = new ContextMenu();
+	
 	private final Map<GraphConnectionSkin, Point2D[]> connectionPoints = new HashMap<>();
 	
 	/**
@@ -64,10 +69,14 @@ public class GraphNodeEditorView extends Region {
 	public GraphNodeEditorView(GraphNodeEditor editor) {
 		this.editor = editor;
 		
+		setFocusTraversable(true);
+		
 		getStyleClass().addAll(STYLE_CLASS);
 		
 		setMaxWidth(Double.MAX_VALUE);
 		setMaxHeight(Double.MAX_VALUE);
+		
+		addEventHandler(MouseEvent.MOUSE_PRESSED, this::handleMouseClickEvent);
 		
 		initializeLayers();
 	}
@@ -86,17 +95,34 @@ public class GraphNodeEditorView extends Region {
 		getChildren().addAll(connectionLayer, nodeLayer);
 	}
 	
+	private void handleMouseClickEvent(final MouseEvent event) {
+		editor.save();
+		
+		if (event.getButton() == MouseButton.SECONDARY && !menu.isShowing() && !event.isConsumed()) {
+			menu.show(this, event.getSceneX(), event.getSceneY());
+			return;
+		}
+		
+		menu.hide();
+	}
+	
 	public void add(final GraphNodeSkin nodeSkin) {
 		if(nodeSkin != null) {
 			nodeLayer.getChildren().add(nodeSkin.getRoot());
-			nodes.add(nodeSkin.getElement());
+			if(nodes.isEmpty()) {
+				root = nodeSkin.getElement();
+			}
+			nodes.put(nodeSkin.getElement().id(), nodeSkin.getElement());
 		}
 	}
 	
 	public void remove(final GraphNodeSkin nodeSkin) {
 		if(nodeSkin != null) {
 			nodeLayer.getChildren().remove(nodeSkin.getRoot());
-			nodes.remove(nodeSkin.getElement());
+			if(nodeSkin.getElement().equals(root)) {
+				throw new IllegalStateException();
+			}
+			nodes.remove(nodeSkin.getElement().id());
 		}
 	}
 	
@@ -180,7 +206,11 @@ public class GraphNodeEditorView extends Region {
 		connectionLayer.getChildren().clear();
 	}
 	
-	public List<GraphNode> getNodes() {
+	public GraphNode getRootNode() {
+		return root;
+	}
+	
+	public ObjectDictionary<Integer, GraphNode> getNodes() {
 		return nodes;
 	}
 	

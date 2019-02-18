@@ -13,6 +13,10 @@ import fr.alchemy.editor.api.editor.graph.element.GraphNode;
 public class BaseGraphNode implements GraphNode {
 	
 	/**
+	 * The attributed ID of the node.
+	 */
+	protected int id = -1;
+	/**
 	 * The X-axis coordinate of the node.
 	 */
 	protected double x;
@@ -36,7 +40,16 @@ public class BaseGraphNode implements GraphNode {
 	 * The array of connectors contained in the graph node.
 	 */
 	protected final Array<GraphConnector> connectors = Array.ofType(GraphConnector.class);
+	
+	public BaseGraphNode(int id) {
+		this.id = id;
+	}
 
+	@Override
+	public int id() {
+		return id;
+	}
+	
 	@Override
 	public double getX() {
 		return x;
