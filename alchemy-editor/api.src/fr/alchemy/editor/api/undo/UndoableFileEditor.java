@@ -10,4 +10,15 @@ import fr.alchemy.editor.api.editor.FileEditor;
  */
 public interface UndoableFileEditor extends FileEditor {
 
+	/**
+	 * Increments the changes that occured in the <code>UndoableFileEditor</code>.
+	 * The changes tracker is used to allow saving of the currently edited file.
+	 */
+	void incrementChange();
+	
+	/**
+	 * Decrements the changes that occured in the <code>UndoableFileEditor</code>.
+	 * The changes tracker is used to allow saving of the currently edited file.
+	 */
+	void decrementChange();
 }

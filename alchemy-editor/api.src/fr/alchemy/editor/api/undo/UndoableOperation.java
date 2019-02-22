@@ -21,4 +21,24 @@ public interface UndoableOperation {
 	 * @param editor The editor on which this operation was undone.
 	 */
 	void redo(UndoableFileEditor editor);
+	
+	/**
+	 * Return whether the <code>UndoableOperation</code> can be undone in its current state.
+	 * 
+	 * @return Whether the operation can be currently undone.
+	 */
+	boolean canUndo();
+	
+	/**
+	 * Return whether the <code>UndoableOperation</code> can be redone in its current state.
+	 * 
+	 * @return Whether the operation can be currently redone.
+	 */
+	boolean canRedo();
+	
+	/**
+	 * Called when the <code>UndoableOperation</code> is re-injected into an history queue, i.e into 
+	 * an {@link UndoableOperationControl}.
+	 */
+	void reinject();
 }
