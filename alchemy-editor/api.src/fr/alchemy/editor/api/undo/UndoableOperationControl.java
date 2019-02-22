@@ -70,13 +70,14 @@ public class UndoableOperationControl implements UndoableOperation {
 				break;
 			}
 		}
-		
-		operation.reinject();
+	
 		operations.addFirst(operation);
 	}
 	
 	@Override
 	public void undo(UndoableFileEditor editor) {
+		assert this.editor == editor;
+		
 		if(!canUndo()) {
 			return;
 		}
@@ -86,12 +87,13 @@ public class UndoableOperationControl implements UndoableOperation {
 		editor.decrementChange();
 		
 		// Re-inject for possible redone operation.
-		operation.reinject();
 		operations.addLast(operation);
 	}
 
 	@Override
 	public void redo(UndoableFileEditor editor) {
+		assert this.editor == editor;
+		
 		if(!canRedo()) {
 			return;
 		}
@@ -101,7 +103,6 @@ public class UndoableOperationControl implements UndoableOperation {
 		editor.incrementChange();
 		
 		// Re-inject for possible undone operation.
-		operation.reinject();
 		operations.addFirst(operation);
 	}
 
@@ -115,10 +116,5 @@ public class UndoableOperationControl implements UndoableOperation {
 	public boolean canRedo() {
 		UndoableOperation operation = operations.peekLast();
 		return operation != null && operation.canRedo();
-	}
-
-	@Override
-	public void reinject() {
-		throw new IllegalStateException("Can't re-inject an UndoableOperationControl!");
 	}
 }

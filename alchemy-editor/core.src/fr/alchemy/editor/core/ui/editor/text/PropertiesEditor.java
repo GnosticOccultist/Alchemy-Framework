@@ -10,7 +10,10 @@ import java.util.Properties;
 import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.editor.api.editor.AbstractFileEditor;
+import fr.alchemy.editor.api.editor.BaseFileEditor;
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
+import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
+import fr.alchemy.editor.api.undo.UndoableFileEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.file.FileUtils;
@@ -32,7 +35,7 @@ import javafx.scene.input.KeyCode;
  * 
  * @author GnosticOccultist
  */
-public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>> {
+public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 	
 	/**
 	 * The currently edited properties.
@@ -46,6 +49,9 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 	 * The column containing the value of each property.
 	 */
 	private TableColumn<PropertyPair, String> valueColumn;
+	/**
+	 * The toolbar of the properties editor.
+	 */
 	private ToolbarEditorElement<PropertyPair> toolbar;
 	
 	/**
@@ -83,9 +89,9 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 					return;
 				}
 				
-				pair.setValue(evt.getNewValue());
-				properties.setProperty(pair.getKey(), pair.getValue());
-				setDirty(true);
+				ModifiedPropertyOperation op = new ModifiedPropertyOperation(new PropertyPair(pair.getKey(), pair.getValue()), 
+						new PropertyPair(pair.getValue(), evt.getNewValue()));
+				perform(op);
 			}
         });
 
@@ -98,12 +104,9 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 					return;
 				}
 				
-				// Remove the old key and its value from properties.
-				properties.remove(pair.getKey());
-				
-				pair.setKey(evt.getNewValue());
-				properties.setProperty(pair.getKey(), pair.getValue());
-				setDirty(true);
+				ModifiedPropertyOperation op = new ModifiedPropertyOperation(new PropertyPair(pair.getKey(), pair.getValue()), 
+						new PropertyPair(evt.getNewValue(), pair.getValue()));
+				perform(op);
 			}
         });
 		
@@ -160,6 +163,35 @@ public class PropertiesEditor extends AbstractFileEditor<TableView<PropertyPair>
 	@Override
 	protected TableView<PropertyPair> createRoot() {
 		return new TableView<>();
+	}
+	
+	class ModifiedPropertyOperation extends AbstractUndoableOperation {
+		
+		PropertyPair oldPair;
+		PropertyPair newPair;
+		
+		public ModifiedPropertyOperation(PropertyPair oldPair, PropertyPair newPair) {
+			this.oldPair = oldPair;
+			this.newPair = newPair;
+		}
+		
+		@Override
+		public void undo(UndoableFileEditor editor) {
+			super.undo(editor);
+			
+			properties.setProperty(oldPair.getKey(), oldPair.getValue());
+			properties.remove(newPair.getKey());
+			loadFromProperties();
+		}
+		
+		@Override
+		public void redo(UndoableFileEditor editor) {
+			super.redo(editor);
+			
+			properties.setProperty(newPair.getKey(), newPair.getValue());
+			properties.remove(oldPair.getKey());
+			loadFromProperties();
+		}
 	}
 	
 	/**

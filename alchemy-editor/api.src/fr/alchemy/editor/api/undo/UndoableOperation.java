@@ -35,10 +35,4 @@ public interface UndoableOperation {
 	 * @return Whether the operation can be currently redone.
 	 */
 	boolean canRedo();
-	
-	/**
-	 * Called when the <code>UndoableOperation</code> is re-injected into an history queue, i.e into 
-	 * an {@link UndoableOperationControl}.
-	 */
-	void reinject();
 }

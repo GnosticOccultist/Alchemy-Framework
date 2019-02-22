@@ -87,7 +87,6 @@ public class PanningWindow extends Region {
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
 	protected void layoutChildren() {
 		super.layoutChildren();
 		
@@ -209,12 +208,10 @@ public class PanningWindow extends Region {
 		return content != null ? content.getBoundsInParent().getHeight() - getHeight() : 0;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private double checkContentX(final double xToCheck) {
 		return snapPosition(Math.min(getMaxX(), Math.max(xToCheck, 0)));
 	}
 	
-	@SuppressWarnings("deprecation")
 	private double checkContentY(final double yToCheck) {
 		return snapPosition(Math.min(getMaxY(), Math.max(yToCheck, 0)));
 	}
