@@ -62,6 +62,10 @@ public class XMLExporter {
 			attrs.addAttribute("", name, name, "CDATA", value);
 		}
 	}
+		
+	public GraphNodeEditorView getView() {
+		return view;
+	}
 	
 	private static AttributesImpl ourEmptyAttributes = new AttributesImpl();
 

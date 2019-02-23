@@ -89,7 +89,7 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 					return;
 				}
 				
-				ModifiedPropertyOperation op = new ModifiedPropertyOperation(new PropertyPair(pair.getKey(), pair.getValue()), 
+				ModifiedPropertyOperation op = new ModifiedPropertyOperation(new PropertyPair(pair), 
 						new PropertyPair(pair.getValue(), evt.getNewValue()));
 				perform(op);
 			}
@@ -104,7 +104,7 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 					return;
 				}
 				
-				ModifiedPropertyOperation op = new ModifiedPropertyOperation(new PropertyPair(pair.getKey(), pair.getValue()), 
+				ModifiedPropertyOperation op = new ModifiedPropertyOperation(new PropertyPair(pair), 
 						new PropertyPair(evt.getNewValue(), pair.getValue()));
 				perform(op);
 			}
@@ -117,11 +117,6 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 	@Override
 	public boolean open(Path file) {
 		super.open(file);
-		
-		// Unable to open file with an inapproriate extension.
-		if(!getSupportedExtensions().contains(FileUtils.getExtension(file))) {
-			return false;
-		}
 		
 		this.properties = FileUtils.getProperties(file, properties);
 		loadFromProperties();
@@ -142,7 +137,15 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		}
 	}
 
+	/**
+	 * Loads the <code>PropertiesEditor</code> content using the readed {@link Properties} from a file
+	 * after {@link #open(Path)} has been called.
+	 * <p>
+	 * The internal edited properties must not be null in order to upload its content (might be empty though).
+	 */
 	private void loadFromProperties() {
+		
+		assert properties != null;
 		
 		ObservableList<PropertyPair> pairs = FXCollections.observableArrayList();
 		for(Entry<Object, Object> entry : properties.entrySet()) {
@@ -165,12 +168,33 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		return new TableView<>();
 	}
 	
+	/**
+	 * <code>ModifiedPropertyOperation</code> is an implementation of {@link AbstractUndoableOperation},
+	 * which is used to modify a {@link PropertyPair} inside the <code>PropertiesEditor</code>.
+	 * 
+	 * @author GnosticOccultist
+	 */
 	class ModifiedPropertyOperation extends AbstractUndoableOperation {
 		
+		/**
+		 * The old property pair.
+		 */
 		PropertyPair oldPair;
+		/**
+		 * The new property pair.
+		 */
 		PropertyPair newPair;
 		
+		/**
+		 * Instantiates a new <code>ModifiedPropertyOperation</code> with the given old and new
+		 * {@link PropertyPair}.
+		 * 
+		 * @param oldPair The old property pair (not null).
+		 * @param newPair The new property pair (not null).
+		 */
 		public ModifiedPropertyOperation(PropertyPair oldPair, PropertyPair newPair) {
+			Validator.nonNull(oldPair, "The old property pair can't be null!");
+			Validator.nonNull(newPair, "The new property pair can't be null!");
 			this.oldPair = oldPair;
 			this.newPair = newPair;
 		}
@@ -178,7 +202,7 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		@Override
 		public void undo(UndoableFileEditor editor) {
 			super.undo(editor);
-			
+	
 			properties.setProperty(oldPair.getKey(), oldPair.getValue());
 			properties.remove(newPair.getKey());
 			loadFromProperties();
@@ -210,6 +234,16 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		 * The value of the property pair.
 		 */
 		private SimpleStringProperty value;
+		
+		/**
+		 * Instantiates a new <code>PropertyPair</code> with the key and value of the 
+		 * given pair.
+		 * 
+		 * @param other The other pair to copy from.
+		 */
+		public PropertyPair(PropertyPair other) {
+			this(other.getKey(), other.getValue());
+		}
 		
 		/**
 		 * Instantiates a new <code>PropertyPair</code> with the given key and value
@@ -262,6 +296,18 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		public void setValue(String value) {
 			Validator.nonNull(value, "The value can't be null");
 			this.value.set(value);
+		}
+		
+		/**
+		 * Copy the key and value of the given pair to this <code>PropertyPair</code>.
+		 * 
+		 * @param other The other pair to copy from.
+		 */
+		public void copy(PropertyPair other) {
+			Validator.nonNull(other, "The pair to copy from can't be null!");
+			
+			this.key.set(other.getKey());
+			this.value.set(other.getValue());
 		}
 		
 		@Override

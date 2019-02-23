@@ -10,6 +10,18 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 
+/**
+ * <code>BaseFileEditor</code> is an abstract extension of {@link AbstractFileEditor} which implements {@link UndoableFileEditor},
+ * in order to keep track of performed {@link UndoableOperation} and undo/redo them at any time.
+ * <p>
+ * This implementation provides undo-redo methods and keyboard shortcuts to invoke them (CTRL+Z & CTRL+Y), as well as a change counter 
+ * to automatically change the dirty flag on this editor. In order for these feature to work, you must create implementations of 
+ * {@link UndoableOperation} for each action that causes a modification in the edited file and invoke them using {@link #perform(UndoableOperation)}.
+ * 
+ * @param <R> The type of region to use as the root of the editor.
+ * 
+ * @author GnosticOccultist
+ */
 public abstract class BaseFileEditor<R extends Region> extends AbstractFileEditor<R> implements UndoableFileEditor {
 
 	/**
