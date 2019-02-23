@@ -82,9 +82,10 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	}
 	
 	/**
-	 * Process the specified {@link KeyEvent} from the <code>AbstractFileEditor</code>.
-	 * By default it just add a saving shortcut in order to quickly save a dirty edited file using
-	 * the CTRL+S combination.
+	 * Process the specified {@link KeyEvent} which occured on the <code>AbstractFileEditor</code>.
+	 * <p>
+	 * This implementation just add a saving shortcut, in order to quickly save a dirty edited file using
+	 * the CTRL+S combination, before consuming the event.
 	 * 
 	 * @param event The key event to process.
 	 */

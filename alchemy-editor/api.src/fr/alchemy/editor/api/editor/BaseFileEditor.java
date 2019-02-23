@@ -51,12 +51,29 @@ public abstract class BaseFileEditor<R extends Region> extends AbstractFileEdito
 		this.operations = new UndoableOperationControl(this, history);
 	}
 	
+	/**
+	 * Performs the provided {@link UndoableOperation} on this <code>BaseFileEditor</code>, using 
+	 * the {@link UndoableOperationControl}.
+	 * The method is intended to keep track of this operation so it can later be undone or redone.
+	 * 
+	 * @param operation The operation to perform on this editor (not null).
+	 */
 	@Override
 	public void perform(UndoableOperation operation) {
 		Validator.nonNull(operation, "The operation to perform can't be null!");
 		operations.execute(operation);
 	}
 	
+	/**
+	 * Process the specified {@link KeyEvent} which occured on the <code>BaseFileEditor</code>.
+	 * <p>
+	 * This implementation just add some generic shortcuts, such as a saving shortcut (CTRL+S), a undo 
+	 * operation shortcut (CTRL+Z) and a redo operation shortcut (CTRL+Y).
+	 * <p>
+	 * At the end of the method the event is being consumed automatically.
+	 * 
+	 * @param event The key event to process.
+	 */
 	@Override
 	protected void processKeyPressed(KeyEvent event) {
 		if(event.getCode() == KeyCode.Z && event.isControlDown()) {
@@ -68,22 +85,42 @@ public abstract class BaseFileEditor<R extends Region> extends AbstractFileEdito
 		super.processKeyPressed(event);
 	}
 	
+	/**
+	 * Undo the last performed {@link UndoableOperation}, by delegating it to the
+	 * {@link UndoableOperationControl}.
+	 * <p>
+	 * The function is being called when the CTRL+Z shortcut has been pressed.
+	 */
 	@Override
 	public void undo() {
 		operations.undo(this);
 	}
 	
+	/**
+	 * Redo the last undone {@link UndoableOperation}, by delegating it to the
+	 * {@link UndoableOperationControl}.
+	 * <p>
+	 * The function is being called when the CTRL+Y shortcut has been pressed.
+	 */
 	@Override
 	public void redo() {
 		operations.redo(this);
 	}
 	
+	/**
+	 * Increments the changes that occured in the <code>BaseFileEditor</code>, and
+	 * update the dirty flag of the editor.
+	 */
 	@Override
 	public void incrementChange() {
 		changeCounter.incrementAndGet();
 		setDirty(true);
 	}
 
+	/**
+	 * Decrements the changes that occured in the <code>BaseFileEditor</code>, and
+	 * update the dirty flag of the editor.
+	 */
 	@Override
 	public void decrementChange() {
 		changeCounter.decrementAndGet();

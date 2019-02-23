@@ -19,7 +19,8 @@ import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetFoldersEleme
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.LoadingElement;
 import fr.alchemy.editor.core.ui.component.asset.tree.filler.ContextMenuFiller;
 import fr.alchemy.editor.core.ui.component.asset.tree.filler.ContextMenuFillerRegistry;
-import fr.alchemy.editor.core.ui.component.asset.tree.filler.OpenFileMenu;
+import fr.alchemy.editor.core.ui.component.asset.tree.filler.items.OpenFileItem;
+import fr.alchemy.utilities.file.FileUtils;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -466,8 +467,14 @@ public class AssetTree extends TreeView<AssetElement> {
 			Path fileName = file.getFileName();
 			boolean folder = item instanceof AssetFolderElement;
 			
-			icon.setImage(EditorManager.editor().loadIcon(
-					folder ? "resources/icons/folder.png" : "resources/icons/file.png"));
+			if(FileUtils.getExtension(file).equals("properties")) {
+				icon.setImage(EditorManager.editor().loadIcon("resources/icons/property.png"));
+			} else if(FileUtils.getExtension(file).equals("xml")) {
+				icon.setImage(EditorManager.editor().loadIcon("resources/icons/graph-node.png"));
+			} else {
+				icon.setImage(EditorManager.editor().loadIcon(
+						folder ? "resources/icons/folder.png" : "resources/icons/file.png"));
+			}
 			
 			setText(fileName == null ? file.toString() : fileName.toString());
 			setGraphic(icon);
@@ -492,7 +499,7 @@ public class AssetTree extends TreeView<AssetElement> {
 			}  else if ((treeView.isOnlyFolders() || !(item instanceof AssetFolderElement)) 
 					&& event.getButton() == MouseButton.PRIMARY && event.getClickCount() > 1) {
 				
-				new OpenFileMenu(item).getOnAction().handle(null);
+				new OpenFileItem(item).getOnAction().handle(null);
 			}
 		}
 		

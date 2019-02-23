@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -15,6 +17,7 @@ import java.util.Properties;
 
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.actions.BiModifierAction;
+import fr.alchemy.utilities.array.Array;
 
 public final class FileUtils {
 	
@@ -59,6 +62,64 @@ public final class FileUtils {
 		return getExtension(Objects.toString(path.getFileName()));
 	}
 	
+	/**
+	 * Return all the files from the specified directory.
+	 * 
+	 * @param directory The directory to retrieve files from.
+	 * @param folders	Whether to add folders.
+	 * @return			A new array containing all files, including the root directory.
+	 */
+	public static Array<Path> getFiles(Path directory, boolean folders) {
+		return getFiles(directory, true, folders);
+	}
+	
+	/**
+	 * Return all the files from the specified directory.
+	 * 
+	 * @param directory The directory to retrieve files from.
+	 * @param root		Whether to add the root directory.
+	 * @param folders	Whether to add folders.
+	 * @return			A new array containing all files.
+	 */
+	public static Array<Path> getFiles(Path directory, boolean root, boolean folders) {
+
+        Array<Path> result = Array.ofType(Path.class);
+        addFilesTo(result, directory, root, folders);
+
+        return result;
+	}
+	
+	/**
+	 * Add recursively all files from the specified directory to the provided store.
+	 * 
+	 * @param store		The array to store the files in.
+	 * @param directory	The directory to start adding.
+	 * @param root		Whether to add the root directory.
+	 * @param folders	Whether to add folders.
+	 */
+	public static void addFilesTo(Array<Path> store, Path directory, boolean root, boolean folders) {
+		if(Files.isDirectory(directory) && folders && root) {
+			store.add(directory);
+		}
+		
+		if(!Files.exists(directory)) {
+			System.err.println("Unable to find folder " + directory);
+			return;
+		}
+		
+		try(DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+			for(Path path : stream) {
+				if(Files.isDirectory(path)) {
+					addFilesTo(store, path, true, folders);
+				} else {
+					store.add(path);
+				}
+			}
+		} catch (IOException ex) {
+			throw new UncheckedIOException(ex);
+		}
+	}
+
 	/**
 	 * Open an {@link InputStream} from the provided path of a file.
 	 * <p>

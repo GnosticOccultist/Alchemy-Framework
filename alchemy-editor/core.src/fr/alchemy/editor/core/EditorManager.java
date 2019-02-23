@@ -4,6 +4,7 @@ import fr.alchemy.core.asset.AssetManager;
 import fr.alchemy.utilities.logging.FactoryLogger;
 import fr.alchemy.utilities.logging.Logger;
 import javafx.scene.image.Image;
+import javafx.scene.input.DataFormat;
 
 /**
  * <code>EditorManager</code> is a single-instance utility class for  containing all 
@@ -17,6 +18,10 @@ public class EditorManager {
 	 * The editor logger.
 	 */
 	private Logger logger = FactoryLogger.getLogger("alchemy.editor");
+	/**
+	 * The editor clipboard data.
+	 */
+	public static final DataFormat EDITOR_DATA = new DataFormat("alchemy.editor.data");
 	
 	/**
 	 * The single-instance of the editor manager.

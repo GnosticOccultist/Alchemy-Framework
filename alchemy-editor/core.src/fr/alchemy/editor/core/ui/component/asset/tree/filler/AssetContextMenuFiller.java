@@ -4,6 +4,9 @@ import java.util.List;
 
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetFileElement;
+import fr.alchemy.editor.core.ui.component.asset.tree.filler.items.CopyFileItem;
+import fr.alchemy.editor.core.ui.component.asset.tree.filler.items.OpenFileItem;
+import fr.alchemy.editor.core.ui.component.asset.tree.filler.items.PasteFileItem;
 import javafx.scene.control.MenuItem;
 
 /**
@@ -17,7 +20,10 @@ public class AssetContextMenuFiller implements ContextMenuFiller<AssetElement> {
 	@Override
 	public void fill(AssetElement element, List<MenuItem> items) {
 		if(element instanceof AssetFileElement) {
-			items.add(new OpenFileMenu(element));
+			items.add(new OpenFileItem(element));
 		}
+		
+		items.add(new CopyFileItem(element));
+		items.add(new PasteFileItem(element));
 	}
 }

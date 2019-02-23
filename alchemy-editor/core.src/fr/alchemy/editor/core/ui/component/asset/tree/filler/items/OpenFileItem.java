@@ -1,4 +1,4 @@
-package fr.alchemy.editor.core.ui.component.asset.tree.filler;
+package fr.alchemy.editor.core.ui.component.asset.tree.filler.items;
 
 import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.core.EditorManager;
@@ -8,11 +8,11 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 
-public class OpenFileMenu extends MenuItem {
+public class OpenFileItem extends MenuItem {
 	
 	private AssetElement element;
 	
-	public OpenFileMenu(AssetElement element) {
+	public OpenFileItem(AssetElement element) {
 		
 		this.element = element;
 		
