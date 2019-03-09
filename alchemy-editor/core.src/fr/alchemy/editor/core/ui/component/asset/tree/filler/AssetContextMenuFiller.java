@@ -2,6 +2,7 @@ package fr.alchemy.editor.core.ui.component.asset.tree.filler;
 
 import java.util.List;
 
+import fr.alchemy.editor.core.ui.FXUtils;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetFileElement;
 import fr.alchemy.editor.core.ui.component.asset.tree.filler.items.CopyFileItem;
@@ -24,6 +25,9 @@ public class AssetContextMenuFiller implements ContextMenuFiller<AssetElement> {
 		}
 		
 		items.add(new CopyFileItem(element));
-		items.add(new PasteFileItem(element));
+		
+		if(FXUtils.hasFileInClipboard()) {
+			items.add(new PasteFileItem(element));
+		}
 	}
 }

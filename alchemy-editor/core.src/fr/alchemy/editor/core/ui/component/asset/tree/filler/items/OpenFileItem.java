@@ -1,27 +1,43 @@
 package fr.alchemy.editor.core.ui.component.asset.tree.filler.items;
 
 import fr.alchemy.core.event.AlchemyEventManager;
+import fr.alchemy.editor.api.editor.FileEditor;
 import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import javafx.event.ActionEvent;
-import javafx.scene.control.MenuItem;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 
-public class OpenFileItem extends MenuItem {
+/**
+ * <code>OpenFileItem</code> is an implementation of {@link AbstractAssetItem} which allow to open an
+ * {@link AssetElement} if a {@link FileEditor} implementation exists for its extension.
+ * 
+ * @author GnosticOccultist
+ */
+public class OpenFileItem extends AbstractAssetItem {
 	
-	private AssetElement element;
-	
+	/**
+	 * Instantiates a new <code>OpenFileItem</code> with the specified {@link AssetElement}.
+	 * 
+	 * @param element The asset element for which the item was created.
+	 */
 	public OpenFileItem(AssetElement element) {
-		
-		this.element = element;
-		
-		setText("Open file");
-		setOnAction(this::execute);
-		setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/visible.png")));
+		super(element);
 	}
-	
-	private void execute(ActionEvent event) {
-		AlchemyEventManager.events().notify(AlchemyEditorEvent.newOpenFileEvent(element.getFile()));
+
+	@Override
+	protected void execute(ActionEvent event) {
+		AlchemyEventManager.events().notify(
+				AlchemyEditorEvent.newOpenFileEvent(getElement().getFile()));
+	}
+
+	@Override
+	protected Image icon() {
+		return EditorManager.editor().loadIcon("/resources/icons/visible.png");
+	}
+
+	@Override
+	protected String title() {
+		return "Open file";
 	}
 }

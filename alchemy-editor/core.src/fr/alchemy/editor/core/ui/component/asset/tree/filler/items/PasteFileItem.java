@@ -11,32 +11,36 @@ import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import fr.alchemy.utilities.array.Array;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.event.ActionEvent;
-import javafx.scene.control.MenuItem;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 
-public class PasteFileItem extends MenuItem {
+/**
+ * <code>OpenFileItem</code> is an implementation of {@link AbstractAssetItem} which allow to paste one
+ * or multiple files copied to the {@link Clipboard} to the directory of an {@link AssetElement}.
+ * 
+ * @author GnosticOccultist
+ */
+public class PasteFileItem extends AbstractAssetItem {
 	
-	private AssetElement element;
-	
+	/**
+	 * Instantiates a new <code>PasteFileItem</code> with the specified {@link AssetElement}.
+	 * 
+	 * @param element The asset element for which the item was created.
+	 */
 	public PasteFileItem(AssetElement element) {
-		
-		this.element = element;
-		
-		setText("Paste");
-		setOnAction(this::execute);
-		setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/clipboard.png")));
+		super(element);
 	}
 	
-	private void execute(ActionEvent event) {
+	@Override
+	protected void execute(ActionEvent event) {
 		
 		Clipboard clipboard = Clipboard.getSystemClipboard();
         if (clipboard == null) {
             return;
         }
         
-        Path currentFile = element.getFile();
+        Path currentFile = getElement().getFile();
 
         @SuppressWarnings("unchecked")
 		List<File> files = (List<File>) clipboard.getContent(DataFormat.FILES);
@@ -57,20 +61,20 @@ public class PasteFileItem extends MenuItem {
 		
 		Array<Path> files = null;
 		if(Files.isDirectory(file)) {
-			 files = FileUtils.getFiles(file, false, true);
+			files = FileUtils.getFiles(file, false, true);
 		}
 		
 		Path newFile = target.resolve(file.getFileName().toString());
 		
 		try {
-			safeCopy(file, files, newFile);
+			unsafeCopy(file, files, newFile);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			return;
 		}
 	}
 	
-	private void safeCopy(Path file, Array<Path> files, Path newFile) throws IOException {
+	private void unsafeCopy(Path file, Array<Path> files, Path newFile) throws IOException {
 		Files.copy(file, newFile);
 		
 		files.forEach(path -> {
@@ -83,5 +87,15 @@ public class PasteFileItem extends MenuItem {
 				throw new RuntimeException(ex);
 			}
 		});
+	}
+
+	@Override
+	protected Image icon() {
+		return EditorManager.editor().loadIcon("/resources/icons/clipboard.png");
+	}
+
+	@Override
+	protected String title() {
+		return "Paste";
 	}
 }

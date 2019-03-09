@@ -30,6 +30,9 @@ public class ToolbarEditorElement<T> implements EditorElement {
 	 * The box representing the toolbar.
 	 */
 	private HBox toolbar;
+	/**
+	 * The text search bar used for filtering.
+	 */
 	private TextSearchBar<T> bar;
 
 	/**
