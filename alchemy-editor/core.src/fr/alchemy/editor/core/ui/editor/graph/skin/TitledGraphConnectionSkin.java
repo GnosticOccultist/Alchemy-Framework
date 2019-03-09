@@ -75,12 +75,12 @@ public class TitledGraphConnectionSkin extends GraphConnectionSkin {
 	}
 
 	@Override
-	public void draw(Map<GraphConnectionSkin, Point2D[]> allConnections) {
-		super.draw(allConnections);
+	public void draw(Map<GraphConnectionSkin, Point2D[]> allPoints) {
+		super.draw(allPoints);
 	
 		final double[][] intersections = null;
 		
-		final Point2D[] points = getPoints();
+		final Point2D[] points = allPoints == null ? null : allPoints.get(this);
 		if(points != null) {
 			drawAllSegments(points, intersections);
 		} else {

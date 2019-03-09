@@ -9,12 +9,12 @@ import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
+import fr.alchemy.editor.core.ui.FXUtils;
 import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.array.Array;
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.layout.Region;
 
@@ -69,10 +69,10 @@ public abstract class EditorLayout<T extends Region> {
 	public void construct() {
 		
 		EditorConfig.config().getOpenedComponents(name)
-			.forEach(t -> Platform.runLater(() -> constructComponent(t)));
+			.forEach(t -> FXUtils.performFXThread(() -> constructComponent(t)));
 		
 		EditorConfig.config().getOpenedFiles(name)
-			.forEach(f -> Platform.runLater(() -> openFile(Paths.get(f))));
+			.forEach(f -> FXUtils.performFXThread(() -> openFile(Paths.get(f))));
 	}
 	
 	/**

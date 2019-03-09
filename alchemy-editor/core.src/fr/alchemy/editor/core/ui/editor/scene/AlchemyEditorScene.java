@@ -2,12 +2,9 @@ package fr.alchemy.editor.core.ui.editor.scene;
 
 import fr.alchemy.core.AlchemyApplication;
 import fr.alchemy.core.scene.AlchemyScene;
-import fr.alchemy.core.scene.SceneLayer;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
-import fr.alchemy.editor.core.ui.editor.graph.SimpleGraphNodeEditor;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
 import javafx.geometry.Side;
-import javafx.scene.Group;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -49,12 +46,6 @@ public class AlchemyEditorScene extends AlchemyScene {
 		tabPane.construct();
 		scenePane.construct();
 		
-		SimpleGraphNodeEditor editor = new SimpleGraphNodeEditor();
-		editor.newNode();
-		editor.newNode();
-		editor.reload();
-		scenePane.attach(editor);
-		
 		scenePane.getContent().prefHeightProperty().bind(root.heightProperty());
 		scenePane.getContent().setSide(Side.TOP);
 		
@@ -69,10 +60,6 @@ public class AlchemyEditorScene extends AlchemyScene {
 		root.getChildren().addAll(new VBox(bar, container));
 		
 		tabPane.notifyFinishBuild();
-	}
-	
-	public Group layer(SceneLayer layer) {
-		return getRenderBatch(layer);
 	}
 	
 	public void save() {

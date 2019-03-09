@@ -147,7 +147,7 @@ public class AssetTree extends TreeView<AssetElement> {
 
         fill(newRoot);
 
-        Platform.runLater(() -> applyNewRoot(newRoot));
+        FXUtils.performFXThread(() -> applyNewRoot(newRoot));
     }
     
     /**
@@ -162,7 +162,7 @@ public class AssetTree extends TreeView<AssetElement> {
 
         fill(newRoot);
 
-        Platform.runLater(() -> applyNewRoot(newRoot));
+        FXUtils.performFXThread(() -> applyNewRoot(newRoot));
     }
     
     /**

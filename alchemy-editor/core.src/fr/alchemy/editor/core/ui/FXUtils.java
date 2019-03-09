@@ -1,5 +1,6 @@
 package fr.alchemy.editor.core.ui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import fr.alchemy.editor.api.editor.graph.element.GraphNode;
 import fr.alchemy.editor.api.editor.graph.skin.GraphConnectorSkin;
 import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
 import fr.alchemy.utilities.Validator;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -22,10 +24,17 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseEvent;
 
-public class FXUtils {
+public final class FXUtils {
 
+	/**
+	 * No instantiation of <code>FXUtils</code>.
+	 */
+	private FXUtils() {}
+	
     public static <T> TreeItem<T> findItemForValue(final TreeItem<T> root, final Object object) {
 
         if (object == null) {
@@ -161,5 +170,35 @@ public class FXUtils {
      */
     public static double moveOffPixel(final double position) {
     	return Math.ceil(position) - 0.5D;
+    }
+    
+    /**
+     * Return whether the {@link Clipboard} has file in its content.
+     * 
+     * @return Whether the clipboard contains files.
+     */
+    @SuppressWarnings("unchecked")
+    public static boolean hasFileInClipboard() {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        if (clipboard == null) return false;
+		final List<File> files = (List<File>) clipboard.getContent(DataFormat.FILES);
+        return !(files == null || files.isEmpty());
+    }
+    
+    /**
+     * Performs the specified {@link Runnable} task inside the <b>JavaFX-Thread</b>, by either running it 
+     * directly if the function was already called from the right thread or at some unspecified time in the future.
+     * <p>
+     * Note that each task are executed in the order they are submitted. It's also encouraged that long-running tasks
+     * should be done on a background thread when possible.
+     * 
+     * @param task The task to be performed in the FX-Thread.
+     */
+    public static void performFXThread(Runnable task) {
+    	if(Platform.isFxApplicationThread()) {
+    		task.run();
+    	} else {
+    		Platform.runLater(task);
+    	}
     }
 }

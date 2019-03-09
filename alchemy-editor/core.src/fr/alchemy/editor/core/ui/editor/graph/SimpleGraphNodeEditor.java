@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ss.rlib.common.util.array.Array;
 
-import fr.alchemy.editor.api.editor.AbstractFileEditor;
+import fr.alchemy.editor.api.editor.BaseFileEditor;
 import fr.alchemy.editor.api.editor.graph.GraphNodeEditor;
 import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
 import fr.alchemy.editor.api.editor.graph.element.GraphElement;
@@ -28,7 +28,7 @@ import fr.alchemy.editor.core.ui.editor.graph.selection.SelectionManager;
  * 
  * @author GnosticOccultist
  */
-public class SimpleGraphNodeEditor extends AbstractFileEditor<GraphNodeEditorView> implements GraphNodeEditor {
+public class SimpleGraphNodeEditor extends BaseFileEditor<GraphNodeEditorView> implements GraphNodeEditor {
 	
 	private final AtomicInteger idGenerator = new AtomicInteger(0);
 	/**

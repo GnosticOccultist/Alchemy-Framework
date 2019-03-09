@@ -29,10 +29,6 @@ import javafx.scene.shape.Line;
 public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
 	
 	/**
-	 * The array of points for the connection.
-	 */
-	private Point2D[] points;
-	/**
 	 * The connection index inside the list of children of the connection layer.
 	 */
 	private int connectionIndex;
@@ -64,9 +60,9 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
 	 * A simple connection skin may ignore the given parameter. This parameter can for example be used to
 	 * display a 'rerouting' effect when the connection passes over another connection.
 	 * 
-	 * @param allConnections The lists of points for all connections (can be ingored in a simple skin).
+	 * @param allPoints The lists of points for all connections (can be ingored in a simple skin).
 	 */
-	public void draw(final Map<GraphConnectionSkin, Point2D[]> allConnections) {
+	public void draw(final Map<GraphConnectionSkin, Point2D[]> allPoints) {
 		if(getRoot() != null && getRoot().getParent() != null) {
 			connectionIndex = getRoot().getParent().getChildrenUnmodifiable().indexOf(getRoot());
 		} else {
@@ -101,7 +97,7 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
 		final GraphConnection element = getElement();
         final GraphSkinDictionary skinManager = getGraphEditor() == null ? null : getGraphEditor().getSkinDictionary();
         if(element == null || skinManager == null) {
-        	points = null;
+        	return null;
         } else if(element.getJoints().isEmpty()) {
         	final Point2D[] points = new Point2D[2];
         	
@@ -111,7 +107,7 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
         	// Create the end position aka the target connector position.
         	points[1] = FXUtils.getConnectorPosition(element.getTarget(), skinManager);
         	
-        	this.points = points;
+        	return points;
         } else {
         	final int length = element.getJoints().size() + 2;
             final Point2D[] points = new Point2D[length];
@@ -134,19 +130,8 @@ public abstract class GraphConnectionSkin extends GraphSkin<GraphConnection> {
         	// Create the end position aka the target connector position.
         	points[length - 1] = FXUtils.getConnectorPosition(element.getTarget(), skinManager);
         	
-        	this.points = points;
+        	return points;
         }
-        
-        return points;
-	}
-	
-	/**
-	 * Return the current points of the <code>GraphConnectionSkin</code>.
-	 * 
-	 * @return The current points of this connection.
-	 */
-	protected Point2D[] getPoints() {
-		return points;
 	}
 	
 	/**

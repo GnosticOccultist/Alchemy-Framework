@@ -2,7 +2,7 @@ package fr.alchemy.editor.api;
 
 import java.awt.Point;
 
-import javafx.application.Platform;
+import fr.alchemy.editor.core.ui.FXUtils;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -78,7 +78,7 @@ public abstract class AlchemyDialog {
 		dialog.toFront();
 		dialog.setOnCloseRequest(event -> hide());
 		
-		Platform.runLater(dialog::sizeToScene);
+		FXUtils.performFXThread(dialog::sizeToScene);
 	}
 
 	/**
