@@ -77,4 +77,31 @@ public final class ArrayUtil {
         builder.append("]");
         return builder.toString();
 	}
+
+    @SuppressWarnings("unchecked")
+	public static <T, E extends T> T[] combine(T[] base, E[] added) {
+        return combine(base, added, (Class<T>) base.getClass().getComponentType());
+    }
+
+    public static <T, E extends T> T[] combine(T[] base, E[] added, Class<T> type) {
+        if (base == null) {
+            return added == null ? create(type, 0) : added;
+        } else if (added == null || added.length < 1) {
+            return base;
+        }
+
+        T[] result = create(type, base.length + added.length);
+
+        int index = 0;
+
+        for (T object : base) {
+            result[index++] = object;
+        }
+
+        for (E object : added) {
+            result[index++] = object;
+        }
+
+        return result;
+    }
 }

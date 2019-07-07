@@ -1,7 +1,5 @@
 package fr.alchemy.editor.api.editor.region;
 
-import fr.alchemy.editor.api.editor.graph.event.GraphEventManager;
-import fr.alchemy.editor.api.editor.graph.event.GraphInputGesture;
 import fr.alchemy.editor.core.ui.FXUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -124,12 +122,6 @@ public class DraggableBox extends StackPane {
 		if(event.getButton() != MouseButton.PRIMARY || !isEditable()) {
 			return;
 		}
-		
-		if(GraphEventManager.instance().canActivate(GraphInputGesture.MOVE, event)) {
-			final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
-	        storeClick(cursorPosition.getX(), cursorPosition.getY());
-	        event.consume();
-		}
 	}
 	
 	/**
@@ -159,14 +151,10 @@ public class DraggableBox extends StackPane {
 		if(event.getButton() != MouseButton.PRIMARY || !isEditable()) {
 			return;
 		}
-		
-		GraphEventManager manager = GraphEventManager.instance();
-		if(manager.canActivate(GraphInputGesture.MOVE, event)) {
-			final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
-			handleDrag(cursorPosition.getX(), cursorPosition.getY());
-			manager.activateInputGesture(GraphInputGesture.MOVE);
-			event.consume();
-		}   
+	
+		final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
+		handleDrag(cursorPosition.getX(), cursorPosition.getY());
+		event.consume();
 	}
 	
 	/**
@@ -237,6 +225,10 @@ public class DraggableBox extends StackPane {
         }
 	}
 	
+	protected void handleMouseReleased(MouseEvent event) {
+		
+	}
+	
 	/**
 	 * Aligns the given position to the first alignment value that is closer than the alignment threshold
 	 * for the <code>DraggableBox</code>.
@@ -254,12 +246,6 @@ public class DraggableBox extends StackPane {
 			}
 		}
 		return position;
-	}
-
-	protected void handleMouseReleased(final MouseEvent event) {
-		if(GraphEventManager.instance().finishInputGesture(GraphInputGesture.MOVE)) {
-			event.consume();
-		}
 	}
 	
 	/**

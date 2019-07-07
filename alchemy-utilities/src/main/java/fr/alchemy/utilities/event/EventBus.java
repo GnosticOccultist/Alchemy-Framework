@@ -1,5 +1,7 @@
 package fr.alchemy.utilities.event;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.logging.FactoryLogger;
 import fr.alchemy.utilities.logging.Logger;
 
@@ -24,6 +27,9 @@ import fr.alchemy.utilities.logging.Logger;
  * 
  * @version 0.1.0
  * @since 0.1.0
+ * 
+ * @see #addEventListener(EventType, EventListener)
+ * @see #addListenerMethods(Object, EventType...)
  * 
  * @author GnosticOccultist
  */
@@ -67,7 +73,7 @@ public final class EventBus {
 	
 	/**
 	 * Publishes the specified event to the <code>EventBus</code>, delivering it 
-	 * to all listeners registered for the particular type.
+	 * to all listeners registered for the particular {@link EventType}.
 	 * <p>
 	 * This is the same as calling {@link EventBus#publishEvent(EventType, Object)}, 
 	 * except it first get the singleton-instance of the event bus.
@@ -81,7 +87,7 @@ public final class EventBus {
 	
 	/**
 	 * Publishes the specified event to the <code>EventBus</code>, delivering it 
-	 * to all listeners registered for the particular type.
+	 * to all listeners registered for the particular {@link EventType}.
 	 * 
 	 * @param type  The type of event to be delivered.
 	 * @param event The event to publish.
@@ -94,11 +100,6 @@ public final class EventBus {
 		// for thing like lifecycle logging and not actual event handling.
 		deliver(null, event, all);
 		
-		EventType<? super E> superType = type.getSuperType();
-		if(superType != null) {
-			deliver(superType, event, getListeners(superType));
-		}
-		
 		boolean delivered = deliver(type, event, getListeners(type));
 		
 		if(!delivered) {
@@ -108,7 +109,7 @@ public final class EventBus {
 	
 	/**
 	 * Adds an {@link EventListener} object that will be notified about events of the
-	 * specified type.
+	 * specified {@link EventType}.
 	 * <p>
 	 * This is the same as calling {@link #addEventListener(EventType, EventListener)},
 	 * except it first get the singleton-instance of the event bus.
@@ -122,23 +123,18 @@ public final class EventBus {
 	
 	/**
 	 * Adds an {@link EventListener} object that will be notified about events of the
-	 * specified type.
+	 * specified {@link EventType}.
 	 * 
 	 * @param type	   The type of event.
 	 * @param listener The event listener to register.
 	 */
 	public <E> void addEventListener(EventType<E> type, EventListener<E> listener) {
 		getListeners(type).add(listener);
-		
-		EventType<? super E> superType = type.getSuperType();
-		if(superType != null) {
-			getListeners(superType).add(listener);
-		}
 	}
 	
 	/**
 	 * Removes the {@link EventListener} object that will be notified about events of the
-	 * specified type.
+	 * specified {@link EventType}.
 	 * <p>
 	 * This is the same as calling {@link #removeEventListener(EventType, EventListener)},
 	 * except it first get the singleton-instance of the event bus.
@@ -152,19 +148,121 @@ public final class EventBus {
 	
 	/**
 	 * Removes the {@link EventListener} object that will be notified about events of the
-	 * specified type.
+	 * specified {@link EventType}.
 	 * 
 	 * @param type	   The type of event.
 	 * @param listener The event listener to unregister.
 	 */
 	public <E> void removeEventListener(EventType<E> type, EventListener<E> listener) {
 		getListeners(type).remove(listener);
-		
-		EventType<? super E> superType = type.getSuperType();
-		if(superType != null) {
-			getListeners(superType).remove(listener);
+	}
+	
+	/**
+	 * Removes the {@link EventListener} object that will be notified about events of any
+	 * {@link EventType}
+	 * 
+	 * @param listener The event listener to unregister from every types.
+	 */
+	public <E> void clearEventListener(EventListener<E> listener) {
+		for(EventType type : listenerMap.keySet()) {
+			listenerMap.get(type).remove(listener);
 		}
-	} 
+	}
+	
+	/**
+	 * Adds a generic listener which will have its events delivered through reflection based
+	 * on the {@link EventType} names. For example, if the expected event type is {@link ErrorEvent#FATAL_ERROR},
+	 * then the event type name is "FatalError" and the expected method name will be either "onFatalError" 
+	 * or "fatalError" with a single argument which is the concerned event.
+	 * <p>
+	 * Note that it is ok if the method isn't public if the current security settings allow overriding method
+	 * accessibility.
+	 * 
+	 * @param listener The listener to register methods from.
+	 * @param types	   The events type to create listener for.
+	 * 
+	 * @throws IllegalArgumentException Thrown if any of the dispatch methods is missing.
+	 */
+	public void addListenerMethods(Object listener, EventType...types) {
+		Class clazz = listener.getClass();
+		for(EventType type : types) {
+			try {
+				Method method = findMethod(clazz, type);
+				if(!method.isAccessible()) {
+					method.setAccessible(true);
+				}
+				getListeners(type).add(new MethodDispatcher(listener, method));
+			} catch (NoSuchMethodException ex) {
+				throw new IllegalArgumentException("Event method not found for: " + 
+						type + " on object: " + listener, ex);
+			}
+		}
+	}
+	
+	/**
+	 * Removes a generic listener which have been registered using {@link #addListenerMethods(Object, EventType...)}
+	 * from any of the specified registered {@link EventType}.
+	 * 
+	 * @param type	   The type of event.
+	 * @param listener The event listener to unregister.
+	 */
+	@SuppressWarnings("unchecked")
+	public void removeListenerMethods(Object listener, EventType...types) {
+		for(EventType type : types) {
+			Listeners listeners = getListeners(type);
+			for(EventListener l : listeners.getArray()) {
+				if(!(l instanceof MethodDispatcher)) {
+					continue;
+				}
+				MethodDispatcher md = (MethodDispatcher) l;
+				if(md.delegate == listener || md.delegate.equals(listener)) {
+					removeEventListener(type, md);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * TODO: Testing.
+	 */
+	@SuppressWarnings("unused")
+	private void addListenerAnnotatedMethods(Object listener, EventType...types) {
+		for(Method method : listener.getClass().getDeclaredMethods()) {
+			
+			// The compiler sometimes creates synthetic bridge methods as part of the
+			// type erasure process. As of JDK8, these methods now include the same 
+			// annotations as the original declarations. They should be ingnored from 
+			// the registering process.
+			if(method.isBridge()) {
+				continue;
+			}
+			
+			if(method.isAnnotationPresent(EventSubscriber.class)) {
+				Class<?>[] parametersTypes = method.getParameterTypes();
+				if(parametersTypes.length == 0) {
+					throw new IllegalArgumentException("Method " + method + " has @EventSubscriber "
+							+ "annotation but requires no arguments. Such methods must require at "
+							+ "least one argument.");
+				}
+				
+				EventSubscriber annotation = method.getAnnotation(EventSubscriber.class);
+				String[] typeNames = annotation.types();
+				if(typeNames.length != types.length) {
+					throw new IllegalArgumentException("Method " + method + " has @EventSubscriber "
+							+ "annotation to handle " + typeNames.length + " event types!");
+				}
+				
+				for(String name : typeNames) {
+					for(int i = 0; i < types.length; i++) {
+						if(name == types[i].getName()) {
+							getListeners(types[i]).add(new MethodDispatcher(listener, method));
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	/**
 	 * Adds a global listener that will notified about all {@link EventType}. This can be used
@@ -199,12 +297,25 @@ public final class EventBus {
                 delivered = true;
             } catch(Throwable t) {
                 logger.error("Error handling event:" + event + " for type:" + type + "  in handler:" + listener, t);
+                if(type != ErrorEvent.DISPATCH_ERROR) {
+                	publishEvent(ErrorEvent.DISPATCH_ERROR, new ErrorEvent(t, type, event));
+                }
             }
         }
         return delivered;
 	}
 	
+	/**
+	 * Return the list of {@link EventListener} for the specified {@link EventType},
+	 * creating the list if necessary.
+	 * 
+	 * @param type The event type to get all listeners for (not null).
+	 * @return	   The pre-existing list of listeners or a new filled one if not 
+	 * 			   already present.
+	 */
 	protected Listeners getListeners(EventType type) {
+		Validator.nonNull(type, "The event type can't be null!");
+		
 		Listeners list = listenerMap.get(type);
 		if(list == null) {
 			// Now we need to get the lock so we are the only one
@@ -224,6 +335,59 @@ public final class EventBus {
 			}
 		}
 		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected Method findMethod(Class clazz, EventType type) throws NoSuchMethodException {
+		
+		// First try the 'one' + name version.
+		String name = "on" + type.getName();
+		try {
+			return clazz.getDeclaredMethod(name, type.getEventClass());
+		} catch (NoSuchMethodException ex) {
+			// Handle the miss later.
+		}
+		
+		// Else try with the direct name, lower-cased appropriately.
+		name = type.getName();
+		if(Character.isUpperCase(name.charAt(0)) && Character.isLowerCase(name.charAt(1))) {
+			name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+		}
+		
+		try {
+			return clazz.getDeclaredMethod(name, type.getEventClass());
+		} catch (NoSuchMethodException ex) {
+			// Handle the miss later.
+		}
+		
+		if(clazz.getSuperclass() != null) {
+			// Try within the superclass methods.
+			return findMethod(clazz.getSuperclass(), type);
+		}
+		
+		throw new NoSuchMethodException("No methods matching the syntax 'on" + type.getName() 
+				+ " or " + name + " within " + clazz + " and its subclasses.");
+	}
+	
+	private class MethodDispatcher implements EventListener {
+		
+		private final Object delegate;
+		private final Method method;
+		
+		public MethodDispatcher(Object delegate, Method method) {
+			Validator.nonNull(method, "The listening method can't be null!");
+            this.delegate = delegate;
+            this.method = method;
+		}
+
+		@Override
+		public void newEvent(EventType type, Object event) {
+			try {
+				method.invoke(delegate, event);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+				throw new RuntimeException("Error while calling: " + method + " for event: " + event, ex);
+			}
+		}
 	}
 	
 	private class Listeners {

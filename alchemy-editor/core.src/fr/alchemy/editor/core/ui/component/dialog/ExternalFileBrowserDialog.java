@@ -11,9 +11,11 @@ import java.util.function.Consumer;
 import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.editor.api.AlchemyDialog;
+import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.asset.tree.AssetTree;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.event.EventBus;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 
@@ -60,7 +62,7 @@ public class ExternalFileBrowserDialog extends AlchemyDialog {
 	@Override
 	protected void createContent(VBox container) {
 		
-		this.tree = new AssetTree().setOnlyFolders(true).enableLazyMode();
+		this.tree = new AssetTree(this::openWorkspace).setOnlyFolders(true).enableLazyMode();
 		this.tree.prefHeightProperty().bind(heightProperty());
 		this.tree.prefWidthProperty().bind(widthProperty());
 		this.tree.setShowRoot(false);
@@ -68,6 +70,12 @@ public class ExternalFileBrowserDialog extends AlchemyDialog {
 				(observable, oldValue, newValue) -> processSelected(newValue));
 		
 		container.getChildren().add(tree);
+	}
+	
+	private void openWorkspace(AssetElement element) {
+		EventBus.publish(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, 
+				AlchemyEditorEvent.newChangedCurrentWorkspaceEvent(element.getFile()));
+		processClose();
 	}
 	
 	/**

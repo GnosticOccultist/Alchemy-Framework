@@ -1,12 +1,12 @@
-package fr.alchemy.core.asset.cache;
+package fr.alchemy.editor.core.asset;
 
 /**
- * <code>Asset</code> is an interface to represent an object designed to be an asset.
+ * <code>IAsset</code> is an interface to represent an object designed to be an asset.
  * It can be cached inside {@link AssetCache} and reusable, copyable or destroyable.
  * 
  * @author GnosticOccultist
  */
-public interface Asset {
+public interface IAsset {
 	
 	/**
 	 * @return The file path of the asset.

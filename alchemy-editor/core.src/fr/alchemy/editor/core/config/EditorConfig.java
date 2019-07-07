@@ -209,7 +209,7 @@ public class EditorConfig {
 	 * 
 	 * @return The array of component's class name.
 	 */
-	public synchronized ArrayList<String> getOpenedComponents(String layoutName) {
+	public List<String> getOpenedComponents(String layoutName) {
 		if(!layoutNames.contains(layoutName)) {
 			layoutNames.add(layoutName);
 		}
@@ -242,7 +242,7 @@ public class EditorConfig {
 	 * 
 	 * @return The array of component's class name.
 	 */
-	public synchronized ArrayList<String> getOpenedFiles(String layoutName) {
+	public List<String> getOpenedFiles(String layoutName) {
 		if(!layoutNames.contains(layoutName)) {
 			layoutNames.add(layoutName);
 		}

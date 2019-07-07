@@ -4,12 +4,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.ss.rlib.common.util.array.Array;
 
-import fr.alchemy.core.executor.AlchemyExecutor;
 import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.ui.FXUtils;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
@@ -49,6 +49,13 @@ import javafx.scene.input.MouseEvent;
 public class AssetTree extends TreeView<AssetElement> {
 	
 	/**
+	 * The default opening action for an asset element.
+	 */
+	private static final Consumer<AssetElement> DEFAULT_OPEN_FUNCTION = 
+			element -> new OpenFileItem(element)
+				.getOnAction().handle(null); 
+	
+	/**
 	 * The asset tree event handler.
 	 */
 	private final EventHandler<TreeModificationEvent<AssetElement>> treeItemEventHandler;
@@ -56,6 +63,10 @@ public class AssetTree extends TreeView<AssetElement> {
 	 * Whether to only show the folders.
 	 */
 	private boolean onlyFolders;
+	/**
+	 * The optional function to open the asset element, it will use the default if not specified.
+	 */
+	private Optional<Consumer<AssetElement>> openFunction;
 	/**
 	 * The post-loading handler.
 	 */
@@ -74,9 +85,17 @@ public class AssetTree extends TreeView<AssetElement> {
 	private boolean lazyMode;
 	
 	/**
-	 * Instantiates a new <code>AssetTree</code>.
+	 * Instantiates a new <code>AssetTree</code> with the default opening action for {@link AssetElement}.
 	 */
 	public AssetTree() {
+		this(null);
+	}
+	
+	/**
+	 * Instantiates a new <code>AssetTree</code>.
+	 */
+	public AssetTree(Consumer<AssetElement> openFunction) {
+		this.openFunction = Optional.ofNullable(openFunction);
 		this.extensionFilter = Array.ofType(String.class);
 		this.treeItemEventHandler = this::processChangedExpands;
 		
@@ -103,7 +122,7 @@ public class AssetTree extends TreeView<AssetElement> {
 	 */
 	public void fill(Path rootFolder) {
 		prepareToFill();
-		AlchemyExecutor.executor().performOnBackground(() -> startBackgroundFill(rootFolder));
+		ForkJoinPool.commonPool().execute(() -> startBackgroundFill(rootFolder));
 	}
 	
 	/**
@@ -113,7 +132,7 @@ public class AssetTree extends TreeView<AssetElement> {
 	 */
 	public void fill(Array<Path> rootFolder) {
 		prepareToFill();
-		AlchemyExecutor.executor().performOnBackground(() -> startBackgroundFill(rootFolder));
+		ForkJoinPool.commonPool().execute(() -> startBackgroundFill(rootFolder));
 	}
 	
 	/**
@@ -256,12 +275,12 @@ public class AssetTree extends TreeView<AssetElement> {
                 }
 
                 TreeItem<AssetElement> toLoad = parentItem;
-                AlchemyExecutor.executor().performOnBackground(() -> lazyLoadChildren(toLoad, item -> expandTo(file, needSelect)));
+                ForkJoinPool.commonPool().execute(() -> lazyLoadChildren(toLoad, item -> expandTo(file, needSelect)));
                 return;
         	}
             ObservableList<TreeItem<AssetElement>> children = targetItem.getChildren();
             if (children.size() == 1 && children.get(0).getValue() == LoadingElement.getInstance()) {
-            	AlchemyExecutor.executor().performOnBackground(() -> lazyLoadChildren(targetItem, item -> expandTo(file, needSelect)));
+            	ForkJoinPool.commonPool().execute(() -> lazyLoadChildren(targetItem, item -> expandTo(file, needSelect)));
                 return;
             }
     	}
@@ -310,7 +329,7 @@ public class AssetTree extends TreeView<AssetElement> {
                 .forEach(expanded::add);
 
         for (TreeItem<AssetElement> treeItem : expanded) {
-        	AlchemyExecutor.executor().performOnBackground(() -> lazyLoadChildren(treeItem, null));
+        	ForkJoinPool.commonPool().execute(() -> lazyLoadChildren(treeItem, null));
         }
     }
 
@@ -499,7 +518,7 @@ public class AssetTree extends TreeView<AssetElement> {
 			}  else if ((treeView.isOnlyFolders() || !(item instanceof AssetFolderElement)) 
 					&& event.getButton() == MouseButton.PRIMARY && event.getClickCount() > 1) {
 				
-				new OpenFileItem(item).getOnAction().handle(null);
+				openFunction.orElse(DEFAULT_OPEN_FUNCTION).accept(item);
 			}
 		}
 		

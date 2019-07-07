@@ -1,7 +1,7 @@
 package fr.alchemy.editor.core.ui.editor.layout;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.List;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.api.editor.FileEditor;
@@ -49,9 +49,10 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	 */
 	public TabPane attach(EditorComponent component) {
 		
+		
 		Tab tab = new Tab(component.getName());
 		tab.setClosable(true);
-		
+			
 		if(component instanceof Pane) {
 			Pane pane = (Pane) component;
 			tab.setContent(pane);
@@ -64,16 +65,15 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 			tab.setOnCloseRequest(e -> detach(component));
 			getContent().getSelectionModel().select(tab);
 			editor.dirtyProperty().addListener((observable, oldValue, newValue) ->
-				tab.setText(newValue == Boolean.TRUE ? "*" + editor.getName() : editor.getName()));
-			
+			tab.setText(newValue == Boolean.TRUE ? "*" + editor.getName() : editor.getName()));
+				
 			editor.getUIPage().prefHeightProperty().bind(heightProperty());
-			EditorConfig.config().addOpenedFile(name, editor.getFile().toString());
-			openedEditors.put(editor.getFile(), tab);
+			//EditorConfig.config().addOpenedFile(name, editor.getFile().toString());
+			//openedEditors.put(editor.getFile(), tab);
 		}
-	
+		
 		components.add(component);
 		getContent().getTabs().add(tab);
-		
 		return content;
 	}
 	
@@ -94,10 +94,10 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	
 	@Override
 	public void save() {
-		ArrayList<String> componentClasses = EditorConfig.config().getOpenedComponents(name);
+		List<String> componentClasses = EditorConfig.config().getOpenedComponents(name);
 		componentClasses.clear();
 		
-		ArrayList<String> files = EditorConfig.config().getOpenedFiles(name);
+		List<String> files = EditorConfig.config().getOpenedFiles(name);
 		files.clear();
 		
 		components.forEach(c -> {
@@ -117,13 +117,13 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	@Override
 	protected void openFile(Path file) {
 		Tab tab = openedEditors.get(file);
-		
+			
 		// If the file is already opened in this pane, select it.
 		if(tab != null) {
 			getContent().getSelectionModel().select(tab);
 			return;
 		}
-		
+			
 		String ext = FileUtils.getExtension(file);
 		if(ext.equals("properties")) {
 			PropertiesEditor editor = new PropertiesEditor();

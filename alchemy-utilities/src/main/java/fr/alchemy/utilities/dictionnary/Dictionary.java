@@ -1,5 +1,7 @@
 package fr.alchemy.utilities.dictionnary;
 
+import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.array.FastArray;
 import fr.alchemy.utilities.pool.Reusable;
 
 public interface Dictionary<K, V> extends Iterable<V>, Reusable {
@@ -56,5 +58,13 @@ public interface Dictionary<K, V> extends Iterable<V>, Reusable {
 	 */
 	default boolean isEmpty() {
 		return size() == 0;
+	}
+	
+	default Array<V> values(Array<V> container) {
+		throw new UnsupportedOperationException();
+	}
+	
+	default Array<V> values(Class<V> type) {
+		return values(new FastArray<V>(type, size()));
 	}
 }

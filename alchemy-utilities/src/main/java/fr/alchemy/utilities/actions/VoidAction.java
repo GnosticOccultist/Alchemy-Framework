@@ -1,5 +1,7 @@
 package fr.alchemy.utilities.actions;
 
+import java.util.function.Consumer;
+
 /**
  * A functional interface allowing the user to perform a specific action 
  * with the invoked object.
@@ -10,7 +12,7 @@ package fr.alchemy.utilities.actions;
  * @author GnosticOccultist
  */
 @FunctionalInterface
-public interface VoidAction<T> {
+public interface VoidAction<T> extends Consumer<T> {
 	
 	/**
 	 * Perform the action. 
@@ -18,4 +20,9 @@ public interface VoidAction<T> {
 	 * @param object The object to perform the action with.
 	 */
 	void perform(final T object);
+	
+	@Override
+	default void accept(T t) {
+		perform(t);
+	}
 }

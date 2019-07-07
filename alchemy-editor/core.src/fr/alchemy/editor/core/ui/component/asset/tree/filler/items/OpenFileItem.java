@@ -1,10 +1,10 @@
 package fr.alchemy.editor.core.ui.component.asset.tree.filler.items;
 
-import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.api.editor.FileEditor;
 import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
+import fr.alchemy.utilities.event.EventBus;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 
@@ -27,7 +27,7 @@ public class OpenFileItem extends AbstractAssetItem {
 
 	@Override
 	protected void execute(ActionEvent event) {
-		AlchemyEventManager.events().notify(
+		EventBus.publish(AlchemyEditorEvent.OPEN_FILE, 
 				AlchemyEditorEvent.newOpenFileEvent(getElement().getFile()));
 	}
 

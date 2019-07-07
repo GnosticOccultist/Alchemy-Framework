@@ -4,8 +4,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.event.Event;
-import javafx.event.EventType;
+import fr.alchemy.utilities.event.EventType;
 
 /**
  * <code>AlchemyEditorEvent</code> is an implementation of the JavaFX {@link Event}
@@ -13,41 +12,23 @@ import javafx.event.EventType;
  * 
  * @author GnosticOccultist
  */
-public class AlchemyEditorEvent extends Event {
-
-	private static final long serialVersionUID = -8501913059692434197L;
-
-	/**
-	 * The root event type for all related editor events.
-	 */
-	public static final EventType<AlchemyEditorEvent> EDITOR = new EventType<>(ANY, "EDITOR");
+public class AlchemyEditorEvent {
+	
 	/**
 	 * The event type to notify about a changed workspace, use {@link #newChangedCurrentWorkspaceEvent(Path)}
 	 * to create an event of this type. The new workspace path is stored with the key <b>"workspace"</b>.
 	 */
-	public static final EventType<AlchemyEditorEvent> CHANGED_CURRENT_WORKSPACE = new EventType<>(EDITOR, "CHANGED_CURRENT_WORKSPACE");
+	public static final EventType<AlchemyEditorEvent> CHANGED_CURRENT_WORKSPACE = EventType.create("ChangedCurrentWorkspace", AlchemyEditorEvent.class);
 	/**
 	 * The event type to notify about a requested scene's creation, use {@link #newSceneCreationEvent}
 	 * to create an event of this type.
 	 */
-	public static final EventType<AlchemyEditorEvent> OPEN_FILE = new EventType<>(EDITOR, "OPEN_FILE");
+	public static final EventType<AlchemyEditorEvent> OPEN_FILE = EventType.create("OpenFile", AlchemyEditorEvent.class);
 	
 	/**
 	 * The table mapping the objects concerned by an event.
 	 */
 	private final Map<String, Object> objects = new HashMap<>();
-	
-	/**
-	 * Internal use only. Please use the <code>static</code> constructor
-	 * instead.
-	 * <p>
-	 * For example: {@link #newChangedCurrentWorkspaceEvent(Path)}.
-	 * 
-	 * @param type The type of the event.
-	 */
-	private AlchemyEditorEvent(EventType<? extends Event> type) {
-		super(type);
-	}
 	
 	/**
 	 * Instantiates a new <code>AlchemyEditorEvent</code> of {@link #CHANGED_CURRENT_WORKSPACE}
@@ -57,7 +38,7 @@ public class AlchemyEditorEvent extends Event {
 	 * @return			   A new instance of an editor event to notify about a changed current workspace.
 	 */
 	public static AlchemyEditorEvent newChangedCurrentWorkspaceEvent(Path newWorkspace) {
-		return new AlchemyEditorEvent(CHANGED_CURRENT_WORKSPACE).setPath("workspace", newWorkspace);
+		return new AlchemyEditorEvent().setPath("workspace", newWorkspace);
 	}
 	
 	/**
@@ -66,7 +47,7 @@ public class AlchemyEditorEvent extends Event {
 	 * @return A new instance of an editor event to notify about a requested open file.
 	 */
 	public static AlchemyEditorEvent newOpenFileEvent(Path path) {
-		return new AlchemyEditorEvent(OPEN_FILE).setPath("file", path);
+		return new AlchemyEditorEvent().setPath("file", path);
 	}
 	
 	/**

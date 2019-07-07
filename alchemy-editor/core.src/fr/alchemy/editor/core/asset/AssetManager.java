@@ -1,9 +1,8 @@
-package fr.alchemy.core.asset;
+package fr.alchemy.editor.core.asset;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -14,14 +13,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.alchemy.core.asset.binary.BinaryExporter;
-import fr.alchemy.core.asset.binary.BinaryImporter;
-import fr.alchemy.core.asset.binary.Exportable;
-import fr.alchemy.core.asset.cache.Asset;
-import fr.alchemy.core.asset.cache.AssetCache;
 import javafx.scene.image.Image;
-import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
 
 /**
  * <code>AssetManager</code> loads all the assets needed for the <code>AlchemyApplication</code>.
@@ -67,57 +59,6 @@ public class AssetManager {
 	}
 	
 	/**
-	 * Saves the specified {@link Exportable} to the provided binary file.
-	 * 
-	 * @param exportable The exportable instance to save.
-	 * @param path		 The path for the file on the disk.
-	 */
-	public void saveAsset(final Exportable exportable, final String path) {
-		final BinaryExporter exporter = BinaryExporter.getInstance();
-		
-		try (final OutputStream out = openOutStream(path)) {
-			exporter.export(exportable, out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-	}
-	
-	/**
-	 * Loads an {@link Exportable} value stored into the provided binary file.
-	 * 
-	 * @param exportable The exportable instance to save.
-	 * @param path		 The path for the file on the disk.
-	 */
-	public Exportable loadAsset(final String path) {
-		
-		try (final InputStream is = Files.newInputStream(Paths.get(locateInternal(path).getPath().substring(1)), StandardOpenOption.READ)) {
-			return new BinaryImporter().load(is, Paths.get(locateInternal(path).getPath().substring(1)), null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		return null;
-	}
-	
-	/**
-	 * Loads a <code>Texture</code> from the specified file name.
-	 * It will search the asset internally and in every specified root folders.
-	 * If the asset isn't found it will return null.
-	 * 
-	 * @param name The name of the texture file.
-	 * @return	   The texture object or null if not found.
-	 */
-	public Texture loadTexture(final String name) {
-		final Asset asset = cache.acquire(name);
-		if(asset != null && asset instanceof Texture) {
-			return ((Texture) asset).copy();
-		}
-		
-		final Texture texture = new Texture(loadFXAsset(Image.class, name), name);
-		cache.cache(name, texture);
-		return texture;
-	}
-	
-	/**
 	 * Loads a <code>Image</code> from the specified file name.
 	 * It will search the asset internally and in every specified root folders.
 	 * If the asset isn't found it will return null.
@@ -126,7 +67,7 @@ public class AssetManager {
 	 * @return	   The image object or null if not found.
 	 */
 	public Image loadImage(final String name) {
-		final Asset asset = cache.acquire(name);
+		final IAsset asset = cache.acquire(name);
 		if(asset != null && asset instanceof Texture) {
 			return ((Texture) asset).getImage();
 		}
@@ -154,48 +95,6 @@ public class AssetManager {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	/**
-	 * Loads a <code>Sound</code> from the specified file name.
-	 * It will search the asset internally and in every specified root folders.
-	 * If the asset isn't found it will return null.
-	 * <p>
-	 * After instanciation, you can call {@link Sound#play()} to play the sound effect.
-	 * 
-	 * @param name The asset name.
-	 * @return	   The loaded sound or null if not found.
-	 */
-	public Sound loadSound(final String name) {
-		final Asset asset = cache.acquire(name);
-		if(asset != null && asset instanceof Sound) {
-			return (Sound) asset;
-		}
-		
-		final Sound sound = new Sound(loadFXAsset(AudioClip.class, name), name);
-		cache.cache(name, sound);
-		return sound;
-	}
-	
-	/**
-	 * Loads a <code>Sound</code> from the specified file name.
-	 * It will search the asset internally and in every specified root folders.
-	 * If the asset isn't found it will return null.
-	 * <p>
-	 * After instanciation, you can call {@link Sound#play()} to play the sound effect.
-	 * 
-	 * @param name The asset name.
-	 * @return	   The loaded sound or null if not found.
-	 */
-	public Music loadMusic(final String name) {
-		final Asset asset = cache.acquire(name);
-		if(asset != null && asset instanceof Music) {
-			return (Music) asset;
-		}
-		
-		final Music music = new Music(loadFXAsset(Media.class, name), name);
-		cache.cache(name, music);
-		return music;
 	}
 	
 	/**
@@ -227,15 +126,6 @@ public class AssetManager {
 		return is;
 	}
 	
-	private OutputStream openOutStream(String name) throws IOException {
-		OutputStream os = openOutStreamFromRoot(name);
-		if(os != null) {
-			return os;
-		} 
-		os = openOutStreamInternal(name);
-		return os;
-	}
-	
 	private InputStream openInStreamInternal(String name) throws IOException {
 		final URL url = locateInternal(name);
 		if(url != null) {
@@ -244,11 +134,6 @@ public class AssetManager {
 			return connection.getInputStream();
 		}
 		return null;
-	}
-	
-	private OutputStream openOutStreamInternal(String name) throws IOException {
-		final URL url = locateInternal(name);
-		return Files.newOutputStream(Paths.get(url.getPath().substring(1)));	
 	}
 	
 	private InputStream openInStreamFromRoot(String name) throws IOException {
@@ -260,20 +145,6 @@ public class AssetManager {
 			final Path resolve = roots.get(i).resolve(name);
 			if(Files.exists(resolve)) {
 				return Files.newInputStream(resolve, StandardOpenOption.READ);		
-			}
-		}
-		return null;
-	}
-	
-	private OutputStream openOutStreamFromRoot(String name) throws IOException {
-		if(roots.isEmpty()) {
-			return null;
-		}
-		
-		for(int i = 0; i < roots.size(); i++) {
-			final Path resolve = roots.get(i).resolve(name);
-			if(Files.exists(resolve)) {
-				return Files.newOutputStream(resolve);		
 			}
 		}
 		return null;

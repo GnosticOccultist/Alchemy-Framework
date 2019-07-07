@@ -1,7 +1,5 @@
-package fr.alchemy.core.asset;
+package fr.alchemy.editor.core.asset;
 
-import fr.alchemy.core.asset.cache.Asset;
-import fr.alchemy.core.scene.entity.Entity;
 import fr.alchemy.utilities.actions.ModifierAction;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,13 +9,13 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
 /**
- * <code>Texture</code> represents a 2D image which can be set as a graphics node for
- * an {@link Entity entity}. The size ratio and the viewport can be modified if necessary.
+ * <code>Texture</code> represents a 2D image which can be set as a graphics node. 
+ * The size ratio and the viewport can be modified if necessary.
  * The class itself is a wrapper of the JavaFX {@link ImageView}.
  * 
  * @author GnosticOccultist
  */
-public class Texture extends ImageView implements Asset {
+public class Texture extends ImageView implements IAsset {
 	
 	/**
 	 * The file's path of the texture.

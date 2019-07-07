@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="graph-node" version="0.6">
-    <graph-nodes>
-        <node id="0" ancestorIDs="1" descendantIDs="1"/>
-        <node id="1" ancestorIDs="0" descendantIDs="0"/>
-    </graph-nodes>
-</project>

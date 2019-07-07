@@ -26,13 +26,13 @@ public class WorkspaceComponent extends VBox implements EditorComponent {
 	 * for the currently used workspace and interacting with files.
 	 */
 	public WorkspaceComponent() {
-		createContent();
+		
 	}
 
 	/**
 	 * Creates the content needed for the <code>WorkspaceComponent</code>.
 	 */
-	private void createContent() {
+	public void createContent() {
 		
 		this.workspaceTree = new AssetTree();
 		this.workspaceTree.prefHeightProperty().bind(heightProperty());

@@ -129,6 +129,11 @@ public class FastArray<E> extends AbstractArray<E> {
 
 	@Override
 	public E set(int index, E element) {
+		if(index >= size || size == array.length) {
+    		array = ArrayUtil.copyOf(array, Math.max(array.length >> 1, 1));
+    		this.size = array.length;
+    	}
+		
 		if(index < 0 || index >= size) {
 			throw new ArrayIndexOutOfBoundsException();
 		}

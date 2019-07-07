@@ -2,11 +2,11 @@ package fr.alchemy.editor.core.ui.editor.bar;
 
 import java.nio.file.Path;
 
-import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.dialog.ExternalFileBrowserDialog;
 import fr.alchemy.utilities.SystemUtils;
+import fr.alchemy.utilities.event.EventBus;
 import javafx.scene.control.MenuItem;
 
 /**
@@ -60,6 +60,7 @@ public class OpenWorkspace extends MenuItem {
 		config.setCurrentWorkspace(workspace);
 		config.save();
 		
-		AlchemyEventManager.events().notify(AlchemyEditorEvent.newChangedCurrentWorkspaceEvent(workspace));
+		EventBus.publish(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, 
+				AlchemyEditorEvent.newChangedCurrentWorkspaceEvent(workspace));
 	}
 }

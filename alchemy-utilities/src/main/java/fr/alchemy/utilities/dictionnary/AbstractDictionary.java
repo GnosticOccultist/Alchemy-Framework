@@ -1,5 +1,9 @@
 package fr.alchemy.utilities.dictionnary;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+
+import fr.alchemy.utilities.array.Array;
 import fr.alchemy.utilities.array.ArrayUtil;
 import fr.alchemy.utilities.pool.FastReusablePool;
 
@@ -100,6 +104,55 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
 
             } while (entry != null);
         }
+    }
+    
+    @Override
+    public boolean containsValue(V value) {
+    	for (E entry : entries()) {
+            for (E nextEntry = entry; nextEntry != null; nextEntry = nextEntry.getNext()) {
+                if (Objects.equals(value, nextEntry.getValue())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public void forEach(Consumer<? super V> consumer) {
+        for(Entry<E, V> entry : entries()) {
+            while (entry != null) {
+                consumer.accept(entry.getValue());
+                entry = entry.getNext();
+            }
+        }
+    }
+    
+    @Override
+    public void clear() {
+    	
+    	E[] entries = entries();
+        E next;
+        for(E entry : entries) {
+            while (entry != null) {
+                next = entry.getNext();
+                entryPool.put(entry);
+                entry = next;
+            }
+        }
+        ArrayUtil.clear(entries);
+        setSize(0);
+    }
+    
+    @Override
+    public final Array<V> values(Array<V> container) {
+        for (E entry : entries()) {
+            while (entry != null) {
+                container.add(entry.getValue());
+                entry = entry.getNext();
+            }
+        }
+        return container;
     }
 	
 	/**

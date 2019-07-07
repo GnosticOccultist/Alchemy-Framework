@@ -1,7 +1,5 @@
 package fr.alchemy.editor.api.editor.region;
 
-import fr.alchemy.editor.api.editor.graph.event.GraphEventManager;
-import fr.alchemy.editor.api.editor.graph.event.GraphInputGesture;
 import fr.alchemy.editor.core.ui.FXUtils;
 import fr.alchemy.utilities.Validator;
 import javafx.geometry.Point2D;
@@ -79,8 +77,7 @@ public class ResizableBox extends DraggableBox {
 		final Point2D cursorPosition = FXUtils.cursorPosition(event, getContainer(this));
 		if(lastMouseRegion == RectangleMouseRegion.INSIDE) {
 			super.handleMouseDragged(event);
-		} else if(lastMouseRegion != RectangleMouseRegion.OUTSIDE && GraphEventManager.instance().canActivate(GraphInputGesture.RESIZE, event)) {
-			GraphEventManager.instance().activateInputGesture(GraphInputGesture.RESIZE);
+		} else if(lastMouseRegion != RectangleMouseRegion.OUTSIDE) {
 			handleResize(cursorPosition.getX(), cursorPosition.getY());
 			event.consume();
 		}
@@ -90,7 +87,6 @@ public class ResizableBox extends DraggableBox {
 	protected void handleMouseReleased(final MouseEvent event) {
 		super.handleMouseReleased(event);
 		processMousePosition(event);
-		GraphEventManager.instance().finishInputGesture(GraphInputGesture.RESIZE);
 	}
 	
 	private void handleMouseExited(final MouseEvent event) {

@@ -1,6 +1,6 @@
 package fr.alchemy.editor.core;
 
-import fr.alchemy.core.asset.AssetManager;
+import fr.alchemy.editor.core.asset.AssetManager;
 import fr.alchemy.utilities.logging.FactoryLogger;
 import fr.alchemy.utilities.logging.Logger;
 import javafx.scene.image.Image;

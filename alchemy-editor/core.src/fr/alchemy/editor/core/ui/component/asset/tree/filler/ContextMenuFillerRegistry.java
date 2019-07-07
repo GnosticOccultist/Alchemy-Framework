@@ -7,7 +7,6 @@ import com.ss.rlib.common.util.array.Array;
 import com.ss.rlib.common.util.array.ArrayFactory;
 
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
-import fr.alchemy.editor.core.ui.editor.graph.selection.SelectedGraphSkinFiller;
 import javafx.scene.control.MenuItem;
 
 /**
@@ -42,7 +41,6 @@ public final class ContextMenuFillerRegistry {
 	 */
 	private ContextMenuFillerRegistry() {
 		register(AssetContextMenuFiller.class);
-		register(SelectedGraphSkinFiller.class);
 	}
 	
 	/**

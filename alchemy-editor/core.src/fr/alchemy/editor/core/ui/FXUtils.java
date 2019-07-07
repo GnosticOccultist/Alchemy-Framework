@@ -9,17 +9,13 @@ import java.util.stream.Stream;
 import com.ss.rlib.common.util.array.Array;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
-import fr.alchemy.editor.api.editor.graph.GraphSkinDictionary;
-import fr.alchemy.editor.api.editor.graph.element.GraphConnector;
-import fr.alchemy.editor.api.editor.graph.element.GraphNode;
-import fr.alchemy.editor.api.editor.graph.skin.GraphConnectorSkin;
-import fr.alchemy.editor.api.editor.graph.skin.GraphNodeSkin;
 import fr.alchemy.utilities.Validator;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -127,26 +123,29 @@ public final class FXUtils {
         return new Point2D(sceneX - containerScene.getX(), sceneY - containerScene.getY());
     }
     
-    public static Point2D getConnectorPosition(final GraphConnector connector, final GraphSkinDictionary skinManager) {
-        final GraphConnectorSkin connectorSkin = skinManager.retrieveConnector(connector);
-        final GraphNode parent = connector.getParent();
-
-        final GraphNodeSkin nodeSkin = skinManager.retrieveNode(parent);
-        if (nodeSkin == null) {
-            return null;
-        }
-
-        nodeSkin.layoutConnectors();
-
-        final double nodeX = nodeSkin.getRoot().getLayoutX();
-        final double nodeY = nodeSkin.getRoot().getLayoutY();
-
-        final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
-
-        final double connectorX = connectorPosition.getX();
-        final double connectorY = connectorPosition.getY();
-
-        return new Point2D(moveOnPixel(nodeX + connectorX), moveOnPixel(nodeY + connectorY));
+    /**
+     * Sets the vertical scroll speed of the provided {@link ScrollPane} using the given
+     * factor. It applies the factor to the delta Y of a scrolling event and compute the
+     * corresponding vertical scroll position.
+     * <p>
+     * Note that the content of the scroll-pane is expected to not be null, in order to
+     * listen to the scrolling events.
+     * 
+     * @param pane	 The scroll pane to change scrolling speed (not null).
+     * @param factor The factor to apply to the scrolling event.
+     */
+    public static void setVScrollSpeed(ScrollPane pane, float factor) {
+    	Validator.nonNull(pane, "The scroll-pane can't be null!");
+    	
+    	Node content = pane.getContent();
+    	assert content != null;
+    	
+    	content.setOnScroll(event -> {
+			double dy = event.getDeltaY() * factor;
+			double width = content.getBoundsInLocal().getWidth();
+			double vvalue = pane.getVvalue();
+			pane.setVvalue(vvalue - (dy / width));
+		});
     }
     
     /**

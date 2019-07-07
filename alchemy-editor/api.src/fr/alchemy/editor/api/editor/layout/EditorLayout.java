@@ -1,24 +1,24 @@
 package fr.alchemy.editor.api.editor.layout;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import fr.alchemy.core.event.AlchemyEventManager;
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
-import fr.alchemy.editor.core.ui.FXUtils;
 import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.event.EventBus;
+import fr.alchemy.utilities.event.EventListener;
+import fr.alchemy.utilities.event.EventType;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.layout.Region;
 
-public abstract class EditorLayout<T extends Region> {
+public abstract class EditorLayout<T extends Region> implements EventListener<AlchemyEditorEvent> {
 	
 	/**
 	 * The name of the editor layout.
@@ -54,11 +54,9 @@ public abstract class EditorLayout<T extends Region> {
 		
 		// TODO: Add a better support to filter the components/editors supported by the layout.
 		if(name.contains("components")) {
-			AlchemyEventManager.events().registerEventHandler(
-					AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, event -> handleSwitchWorkspace());
+			EventBus.addListener(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, this);
 		} else if(name.contains("editors")) {
-			AlchemyEventManager.events().registerEventHandler(
-					AlchemyEditorEvent.OPEN_FILE, event -> openFile(event.getPath("file")));
+			EventBus.addListener(AlchemyEditorEvent.OPEN_FILE, this);
 		}
 	}
 	
@@ -67,12 +65,24 @@ public abstract class EditorLayout<T extends Region> {
 	 * the last opened {@link EditorComponent}.
 	 */
 	public void construct() {
-		
-		EditorConfig.config().getOpenedComponents(name)
-			.forEach(t -> FXUtils.performFXThread(() -> constructComponent(t)));
-		
-		EditorConfig.config().getOpenedFiles(name)
-			.forEach(f -> FXUtils.performFXThread(() -> openFile(Paths.get(f))));
+		List<String> components = EditorConfig.config().getOpenedComponents(name);
+		for(int i = 0; i < components.size(); i++) {
+			constructComponent(components.get(i));
+		}
+//			
+//		List<String> files = EditorConfig.config().getOpenedFiles(name);
+//		for(int i = 0; i < files.size(); i++) {
+//			openFile(Paths.get(files.get(i)));
+//		}
+	}
+	
+	@Override
+	public void newEvent(EventType<AlchemyEditorEvent> type, AlchemyEditorEvent event) {
+		if(type.equals(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE)) {
+			handleSwitchWorkspace();
+		} else if(type.equals(AlchemyEditorEvent.OPEN_FILE)) {
+			openFile(event.getPath("file"));
+		}
 	}
 	
 	/**
@@ -107,6 +117,7 @@ public abstract class EditorLayout<T extends Region> {
 			component = Instantiator.fromNameWith(className, scene);
 		}
 		
+		((WorkspaceComponent) component).createContent();
 		attach(component);
 		component.finish();
 	}
@@ -154,7 +165,7 @@ public abstract class EditorLayout<T extends Region> {
 	 * so each of them can be reload during next startup time.
 	 */
 	public void save() {
-		ArrayList<String> componentClasses = EditorConfig.config().getOpenedComponents(name);
+		List<String> componentClasses = EditorConfig.config().getOpenedComponents(name);
 		componentClasses.clear();
 		
 		components.forEach(c -> componentClasses.add(c.getClass().getName()));
