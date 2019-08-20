@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * 
  * @author GnosticOccultist
  */
-public final class Orouboros<T> {
+public final class Ouroboros<T> {
 	
 	/**
 	 * The array with the contained objects.
@@ -38,7 +38,7 @@ public final class Orouboros<T> {
 	 * @param size	   The size of the pool.
 	 * @param factory  The factory to instantiates new object.
 	 */
-	public Orouboros(Class<?> type, int size, Supplier<T> factory) {
+	public Ouroboros(Class<?> type, int size, Supplier<T> factory) {
 		this(type, size, factory, null);
 	}
 	
@@ -55,7 +55,7 @@ public final class Orouboros<T> {
 	 * @param handler  The function to apply to a returned object from the pool.
 	 */
 	@SuppressWarnings("unchecked")
-	public Orouboros(Class<?> type, int size, Supplier<T> factory, Consumer<T> handler) {
+	public Ouroboros(Class<?> type, int size, Supplier<T> factory, Consumer<T> handler) {
 		if(size < 2) {
 			throw new RuntimeException("The size of the pool is less than 2!");
 		}
