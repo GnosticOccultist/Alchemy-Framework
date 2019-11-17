@@ -43,6 +43,7 @@ public class AlchemyEditor extends Application {
 		// Look for previously used width and height value or use the defaults.
 		primaryStage.setWidth(config.getSavedWidth(1240));
 		primaryStage.setHeight(config.getSavedHeight(720));
+		primaryStage.setMaximized(config.isMaximized(true));
 		
 		primaryStage.setResizable(true);
 		primaryStage.centerOnScreen();
@@ -52,7 +53,8 @@ public class AlchemyEditor extends Application {
 		primaryStage.setScene(scene.getFXScene());
 		
 		primaryStage.setOnCloseRequest(event -> {
-			EditorConfig.config().saveWindowDimensions(primaryStage.getWidth(), primaryStage.getHeight());
+			EditorConfig.config().saveWindowDimensions(primaryStage.getWidth(), 
+					primaryStage.getHeight(), primaryStage.isMaximized());
 			scene.save();
 		});
 		

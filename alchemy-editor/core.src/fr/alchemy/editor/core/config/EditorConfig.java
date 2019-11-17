@@ -30,6 +30,7 @@ public class EditorConfig {
 	public static final String PREF_DIVIDER_POS = "editor.dividers";
 	public static final String PREF_EDITOR_WIDTH = "editor.width";
 	public static final String PREF_EDITOR_HEIGHT = "editor.height";
+	public static final String PREF_EDITOR_MAXIMIZED = "editor.maximized";
 	
 	private static final String PREF_OPENED_COMPONENTS = ".components";
 	private static final String PREF_OPENED_FILES = ".files";
@@ -204,15 +205,29 @@ public class EditorConfig {
 	}
 	
 	/**
+	 * Return whether the window dimensions as been saved as maximized in the <code>EditorConfig</code>,
+	 * or use the default boolean value if it hasn't been found.
+	 * 
+	 * @param defMaximized Whether the dimensions should be maximized by default.
+	 * @return			   Whether the dimensions for the window should be maximized.
+	 */
+	public boolean isMaximized(boolean defMaximized) {
+		return preferences().getBoolean(PREF_EDITOR_MAXIMIZED, defMaximized);
+	}
+	
+	/**
 	 * Save the provided window's width and height in the <code>EditorConfig</code> to be used the next time
-	 * the editor is launched.
+	 * the editor is launched. Also save whether the dimensions are maximized.
 	 * <p>
 	 * Note that the width and height will be saved only if they are greater than zero.
 	 * 
-	 * @param width  The window's width to be saved.
-	 * @param height The window's height to be saved.
+	 * @param width  	The window's width to be saved.
+	 * @param height 	The window's height to be saved.
+	 * @param maximized Whether the window dimensions are maximized.
 	 */
-	public void saveWindowDimensions(double width, double height) {
+	public void saveWindowDimensions(double width, double height, boolean maximized) {
+		preferences().putBoolean(PREF_EDITOR_MAXIMIZED, maximized);
+		
 		if(width > 0D) {
 			preferences().putDouble(PREF_EDITOR_WIDTH, width);
 		}
