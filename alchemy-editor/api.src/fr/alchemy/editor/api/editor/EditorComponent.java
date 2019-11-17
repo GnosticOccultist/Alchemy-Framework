@@ -9,6 +9,15 @@ package fr.alchemy.editor.api.editor;
 public interface EditorComponent {
 	
 	/**
+	 * Return whether the <code>EditorComponent</code> can be closed.
+	 * 
+	 * @return Whether the component can be closed or should stay open.
+	 */
+	default boolean isCloseable() {
+		return true;
+	}
+	
+	/**
 	 * Return the name used by the <code>EditorComponent</code>.
 	 * 
 	 * @return The name of the component.

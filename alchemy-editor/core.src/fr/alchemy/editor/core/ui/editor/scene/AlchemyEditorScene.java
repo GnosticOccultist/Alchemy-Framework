@@ -1,5 +1,6 @@
 package fr.alchemy.editor.core.ui.editor.scene;
 
+import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
 import javafx.geometry.Side;
@@ -62,6 +63,7 @@ public class AlchemyEditorScene {
 	public void save() {
 		tabPane.save();
 		scenePane.save();
+		EditorConfig.config().save();
 	}
 	
 	public Scene getFXScene() {

@@ -24,6 +24,10 @@ public class AlchemyEditorEvent {
 	 * to create an event of this type.
 	 */
 	public static final EventType<AlchemyEditorEvent> OPEN_FILE = EventType.create("OpenFile", AlchemyEditorEvent.class);
+	/**
+	 * The event type to notify about a request of closing the editor.
+	 */
+	public static final EventType<AlchemyEditorEvent> CLOSING_EDITOR = EventType.create("ClosingEditor", AlchemyEditorEvent.class);
 	
 	/**
 	 * The table mapping the objects concerned by an event.

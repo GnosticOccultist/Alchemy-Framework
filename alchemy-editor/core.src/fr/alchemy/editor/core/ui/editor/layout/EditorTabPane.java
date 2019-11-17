@@ -51,14 +51,14 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 		
 		
 		Tab tab = new Tab(component.getName());
-		tab.setClosable(true);
+		tab.setClosable(component.isCloseable());
 			
 		if(component instanceof Pane) {
 			Pane pane = (Pane) component;
 			tab.setContent(pane);
 			tab.setOnCloseRequest(e -> detach(component));
 			pane.prefHeightProperty().bind(heightProperty());
-			EditorConfig.config().addOpenedComponent(name, component.getClass().getName());
+//			EditorConfig.config().addOpenedComponent(name, component.getClass().getName());
 		} else if(component instanceof FileEditor) {
 			FileEditor editor = (FileEditor) component;
 			tab.setContent(editor.getUIPage());
@@ -94,10 +94,12 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	
 	@Override
 	public void save() {
-		List<String> componentClasses = EditorConfig.config().getOpenedComponents(name);
+		EditorConfig config = EditorConfig.config();
+		
+		List<String> componentClasses = config.getOpenedComponents(name);
 		componentClasses.clear();
 		
-		List<String> files = EditorConfig.config().getOpenedFiles(name);
+		List<String> files = config.getOpenedFiles(name);
 		files.clear();
 		
 		components.forEach(c -> {
