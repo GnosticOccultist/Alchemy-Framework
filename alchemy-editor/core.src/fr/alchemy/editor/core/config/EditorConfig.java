@@ -27,6 +27,10 @@ public class EditorConfig {
 	private static final String PREF_CURRENT_WORKSPACE = WORKSPACE_ALIAS + "." + "current";
 	private static final String PREF_LAYOUT_NAME = "layout.names";
 	
+	public static final String PREF_DIVIDER_POS = "editor.dividers";
+	public static final String PREF_EDITOR_WIDTH = "editor.width";
+	public static final String PREF_EDITOR_HEIGHT = "editor.height";
+	
 	private static final String PREF_OPENED_COMPONENTS = ".components";
 	private static final String PREF_OPENED_FILES = ".files";
 	
@@ -166,7 +170,7 @@ public class EditorConfig {
 	 * @param path The path to store.
 	 */
 	public void put(String key, Path path) {
-		if (path != null && !Files.exists(path)) {
+		if(path != null && !Files.exists(path)) {
 			path = null;
 		}
 		
@@ -174,6 +178,47 @@ public class EditorConfig {
 			preferences().put(key, path.toUri().toString());       
 		} else {
 			preferences().remove(key);
+		}
+	}
+	
+	/**
+	 * Return the saved width for the window in the <code>EditorConfig</code>, or the provided default width
+	 * if it hasn't been found.
+	 * 
+	 * @param defWidth The default width to use if none is saved.
+	 * @return		   A width to use for the window either the saved or the default one.
+	 */
+	public double getSavedWidth(double defWidth) {
+		return preferences().getDouble(PREF_EDITOR_WIDTH, defWidth);
+	}
+	
+	/**
+	 * Return the saved height for the window in the <code>EditorConfig</code>, or the provided default height
+	 * if it hasn't been found.
+	 * 
+	 * @param defHeight The default height to use if none is saved.
+	 * @return			A height to use for the window either the saved or the default one.
+	 */
+	public double getSavedHeight(double defHeight) {
+		return preferences().getDouble(PREF_EDITOR_HEIGHT, defHeight);
+	}
+	
+	/**
+	 * Save the provided window's width and height in the <code>EditorConfig</code> to be used the next time
+	 * the editor is launched.
+	 * <p>
+	 * Note that the width and height will be saved only if they are greater than zero.
+	 * 
+	 * @param width  The window's width to be saved.
+	 * @param height The window's height to be saved.
+	 */
+	public void saveWindowDimensions(double width, double height) {
+		if(width > 0D) {
+			preferences().putDouble(PREF_EDITOR_WIDTH, width);
+		}
+		
+		if(height > 0D) {
+			preferences().putDouble(PREF_EDITOR_HEIGHT, height);
 		}
 	}
 	

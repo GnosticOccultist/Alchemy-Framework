@@ -194,10 +194,24 @@ public final class FXUtils {
      * @param task The task to be performed in the FX-Thread.
      */
     public static void performFXThread(Runnable task) {
-    	if(Platform.isFxApplicationThread()) {
-    		task.run();
-    	} else {
+    	performFXThread(task, false);
+    }
+    
+    /**
+     * Performs the specified {@link Runnable} task inside the <b>JavaFX-Thread</b>, by either running it 
+     * directly if the function was already called from the right thread or at some unspecified time in the future.
+     * <p>
+     * Note that each task are executed in the order they are submitted. It's also encouraged that long-running tasks
+     * should be done on a background thread when possible.
+     * 
+     * @param task  The task to be performed in the FX-Thread.
+     * @param force Whether to force the task to be executed in the JavaFX thread.
+     */
+    public static void performFXThread(Runnable task, boolean force) {
+    	if(!Platform.isFxApplicationThread() || force) {
     		Platform.runLater(task);
+    	} else {
+    		task.run();
     	}
     }
 }

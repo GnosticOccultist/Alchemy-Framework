@@ -1,6 +1,7 @@
 package fr.alchemy.editor.core;
 
 import fr.alchemy.editor.core.asset.AssetManager;
+import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -36,14 +37,24 @@ public class AlchemyEditor extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle(EDITOR_NAME + " - " + EDITOR_VERSION);
+		
+		EditorConfig config = EditorConfig.config();
+		
+		// Look for previously used width and height value or use the defaults.
+		primaryStage.setWidth(config.getSavedWidth(1240));
+		primaryStage.setHeight(config.getSavedHeight(720));
+		
 		primaryStage.setResizable(true);
-		primaryStage.setMaximized(true);
+		primaryStage.centerOnScreen();
 		
 		AlchemyEditorScene scene = new AlchemyEditorScene();
 		scene.initialize(primaryStage.getWidth(), primaryStage.getHeight());
 		primaryStage.setScene(scene.getFXScene());
 		
-		primaryStage.setOnCloseRequest(event -> scene.save());
+		primaryStage.setOnCloseRequest(event -> {
+			EditorConfig.config().saveWindowDimensions(primaryStage.getWidth(), primaryStage.getHeight());
+			scene.save();
+		});
 		
 		EditorManager.initialize(new AssetManager());
 		
