@@ -4,11 +4,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
+import fr.alchemy.editor.api.editor.FileEditorRegistry;
 import fr.alchemy.editor.api.editor.FileEditor;
 import fr.alchemy.editor.api.editor.layout.EditorLayout;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
-import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.utilities.dictionnary.ObjectDictionary;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.scene.control.Tab;
@@ -51,7 +51,7 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 		
 		
 		Tab tab = new Tab(component.getName());
-		tab.setClosable(component.isCloseable());
+		tab.setClosable(true);
 			
 		if(component instanceof Pane) {
 			Pane pane = (Pane) component;
@@ -127,11 +127,10 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 		}
 			
 		String ext = FileUtils.getExtension(file);
-		if(ext.equals("properties")) {
-			PropertiesEditor editor = new PropertiesEditor();
+		FileEditorRegistry.get().createFor(ext).ifPresent(editor -> {
 			editor.open(file);
 			attach(editor);
-		}
+		});
 	}
 
 	/**
