@@ -57,6 +57,13 @@ public interface FileEditor extends EditorComponent {
 	BooleanExpression dirtyProperty();
 	
 	/**
+	 * Return the readable only property of the edited file by the <code>FileEditor</code>. 
+	 * 
+	 * @return The readable only property of the edited file.
+	 */
+	BooleanExpression readOnlyProperty();
+	
+	/**
 	 * Return the root pane of the <code>FileEditor</code>. 
 	 * 
 	 * @return The root pane of the editor.

@@ -4,6 +4,7 @@ import java.nio.file.Path;
 
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
 import fr.alchemy.utilities.array.Array;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.input.KeyCode;
@@ -39,12 +40,17 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	 * The dirty property of the file being edited.
 	 */
 	private final BooleanProperty dirty;
+	/**
+	 * The read-only property of the file being edited.
+	 */
+	private final BooleanProperty readOnly;
 	
 	/**
 	 * Instantiates a new <code>AbstractFileEditor</code>.
 	 */
 	protected AbstractFileEditor() {
 		this.dirty = new SimpleBooleanProperty(this, "dirty", false);
+		this.readOnly = new SimpleBooleanProperty(this, "readOnly", false);
 		this.root = createRoot();
 	}
 	
@@ -123,6 +129,7 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	 * 
 	 * @return The dirty property of the edited file.
 	 */
+	@Override
 	public BooleanProperty dirtyProperty() {
 		return dirty;
 	}
@@ -145,6 +152,36 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	 */
 	protected void setDirty(boolean dirty) {
 		this.dirty.set(dirty);
+	}
+	
+	/**
+	 * Return the read-only property of the edited file by the <code>AbstractFileEditor</code>. 
+	 * 
+	 * @return The read-only property of the edited file.
+	 */
+	@Override
+	public BooleanExpression readOnlyProperty() {
+		return readOnly;
+	}
+	
+	/**
+	 * Return whether the edited file by the <code>AbstractFileEditor</code> is readable-only, meaning
+	 * it cannot be modified.
+	 * 
+	 * @return Whether the file is readable-only.
+	 */
+	public boolean isReadOnly() {
+		return readOnly.get();
+	}
+	
+	/**
+	 * Sets whether the edited file by the <code>AbstractFileEditor</code> is readable-only, meaning
+	 * it cannot be modified.
+	 * 
+	 * @param readOnly Whether the file is readable-only.
+	 */
+	protected void setReadOnly(boolean readOnly) {
+		this.readOnly.set(readOnly);
 	}
 	
 	/**
