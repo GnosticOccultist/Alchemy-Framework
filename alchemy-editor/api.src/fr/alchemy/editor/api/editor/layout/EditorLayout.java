@@ -81,7 +81,7 @@ public abstract class EditorLayout<T extends Region> implements EventListener<Al
 		if(type.equals(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE)) {
 			handleSwitchWorkspace();
 		} else if(type.equals(AlchemyEditorEvent.OPEN_FILE)) {
-			openFile(event.getPath("file"));
+			openFile(event.getPath("file"), event.getBoolean("readOnly"));
 		}
 	}
 	
@@ -141,9 +141,10 @@ public abstract class EditorLayout<T extends Region> implements EventListener<Al
 	/**
 	 * Opens the provided file on this <code>EditorLayout</code>.
 	 * 
-	 * @param file The file which was requested for opening.
+	 * @param file 	   The file which was requested for opening.
+	 * @param readOnly Whether the file to open should be readable only.
 	 */
-	protected abstract void openFile(Path file);
+	protected abstract void openFile(Path file, boolean readOnly);
 	
 	/**
 	 * Detaches the provided {@link EditorComponent} to the <code>EditorLayout</code>.

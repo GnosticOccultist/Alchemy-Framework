@@ -332,6 +332,7 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
         @Override
         public void startEdit() {
         	super.startEdit();
+        	setEditable(!isReadOnly());
         	
         	createTextField();
         	setText(null);
@@ -370,12 +371,13 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
         		textField = new TextField();
         	}
         	
+        	textField.setEditable(!isReadOnly());
         	textField.setText(text());
-            textField.setMinWidth(getWidth() - getGraphicTextGap() * 2);
-            textField.setOnKeyReleased(event -> {
-            	if(event.getCode() == KeyCode.ENTER) {
-            		commitEdit(textField.getText());
-            	}
+        	textField.setMinWidth(getWidth() - getGraphicTextGap() * 2);
+        	textField.setOnKeyReleased(event -> {
+        		if(event.getCode() == KeyCode.ENTER) {
+        			commitEdit(textField.getText());
+        		}
             });
         }
         

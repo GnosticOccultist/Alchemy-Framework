@@ -64,6 +64,13 @@ public interface FileEditor extends EditorComponent {
 	BooleanExpression readOnlyProperty();
 	
 	/**
+	 * Sets whether the edited file by the <code>FileEditor</code> is readable only. 
+	 * 
+	 * @param readOnly Whether the edited file is readable only.
+	 */
+	void setReadOnly(boolean readOnly);
+	
+	/**
 	 * Return the root pane of the <code>FileEditor</code>. 
 	 * 
 	 * @return The root pane of the editor.

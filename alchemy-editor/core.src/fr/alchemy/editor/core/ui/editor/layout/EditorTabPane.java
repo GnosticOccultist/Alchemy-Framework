@@ -114,10 +114,11 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	/**
 	 * Opens the provided file on this <code>EditorTabPane</code>.
 	 * 
-	 * @param file The file which was requested for opening.
+	 * @param file 	   The file which was requested for opening.
+	 * @param readOnly Whether the file to open should be readable only.
 	 */
 	@Override
-	protected void openFile(Path file) {
+	protected void openFile(Path file, boolean readOnly) {
 		Tab tab = openedEditors.get(file);
 			
 		// If the file is already opened in this pane, select it.
@@ -128,6 +129,7 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 			
 		String ext = FileUtils.getExtension(file);
 		FileEditorRegistry.get().createFor(ext).ifPresent(editor -> {
+			editor.setReadOnly(readOnly);
 			editor.open(file);
 			attach(editor);
 		});

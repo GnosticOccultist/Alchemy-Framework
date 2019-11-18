@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.alchemy.utilities.event.EventType;
+import javafx.event.Event;
 
 /**
  * <code>AlchemyEditorEvent</code> is an implementation of the JavaFX {@link Event}
@@ -51,7 +52,17 @@ public class AlchemyEditorEvent {
 	 * @return A new instance of an editor event to notify about a requested open file.
 	 */
 	public static AlchemyEditorEvent newOpenFileEvent(Path path) {
-		return new AlchemyEditorEvent().setPath("file", path);
+		return newOpenFileEvent(path, false);
+	}
+	
+	/**
+	 * Instantiates a new <code>AlchemyEditorEvent</code> of {@link #OPEN_FILE} type.
+	 * 
+	 * @param readOnly Whether the file should be opened in read-only mode.
+	 * @return 		   A new instance of an editor event to notify about a requested open file.
+	 */
+	public static AlchemyEditorEvent newOpenFileEvent(Path path, boolean readOnly) {
+		return new AlchemyEditorEvent().setPath("file", path).setBoolean("readOnly", readOnly);
 	}
 	
 	/**

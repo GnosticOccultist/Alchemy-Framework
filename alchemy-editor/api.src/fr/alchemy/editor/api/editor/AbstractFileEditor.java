@@ -180,7 +180,8 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	 * 
 	 * @param readOnly Whether the file is readable-only.
 	 */
-	protected void setReadOnly(boolean readOnly) {
+	@Override
+	public void setReadOnly(boolean readOnly) {
 		this.readOnly.set(readOnly);
 	}
 	
