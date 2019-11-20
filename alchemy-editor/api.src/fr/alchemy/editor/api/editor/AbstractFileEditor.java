@@ -195,7 +195,7 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	}
 	
 	@Override
-	public Region getRoot() {
+	public R getRoot() {
 		return root;
 	}
 	

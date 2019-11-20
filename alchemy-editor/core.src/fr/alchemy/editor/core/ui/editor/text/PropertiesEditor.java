@@ -20,7 +20,11 @@ import fr.alchemy.utilities.file.FileUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Side;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -28,6 +32,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  * <code>PropertiesEditor</code> is an implementation of {@link AbstractFileEditor} used for editing 
@@ -72,7 +78,10 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		root.setFocusTraversable(true);
 		
 		keyColumn = new TableColumn<>("Key");
+		keyColumn.setEditable(true);
+		
 		valueColumn = new TableColumn<>("Value");
+		valueColumn.setEditable(true);
 
 		keyColumn.prefWidthProperty().bind(root.widthProperty().divide(2));
 		valueColumn.prefWidthProperty().bind(root.widthProperty().divide(2));
@@ -219,6 +228,46 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 	}
 	
 	/**
+	 * <code>ModifiedPropertyOperation</code> is an implementation of {@link AbstractUndoableOperation},
+	 * which is used to remove a {@link PropertyPair} inside the <code>PropertiesEditor</code>.
+	 * 
+	 * @author GnosticOccultist
+	 */
+	class RemovePropertyOperation extends AbstractUndoableOperation {
+		
+		/**
+		 * The pair which was removed.
+		 */
+		PropertyPair pair;
+		
+		/**
+		 * Instantiates a new <code>RemovePropertyOperation</code> with the given {@link PropertyPair}.
+		 * 
+		 * @param oldPair The property pair to be removed (not null).
+		 */
+		public RemovePropertyOperation(PropertyPair pair) {
+			Validator.nonNull(pair, "The property pair can't be null!");
+			this.pair = pair;
+		}
+		
+		@Override
+		public void undo(UndoableFileEditor editor) {
+			super.undo(editor);
+	
+			properties.setProperty(pair.getKey(), pair.getValue());
+			loadFromProperties();
+		}
+		
+		@Override
+		public void redo(UndoableFileEditor editor) {
+			super.redo(editor);
+			
+			properties.remove(pair.getKey());
+			loadFromProperties();
+		}
+	}
+	
+	/**
 	 * <code>PropertyPair</code> represents a pair of key and value for a specific property inside
 	 * a properties file.
 	 * 
@@ -328,6 +377,18 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		 * The text field used to modify the cell's text.
 		 */
 		private TextField textField;
+		/**
+		 * The context menu of the cell.
+		 */
+		private ContextMenu menu;
+		
+		public EditingCell() {
+			this.menu = new ContextMenu();
+			
+			if(!isReadOnly()) {
+				setOnMouseClicked(this::onMouseClicked);
+			}
+		}
  
         @Override
         public void startEdit() {
@@ -379,6 +440,38 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
         			commitEdit(textField.getText());
         		}
             });
+        }
+        
+        private void onMouseClicked(MouseEvent event) {
+        	menu.hide();
+			menu.getItems().clear();
+			
+			if(event.getButton() == MouseButton.SECONDARY) {
+				if(!getTableRow().isEmpty()) {
+					MenuItem removeMenuItem = new MenuItem("Remove");  
+		            removeMenuItem.setOnAction(new EventHandler<ActionEvent>() {  
+		                @Override  
+		                public void handle(ActionEvent event) {
+		                	PropertyPair pair = getRoot().getSelectionModel().getSelectedItem();
+		                	
+		                	RemovePropertyOperation op = new RemovePropertyOperation(pair);
+		                	perform(op);
+		                }  
+		            });
+		            menu.getItems().add(removeMenuItem);
+				} else {
+					getRoot().getSelectionModel().clearSelection();
+					MenuItem addMenuItem = new MenuItem("Add");  
+					addMenuItem.setOnAction(new EventHandler<ActionEvent>() {  
+		                @Override  
+		                public void handle(ActionEvent event) {
+		                	// TODO: Add a property pair using an operation.
+		                }  
+		            });
+		            menu.getItems().add(addMenuItem);
+				}
+				menu.show(this, Side.BOTTOM, 0, 0);
+			}
         }
         
         private String text() {
