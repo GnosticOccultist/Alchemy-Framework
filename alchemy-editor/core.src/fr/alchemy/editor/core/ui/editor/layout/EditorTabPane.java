@@ -69,7 +69,7 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 				
 			editor.getUIPage().prefHeightProperty().bind(heightProperty());
 			//EditorConfig.config().addOpenedFile(name, editor.getFile().toString());
-			//openedEditors.put(editor.getFile(), tab);
+			openedEditors.put(editor.getFile(), tab);
 		}
 		
 		components.add(component);
@@ -132,6 +132,9 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 			editor.setReadOnly(readOnly);
 			editor.open(file);
 			attach(editor);
+			 
+			// Request the focus of the root.
+			editor.getRoot().requestFocus();
 		});
 	}
 

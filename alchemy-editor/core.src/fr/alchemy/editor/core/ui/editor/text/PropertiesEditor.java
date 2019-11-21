@@ -34,6 +34,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -126,6 +127,7 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
         });
 		
 		Button addButton = new Button("Add");
+		addButton.setTooltip(new Tooltip("Add a property (Ctrl + Enter)"));
 		addButton.disableProperty().bind(readOnlyProperty());
 		addButton.setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/add.png")));
 		addButton.setOnAction(new EventHandler<ActionEvent>() {  
@@ -140,6 +142,16 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		
 		root.getColumns().add(keyColumn);
 		root.getColumns().add(valueColumn);
+	}
+	
+	@Override
+	protected void processKeyPressed(KeyEvent event) {
+		if(event.getCode() == KeyCode.ENTER && event.isControlDown() && !isReadOnly()) {
+			AddPropertyDialog dialog = new AddPropertyDialog(this);
+        	dialog.show();
+		}
+		
+		super.processKeyPressed(event);
 	}
 
 	@Override

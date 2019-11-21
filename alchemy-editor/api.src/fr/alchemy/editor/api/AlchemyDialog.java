@@ -153,7 +153,7 @@ public abstract class AlchemyDialog {
 		}
 		
 		// Process validation action.
-		if (okButton != null && event.getCode() == KeyCode.ENTER && !okButton.isDisable()) {
+		if (okButton != null && event.getCode() == KeyCode.ENTER && !okButton.isDisable() && !event.isConsumed()) {
             processOK();
         }
 	}
