@@ -4,12 +4,20 @@ import java.awt.Point;
 
 import fr.alchemy.editor.api.AlchemyDialog;
 import fr.alchemy.editor.api.undo.UndoableFileEditor;
+import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.editor.core.ui.editor.undo.ModifyCountPropertyOperation;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 
+/**
+ * <code>AddPropertyDialog</code> is an implementation of {@link AlchemyDialog} to add a new property in the {@link PropertiesEditor},
+ * using a dialog. The user can input the property name as well as its value and the data will be sent to the editor when the 'OK' button
+ * is being clicked or the ENTER key is being pressed.
+ * 
+ * @author GnosticOccultist
+ */
 public class AddPropertyDialog extends AlchemyDialog {
 
 	/**
@@ -30,28 +38,36 @@ public class AddPropertyDialog extends AlchemyDialog {
 	 */
 	private final UndoableFileEditor editor;
 	
+	/**
+	 * Instantiates a new <code>AddPropertyDialog</code> for the provided {@link UndoableFileEditor} to handle
+	 * the operation.
+	 * 
+	 * @param editor The editor to handle the operation.
+	 */
 	public AddPropertyDialog(UndoableFileEditor editor) {
 		this.editor = editor;
 	}
 
 	@Override
-	protected void createContent(VBox root) {
+	protected void createContent(GridPane root) {
 		super.createContent(root);
 		
-		final Label customNameLabel = new Label("Name" + ":");
-        customNameLabel.prefWidthProperty().bind(root.widthProperty().multiply(0.5));
+		final Label propertyNameLabel = new Label("Name" + ":");
+		propertyNameLabel.prefWidthProperty().bind(root.widthProperty().multiply(0.5));
         
-        propertyNameField = new TextField();
-        propertyNameField.prefWidthProperty().bind(root.widthProperty().multiply(0.5));
+		propertyNameField = new TextField();
+		propertyNameField.prefWidthProperty().bind(root.widthProperty().multiply(0.5));
         
-        final Label customValueLabel = new Label("Value" + ":");
-        customValueLabel.prefWidthProperty().bind(root.widthProperty().multiply(0.5));
+		final Label propertyValueLabel = new Label("Value" + ":");
+        propertyValueLabel.prefWidthProperty().bind(root.widthProperty().multiply(0.5));
         
         propertyValueField = new TextField();
         propertyValueField.prefWidthProperty().bind(root.widthProperty().multiply(0.5));
         
-        root.getChildren().addAll(customNameLabel, propertyNameField, 
-        		customValueLabel, propertyValueField);
+        root.add(propertyNameLabel, 0, 0);
+        root.add(propertyNameField, 1, 0);
+        root.add(propertyValueLabel, 0, 1);
+        root.add(propertyValueField, 1, 1);
 	}
 	
 	@Override
@@ -60,6 +76,11 @@ public class AddPropertyDialog extends AlchemyDialog {
 	
 		editor.perform(new ModifyCountPropertyOperation(new PropertyPair(
 				propertyNameField.getText(), propertyValueField.getText()), false));
+	}
+	
+	@Override
+	protected boolean useGridStructure() {
+		return true;
 	}
 	
 	@Override

@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -118,9 +119,15 @@ public abstract class AlchemyDialog {
 	 * @param root The root to add sub-layout to.
 	 */
 	protected void createControls(VBox root) {
-		VBox container = new VBox();
-		createContent(container);
-		root.getChildren().add(container);
+		if(useGridStructure()) {
+			GridPane container = new GridPane();
+			createContent(container);
+			root.getChildren().add(container);
+		} else {
+			VBox container = new VBox();
+			createContent(container);
+			root.getChildren().add(container);
+		}
 		
 		VBox actionsContainer = new VBox();
 		createActions(actionsContainer);
@@ -152,13 +159,32 @@ public abstract class AlchemyDialog {
 	}
 	
 	/**
-	 * Creates the content of the <code>AlchemyDialog</code>.
+	 * Whether the <code>AlchemyDialog</code> should use a {@link GridPane} to create its content,
+	 * otherwise it will use a simple {@link VBox}.
+	 * 
+	 * @return Whether the dialog should use a grid structure.
+	 */
+	protected boolean useGridStructure() {
+		return false;
+	}
+	
+	/**
+	 * Creates the content of the <code>AlchemyDialog</code> in the given {@link VBox}.
 	 * By default this method doesn't do anything, so you need to override
 	 * the function.
 	 * 
 	 * @param root The root to add content to.
 	 */
 	protected void createContent(VBox root) {}
+	
+	/**
+	 * Creates the content of the <code>AlchemyDialog</code> in the given {@link GridPane}.
+	 * By default this method doesn't do anything, so you need to override
+	 * the function.
+	 * 
+	 * @param root The root to add content to.
+	 */
+	protected void createContent(GridPane root) {}
 	
 	/**
 	 * Creates the actions of the <code>AlchemyDialog</code>.
