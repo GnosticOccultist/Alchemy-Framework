@@ -14,6 +14,7 @@ import fr.alchemy.editor.api.editor.BaseFileEditor;
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
 import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
 import fr.alchemy.editor.api.undo.UndoableFileEditor;
+import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.ui.component.dialog.AddPropertyDialog;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.editor.core.ui.editor.undo.ModifyCountPropertyOperation;
@@ -25,6 +26,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
@@ -33,7 +35,9 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -120,6 +124,19 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 				perform(op);
 			}
         });
+		
+		Button addButton = new Button("Add");
+		addButton.disableProperty().bind(readOnlyProperty());
+		addButton.setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/add.png")));
+		addButton.setOnAction(new EventHandler<ActionEvent>() {  
+            @Override  
+            public void handle(ActionEvent event) {
+            	AddPropertyDialog dialog = new AddPropertyDialog(PropertiesEditor.this);
+            	dialog.show();
+            }  
+        });
+		
+		getElement(ToolbarEditorElement.class).add(1, addButton);
 		
 		root.getColumns().add(keyColumn);
 		root.getColumns().add(valueColumn);

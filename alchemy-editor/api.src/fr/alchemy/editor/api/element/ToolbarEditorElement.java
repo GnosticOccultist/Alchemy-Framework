@@ -5,6 +5,7 @@ import fr.alchemy.editor.api.editor.FileEditor;
 import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.utilities.Validator;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
@@ -17,6 +18,8 @@ import javafx.scene.layout.Priority;
  * <code>ToolbarEditorElement</code> is an implementation of {@link EditorElement} which is used to add a 
  * toolbar on the {@link FileEditor} page. It can be composed of buttons, for example a save button, or 
  * other types of {@link Control}.
+ * 
+ * @param <T> The type of elements filtered by the search bar.
  * 
  * @author GnosticOccultist
  */
@@ -68,6 +71,37 @@ public class ToolbarEditorElement<T> implements EditorElement {
 		container.getChildren().add(toolbar);
 	}
 	
+	/**
+	 * Adds the provided {@link Node} as an element of the <code>ToolbarEditorElement</code>.
+	 * 
+	 * @param element The element to add to the toolbar (not null).
+	 * @return		  The toolbar with the new element for chaining purposes.
+	 */
+	public ToolbarEditorElement<T> add(Node element) {
+		Validator.nonNull(element, "The element can't be null!");
+		toolbar.getChildren().add(element);
+		return this;
+	}
+	
+	/**
+	 * Adds the provided {@link Node} as an element of the <code>ToolbarEditorElement</code>.
+	 * at the given index.
+	 * 
+	 * @param element The element to add to the toolbar (not null).
+	 * @param index   The index at which the element should be added.
+	 * @return		  The toolbar with the new element for chaining purposes.
+	 */
+	public ToolbarEditorElement<T> add(int index, Node element) {
+		Validator.nonNull(element, "The element can't be null!");
+		toolbar.getChildren().add(index, element);
+		return this;
+	}
+	
+	/**
+	 * Return the {@link TextSearchBar} used by the <code>ToolbarEditorElement</code>.
+	 * 
+	 * @return The search bar of the toolbar.
+	 */
 	public TextSearchBar<T> getSearchBar() {
 		return bar;
 	}
