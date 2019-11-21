@@ -14,7 +14,9 @@ import fr.alchemy.editor.api.editor.BaseFileEditor;
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
 import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
 import fr.alchemy.editor.api.undo.UndoableFileEditor;
+import fr.alchemy.editor.core.ui.component.dialog.AddPropertyDialog;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
+import fr.alchemy.editor.core.ui.editor.undo.ModifyCountPropertyOperation;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.beans.property.SimpleStringProperty;
@@ -168,6 +170,24 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 	}
 	
 	@Override
+	public void handleAddedProperty(Object property) {
+		if(property instanceof PropertyPair) {
+			PropertyPair pair = (PropertyPair) property;
+			properties.setProperty(pair.getKey(), pair.getValue());
+			loadFromProperties();
+		}
+	}
+	
+	@Override
+	public void handleRemovedProperty(Object property) {
+		if(property instanceof PropertyPair) {
+			PropertyPair pair = (PropertyPair) property;
+			properties.remove(pair.getKey());
+			loadFromProperties();
+		}
+	}
+	
+	@Override
 	public Array<String> getSupportedExtensions() {
 		return Array.of("properties");
 	}
@@ -223,46 +243,6 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 			
 			properties.setProperty(newPair.getKey(), newPair.getValue());
 			properties.remove(oldPair.getKey());
-			loadFromProperties();
-		}
-	}
-	
-	/**
-	 * <code>ModifiedPropertyOperation</code> is an implementation of {@link AbstractUndoableOperation},
-	 * which is used to remove a {@link PropertyPair} inside the <code>PropertiesEditor</code>.
-	 * 
-	 * @author GnosticOccultist
-	 */
-	class RemovePropertyOperation extends AbstractUndoableOperation {
-		
-		/**
-		 * The pair which was removed.
-		 */
-		PropertyPair pair;
-		
-		/**
-		 * Instantiates a new <code>RemovePropertyOperation</code> with the given {@link PropertyPair}.
-		 * 
-		 * @param oldPair The property pair to be removed (not null).
-		 */
-		public RemovePropertyOperation(PropertyPair pair) {
-			Validator.nonNull(pair, "The property pair can't be null!");
-			this.pair = pair;
-		}
-		
-		@Override
-		public void undo(UndoableFileEditor editor) {
-			super.undo(editor);
-	
-			properties.setProperty(pair.getKey(), pair.getValue());
-			loadFromProperties();
-		}
-		
-		@Override
-		public void redo(UndoableFileEditor editor) {
-			super.redo(editor);
-			
-			properties.remove(pair.getKey());
 			loadFromProperties();
 		}
 	}
@@ -454,7 +434,7 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		                public void handle(ActionEvent event) {
 		                	PropertyPair pair = getRoot().getSelectionModel().getSelectedItem();
 		                	
-		                	RemovePropertyOperation op = new RemovePropertyOperation(pair);
+		                	ModifyCountPropertyOperation op = new ModifyCountPropertyOperation(pair);
 		                	perform(op);
 		                }  
 		            });
@@ -465,7 +445,8 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 					addMenuItem.setOnAction(new EventHandler<ActionEvent>() {  
 		                @Override  
 		                public void handle(ActionEvent event) {
-		                	// TODO: Add a property pair using an operation.
+		                	AddPropertyDialog dialog = new AddPropertyDialog(PropertiesEditor.this);
+		                	dialog.show();
 		                }  
 		            });
 		            menu.getItems().add(addMenuItem);

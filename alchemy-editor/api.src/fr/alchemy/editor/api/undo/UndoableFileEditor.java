@@ -19,6 +19,20 @@ public interface UndoableFileEditor extends FileEditor {
 	void perform(UndoableOperation operation);
 	
 	/**
+	 * Handles the provided new property object within this <code>UndoableFileEditor</code>.
+	 * 
+	 * @param property The property that have been added.
+	 */
+	void handleAddedProperty(Object property);
+	
+	/**
+	 * Handles the provided removed property object within this <code>UndoableFileEditor</code>.
+	 * 
+	 * @param property The property that have been removed.
+	 */
+	void handleRemovedProperty(Object property);
+	
+	/**
 	 * Undo the last {@link UndoableOperation} which was performed for this 
 	 * <code>UndoableFileEditor</code>.
 	 */
