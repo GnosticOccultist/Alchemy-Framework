@@ -2,6 +2,7 @@ package fr.alchemy.editor.api.editor;
 
 import java.util.Optional;
 
+import fr.alchemy.editor.core.ui.editor.nodes.VisualNodesFileEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
@@ -49,6 +50,7 @@ public final class FileEditorRegistry {
 		this.editors = ObjectDictionary.ofType(String.class, Class.class);
 		
 		register("properties", PropertiesEditor.class);
+		register("nodes", VisualNodesFileEditor.class);
 		
 		logger.info("Sucessfully loaded " + getClass().getSimpleName() + " with " + editors.size() + " file editors.");
 	}
