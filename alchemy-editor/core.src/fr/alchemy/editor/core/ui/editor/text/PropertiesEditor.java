@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -29,6 +31,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -80,6 +83,8 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 	@Override
 	protected void construct(TableView<PropertyPair> root) {
 		super.construct(root);
+		
+		root.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		
 		root.setEditable(true);
 		root.setFocusTraversable(true);
@@ -138,7 +143,22 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
             }  
         });
 		
+		Button removeButton = new Button("Remove");
+		removeButton.setTooltip(new Tooltip("Remove a property (Delete)"));
+		removeButton.disableProperty().bind(readOnlyProperty());
+		removeButton.setGraphic(new ImageView(EditorManager.editor().loadIcon("/resources/icons/remove.png")));
+		removeButton.setOnAction(new EventHandler<ActionEvent>() {  
+            @Override  
+            public void handle(ActionEvent event) {
+            	Collection<PropertyPair> pairs = getRoot().getSelectionModel().getSelectedItems();
+            	
+            	ModifyCountPropertyOperation op = new ModifyCountPropertyOperation(pairs);
+            	perform(op);
+            }  
+        });
+		
 		getElement(ToolbarEditorElement.class).add(1, addButton);
+		getElement(ToolbarEditorElement.class).add(2, removeButton);
 		
 		root.getColumns().add(keyColumn);
 		root.getColumns().add(valueColumn);
@@ -149,6 +169,11 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		if(event.getCode() == KeyCode.ENTER && event.isControlDown() && !isReadOnly()) {
 			AddPropertyDialog dialog = new AddPropertyDialog(this);
         	dialog.show();
+		} else if(event.getCode() == KeyCode.DELETE && !isReadOnly()) {
+			Collection<PropertyPair> pairs = getRoot().getSelectionModel().getSelectedItems();
+        	
+        	ModifyCountPropertyOperation op = new ModifyCountPropertyOperation(pairs);
+        	perform(op);
 		}
 		
 		super.processKeyPressed(event);
@@ -205,6 +230,20 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 			properties.setProperty(pair.getKey(), pair.getValue());
 			loadFromProperties();
 		}
+		
+		if(property instanceof Collection) {
+			Collection<?> props = (Collection<?>) property;
+			
+			Iterator<?> it = props.iterator();
+			while (it.hasNext()) {
+				Object value = it.next();
+				if(value instanceof PropertyPair) {
+					PropertyPair pair = (PropertyPair) value;
+					properties.setProperty(pair.getKey(), pair.getValue());
+					loadFromProperties();
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -213,6 +252,20 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 			PropertyPair pair = (PropertyPair) property;
 			properties.remove(pair.getKey());
 			loadFromProperties();
+		}
+		
+		if(property instanceof Collection) {
+			Collection<?> props = (Collection<?>) property;
+			
+			Iterator<?> it = props.iterator();
+			while (it.hasNext()) {
+				Object value = it.next();
+				if(value instanceof PropertyPair) {
+					PropertyPair pair = (PropertyPair) value;
+					properties.remove(pair.getKey());
+					loadFromProperties();
+				}
+			}
 		}
 	}
 	
@@ -461,9 +514,9 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		            removeMenuItem.setOnAction(new EventHandler<ActionEvent>() {  
 		                @Override  
 		                public void handle(ActionEvent event) {
-		                	PropertyPair pair = getRoot().getSelectionModel().getSelectedItem();
+		                	Collection<PropertyPair> pairs = getRoot().getSelectionModel().getSelectedItems();
 		                	
-		                	ModifyCountPropertyOperation op = new ModifyCountPropertyOperation(pair);
+		                	ModifyCountPropertyOperation op = new ModifyCountPropertyOperation(pairs);
 		                	perform(op);
 		                }  
 		            });

@@ -164,14 +164,4 @@ public class FastArray<E> extends AbstractArray<E> {
 	public boolean retainAll(Collection<?> arg0) {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public Object[] toArray() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public <T> T[] toArray(T[] arg0) {
-		throw new UnsupportedOperationException();
-	}
 }

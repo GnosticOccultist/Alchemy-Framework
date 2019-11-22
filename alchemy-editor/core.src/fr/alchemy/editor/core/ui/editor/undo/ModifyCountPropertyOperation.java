@@ -1,23 +1,26 @@
 package fr.alchemy.editor.core.ui.editor.undo;
 
+import java.util.Collection;
+
 import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
 import fr.alchemy.editor.api.undo.UndoableFileEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.array.Array;
 
 /**
- * <code>ModifyCountPropertyOperation</code> is an implementation of {@link AbstractUndoableOperation},
- * which is used to remove or add a {@link PropertyPair} inside the {@link PropertiesEditor}.
+ * <code>ModifyCountPropertyOperation</code> is an implementation of {@link AbstractUndoableOperation}, which is 
+ * used to remove or add one or multiple {@link PropertyPair} at the same time inside the {@link PropertiesEditor}.
  * 
  * @author GnosticOccultist
  */
 public final class ModifyCountPropertyOperation extends AbstractUndoableOperation {
 
 	/**
-	 * The pair which was removed.
+	 * The pairs which was removed or added.
 	 */
-	PropertyPair pair;
+	Array<PropertyPair> pairs;
 	/**
 	 * Whether the pair was removed or added.
 	 */
@@ -26,21 +29,44 @@ public final class ModifyCountPropertyOperation extends AbstractUndoableOperatio
 	/**
 	 * Instantiates a new <code>ModifyCountPropertyOperation</code> with the given {@link PropertyPair}.
 	 * 
-	 * @param oldPair The property pair to be removed (not null).
+	 * @param pair The property pair to be removed (not null).
 	 */
 	public ModifyCountPropertyOperation(PropertyPair pair) {
 		this(pair, true);
 	}
 	
 	/**
+	 * Instantiates a new <code>ModifyCountPropertyOperation</code> with the given collection of {@link PropertyPair}.
+	 * 
+	 * @param pairs	The collection of pairs to be removed or added (not null, not empty).
+	 */
+	public ModifyCountPropertyOperation(Collection<PropertyPair> pairs) {
+		Validator.nonEmpty(pairs, "The property pair can't be null!");
+		this.pairs = Array.of(pairs);
+		this.removed = true;
+	}
+	
+	/**
+	 * Instantiates a new <code>ModifyCountPropertyOperation</code> with the given collection of {@link PropertyPair}.
+	 * 
+	 * @param pairs	  The collection of pairs to be removed or added (not null, not empty).
+	 * @param removed Whether the property should be removed or added.
+	 */
+	public ModifyCountPropertyOperation(Collection<PropertyPair> pairs, boolean removed) {
+		Validator.nonEmpty(pairs, "The property pair can't be null!");
+		this.pairs = Array.of(pairs);
+		this.removed = removed;
+	}
+	
+	/**
 	 * Instantiates a new <code>ModifyCountPropertyOperation</code> with the given {@link PropertyPair}.
 	 * 
-	 * @param oldPair The property pair to be removed or added (not null).
+	 * @param pair 	  The property pair to be removed or added (not null).
 	 * @param removed Whether the property should be removed or added.
 	 */
 	public ModifyCountPropertyOperation(PropertyPair pair, boolean removed) {
 		Validator.nonNull(pair, "The property pair can't be null!");
-		this.pair = pair;
+		this.pairs = Array.of(pair);
 		this.removed = removed;
 	}
 	
@@ -49,9 +75,9 @@ public final class ModifyCountPropertyOperation extends AbstractUndoableOperatio
 		super.undo(editor);
 		
 		if(removed) {
-			editor.handleAddedProperty(pair);
+			editor.handleAddedProperty(pairs);
 		} else {
-			editor.handleRemovedProperty(pair);
+			editor.handleRemovedProperty(pairs);
 		}
 	}
 	
@@ -60,9 +86,9 @@ public final class ModifyCountPropertyOperation extends AbstractUndoableOperatio
 		super.redo(editor);
 		
 		if(removed) {
-			editor.handleRemovedProperty(pair);
+			editor.handleRemovedProperty(pairs);
 		} else {
-			editor.handleAddedProperty(pair);
+			editor.handleAddedProperty(pairs);
 		}
 	}
 }

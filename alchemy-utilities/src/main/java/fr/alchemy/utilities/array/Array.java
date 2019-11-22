@@ -1,7 +1,9 @@
 package fr.alchemy.utilities.array;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.RandomAccess;
 
@@ -16,6 +18,29 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
     @SuppressWarnings("unchecked")
 	static <T> ReadOnlyArray<T> of(T[] elements) {
         return (ReadOnlyArray<T>) new ReadOnlyFastArray(ArrayUtil.copyOf(elements, 0));
+    }
+    
+    @SuppressWarnings("unchecked")
+	static <T> ReadOnlyArray<T> of(T element) {
+    	T[] newArray = (T[]) ArrayUtil.create(element.getClass(), 1);
+        newArray[0] = element;
+
+        return new ReadOnlyFastArray(newArray);
+    }
+    
+    @SuppressWarnings("unchecked")
+	static <T> ReadOnlyArray<T> of(Collection<T> elements) {
+    	Class<T> type = null;
+    	Iterator<?> it = elements.iterator();
+    	while (it.hasNext()) {
+    		Object next = it.next();
+    		if(next != null && type == null) {
+    			type = (Class<T>) next.getClass();
+    		}
+    	}
+    	T[] newArray = ArrayUtil.create(type, elements.size());
+    	
+        return Array.of(elements.toArray(newArray));
     }
     
     /**
@@ -164,6 +189,41 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
     
     default ReadOnlyArray<E> readOnly() {
     	return Array.of(array());
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+    default E[] toArray() {
+    	E[] array = array();
+        return Arrays.copyOf(array, size(), (Class<E[]>) array.getClass());
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+    default <T> T[] toArray(T[] newArray) {
+    	E[] array = array();
+        if (newArray.length >= size()) {
+            for (int i = 0, j = 0, length = array.length, newLength = newArray.length;
+            	i < length && j < newLength; i++) {
+                if (array[i] == null) continue;
+                newArray[j++] = (T) array[i];
+            }
+            return newArray;
+        }
+
+        Class<T[]> arrayClass = (Class<T[]>) newArray.getClass();
+        Class<T> componentType = (Class<T>) arrayClass.getComponentType();
+
+        return toArray(componentType);
+    }
+    
+    default <T> T[] toArray(Class<T> componentType) {
+        T[] newArray = ArrayUtil.create(componentType, size());
+        
+        E[] array = array();
+        System.arraycopy(array, 0, newArray, 0, size());
+
+        return newArray;
     }
     
     @Override

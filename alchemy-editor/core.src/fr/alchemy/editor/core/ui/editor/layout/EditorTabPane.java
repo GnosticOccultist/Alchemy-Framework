@@ -48,8 +48,6 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	 * @return			The updated tab pane.
 	 */
 	public TabPane attach(EditorComponent component) {
-		
-		
 		Tab tab = new Tab(component.getName());
 		tab.setClosable(true);
 			
