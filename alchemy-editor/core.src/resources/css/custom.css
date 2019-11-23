@@ -1,0 +1,31 @@
+/*******************************************************************************
+ *                                                                             *
+ * Visual Nodes                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+.visual-nodes-root {
+    -fx-background-color: #ffffff,
+        linear-gradient(from 0.5px 0px to 16.5px 0px, repeat, #dcdfe3 5%, transparent 5%),
+        linear-gradient(from 0px 0.5px to 0px 16.5px, repeat, #dcdfe3 5%, transparent 5%);
+    -fx-min-width: 10555px;
+    -fx-min-height: 5555px;
+}
+
+.visual-node {
+    -fx-background: #fbfbfc;
+    -fx-background-color: -fx-background;
+    -fx-background-insets: 0px;
+    -fx-background-radius: 3px;
+    -fx-border-color: #dcdfe3;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-padding: 0px 0px 2px 0px;
+}
+
+.visual-node > .header {
+    -fx-background-color: #f5f6f7;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2px 2px 0px 0px;
+    -fx-padding: 0px 4px 0px 4px;
+}

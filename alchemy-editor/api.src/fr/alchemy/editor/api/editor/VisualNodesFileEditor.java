@@ -1,13 +1,13 @@
-package fr.alchemy.editor.core.ui.editor.nodes;
+package fr.alchemy.editor.api.editor;
 
 import com.ss.rlib.common.util.array.Array;
 
-import fr.alchemy.editor.api.editor.BaseFileEditor;
-import fr.alchemy.editor.core.ui.component.nodes.VisualNodesContainer;
+import fr.alchemy.editor.api.ui.component.nodes.VisualNodesContainer;
 
-public class VisualNodesFileEditor extends BaseFileEditor<VisualNodesContainer> {
-
+public abstract class VisualNodesFileEditor<C extends VisualNodesContainer> extends BaseFileEditor<VisualNodesContainer> {
+	
 	public VisualNodesFileEditor() {
+		super();
 		construct(root);
 	}
 	
@@ -21,11 +21,6 @@ public class VisualNodesFileEditor extends BaseFileEditor<VisualNodesContainer> 
 	public void handleRemovedProperty(Object property) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	protected VisualNodesContainer createRoot() {
-		return new VisualNodesContainer();
 	}
 
 	@Override
