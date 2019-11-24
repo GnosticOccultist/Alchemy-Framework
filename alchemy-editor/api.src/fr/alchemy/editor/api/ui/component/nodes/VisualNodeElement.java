@@ -3,6 +3,9 @@ package fr.alchemy.editor.api.ui.component.nodes;
 import java.util.UUID;
 
 import fr.alchemy.utilities.Validator;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.BooleanPropertyBase;
+import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
@@ -26,9 +29,34 @@ public class VisualNodeElement<E> extends VBox {
 	private static final int RESIZE_THRESHOLD = 6;
 	
 	/**
+	 * The selected state of the visual node.
+	 */
+	private final BooleanProperty selected = new BooleanPropertyBase(false) {
+		
+		@Override
+		public  void invalidated() {
+			pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), get());
+		}
+		
+		@Override
+		public Object getBean() {
+			return VisualNodeElement.this;
+		}
+
+		@Override
+		public String getName() {
+			return "selected";
+		}
+	};
+	
+	/**
 	 * The unique identifier of the node.
 	 */
 	protected final UUID id;
+	/**
+	 * The container of the visual node.
+	 */
+	protected final VisualNodesContainer container;
 	/**
 	 * The element wrapped in the node.
 	 */
@@ -55,11 +83,12 @@ public class VisualNodeElement<E> extends VBox {
 	 * 
 	 * @param element The element to represent (not null).
 	 */
-	protected VisualNodeElement(E element) {
+	protected VisualNodeElement(VisualNodesContainer container, E element) {
 		Validator.nonNull(element, "The element can't be null!");
 		
 		this.element = element;
 		this.id = UUID.randomUUID();
+		this.container = container;
 		this.parametersContainer = new VBox();
 		
 		setOnMouseMoved(this::processMouseMoved);
@@ -97,6 +126,17 @@ public class VisualNodeElement<E> extends VBox {
 	 * @param container The container of the parameters (not null).
 	 */
 	protected void constructParameters(VBox container) {}
+	
+	/**
+	 * Called by the {@link VisualNodesContainer} when it selects or deselects the <code>VisualNodeElement</code>.
+	 * 
+	 * @see VisualNodesContainer#requestSelection(VisualNodeElement)
+	 * 
+	 * @param value Whether the node needs to be selected or deselected.
+	 */
+	protected void onSelected(boolean value) {
+		this.selected.setValue(value);
+	}
 	
 	/**
 	 * Process the given moved {@link MouseEvent} by changing the {@link Cursor} according to the hovered region 
@@ -180,6 +220,10 @@ public class VisualNodeElement<E> extends VBox {
 	protected void processMousePressed(MouseEvent event) {
 		Validator.nonNull(event, "The mouse event can't be null!");
 		
+		if(event.getButton() != MouseButton.MIDDLE) {
+			container.requestSelection(this);
+		}
+		
 		if(event.getButton() != MouseButton.PRIMARY) {
 			return;
 		}
@@ -251,6 +295,15 @@ public class VisualNodeElement<E> extends VBox {
 	 */
 	protected String getTitleText() {
 		return "Title";
+	}
+	
+	/**
+	 * Return the unique identifier of the <code>VisualNodeElement</code>.
+	 * 
+	 * @return The unique identifier of the node (not null).
+	 */
+	public UUID getID() {
+		return id;
 	}
 	
 	/**

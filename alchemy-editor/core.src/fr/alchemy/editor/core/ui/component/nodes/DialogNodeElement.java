@@ -5,8 +5,8 @@ import fr.alchemy.editor.core.ui.component.nodes.DialogNodeElement.DialogNode;
 
 public class DialogNodeElement extends VisualNodeElement<DialogNode> {
 
-	public DialogNodeElement(DialogNode element) {
-		super(element);
+	public DialogNodeElement(DialogNodesContainer container, DialogNode element) {
+		super(container, element);
 	}
 
 	public static class DialogNode {

@@ -23,6 +23,11 @@
     -fx-padding: 0px 0px 2px 0px;
 }
 
+.visual-node:selected {
+    -fx-border-color: -fx-focus-color;
+    -fx-background: derive(#fbfbfc, -3%);
+}
+
 .visual-node > .header {
     -fx-background-color: #f5f6f7;
     -fx-background-insets: 0;
