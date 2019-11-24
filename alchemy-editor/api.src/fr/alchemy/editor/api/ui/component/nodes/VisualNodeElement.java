@@ -5,10 +5,14 @@ import java.util.UUID;
 import fr.alchemy.utilities.Validator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -95,6 +99,7 @@ public class VisualNodeElement<E> extends VBox {
 		setOnMousePressed(this::processMousePressed);
 		setOnMouseDragged(this::processMouseDragged);
 		setOnMouseDragExited(this::processMouseExited);
+		setOnContextMenuRequested(this::handleContextMenu);
 		
 		setPrefWidth(200D);
 		getStyleClass().add("visual-node");
@@ -137,6 +142,27 @@ public class VisualNodeElement<E> extends VBox {
 	protected void onSelected(boolean value) {
 		this.selected.setValue(value);
 	}
+	
+	/**
+	 * Handles the {@link ContextMenu} request of the <code>VisualNodeElement</code> by delegating its 
+	 * creation to the associated {@link VisualNodesContainer}.
+	 * 
+	 * @param event The context menu event (not null).
+	 */
+	protected void handleContextMenu(ContextMenuEvent event) {
+		Validator.nonNull(event, "The context menu event can't be null!");
+		
+		this.container.handleContextMenu(event);
+	}
+	
+	/**
+	 * Override this method to create your own actions to be registered when a {@link ContextMenu} is
+	 * requested for the <code>VisualNodeElement</code>.
+	 * 
+	 * @param event   The context menu event (not null).
+	 * @param actions The list of actions to add your actions to (not null).
+	 */
+	protected void fillAdditionalActions(ContextMenuEvent event, ObservableList<MenuItem> actions) {}
 	
 	/**
 	 * Process the given moved {@link MouseEvent} by changing the {@link Cursor} according to the hovered region 
