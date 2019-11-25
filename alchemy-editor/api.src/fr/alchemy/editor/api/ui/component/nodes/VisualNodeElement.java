@@ -247,7 +247,11 @@ public class VisualNodeElement<E> extends VBox {
 		Validator.nonNull(event, "The mouse event can't be null!");
 		
 		if(event.getButton() != MouseButton.MIDDLE) {
-			container.requestSelection(this);
+			if(event.isControlDown() || (isSelected() && event.getButton() == MouseButton.SECONDARY)) {
+				container.requestSelection(this, false);
+			} else {
+				container.requestSelection(this, true);
+			}
 		}
 		
 		if(event.getButton() != MouseButton.PRIMARY) {
@@ -330,6 +334,15 @@ public class VisualNodeElement<E> extends VBox {
 	 */
 	public UUID getID() {
 		return id;
+	}
+	
+	/**
+	 * Return whether the <code>VisualNodeElement</code> is selected.
+	 * 
+	 * @return Whether the visual node is selected.
+	 */
+	public boolean isSelected() {
+		return selected.get();
 	}
 	
 	/**

@@ -13,6 +13,8 @@ public class DialogNodesContainer extends VisualNodesContainer<DialogNodeElement
 	public DialogNodesContainer() {
 		
 		add(new DialogNodeElement(this, new DialogNode("Hello, this is a test")));
+		add(new DialogNodeElement(this, new DialogNode("Hello, this is a test (2)")));
+		add(new DialogNodeElement(this, new DialogNode("Hello, this is a test (3)")));
 	}
 	
 	@Override

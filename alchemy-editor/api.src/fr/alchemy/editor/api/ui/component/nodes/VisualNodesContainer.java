@@ -11,6 +11,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 public abstract class VisualNodesContainer<E extends VisualNodeElement> extends ScrollPane {
@@ -34,6 +36,7 @@ public abstract class VisualNodesContainer<E extends VisualNodeElement> extends 
 		this.root.prefWidthProperty().bind(widthProperty());
 		this.root.prefHeightProperty().bind(heightProperty());
 		this.root.setOnContextMenuRequested(this::handleContextMenu);
+		this.root.setOnMousePressed(this::processMousePressed);
 		
 		this.contextMenu = new ContextMenu();
 		
@@ -98,19 +101,47 @@ public abstract class VisualNodesContainer<E extends VisualNodeElement> extends 
 	protected abstract Collection<MenuItem> createAddActions(Point2D location);
 	
 	/**
+	 * Process the given pressed {@link MouseEvent} by saving hiding the {@link ContextMenu} and clearing selection
+	 * from all {@link VisualNodeElement} contained in the <code>VisualNodesContainer</code>.
+	 * 
+	 * @param event The mouse event that occured (not null).
+	 */
+	public void processMousePressed(MouseEvent event) {
+		Validator.nonNull(event, "The mouse event can't be null!");
+		
+		if(event.getButton() == MouseButton.PRIMARY && contextMenu.isShowing()) {
+			contextMenu.hide();
+		}
+		
+		Object source = event.getTarget();
+		
+		if(source == root) {
+			root.getChildren().stream()
+				.filter(VisualNodeElement.class::isInstance)
+				.map(node -> (VisualNodeElement<?>) node)
+				.forEach(element -> element.onSelected(false));
+			
+			event.consume();
+		}
+	}
+	
+	/**
 	 * Request the selection of the provided {@link VisualNodeElement} and clear any other previously
 	 * selected node element from the <code>VisualNodesContainer</code>.
 	 * 
-	 * @param requester The node element that requested the selection (not null).
+	 * @param requester 	The node element that requested the selection (not null).
+	 * @param clearAnyOther Whether to clear any other selection apart from the requester.
 	 */
-	public void requestSelection(VisualNodeElement requester) {
+	public void requestSelection(VisualNodeElement requester, boolean clearAnyOther) {
 		Validator.nonNull(requester, "The visual node element can't be null!");
 		
-		root.getChildren().stream()
-			.filter(VisualNodeElement.class::isInstance)
-			.map(node -> (VisualNodeElement<?>) node)
-			.filter(node -> node.getID() != requester.getID())
-			.forEach(element -> element.onSelected(false));
+		if(clearAnyOther) {
+			root.getChildren().stream()
+				.filter(VisualNodeElement.class::isInstance)
+				.map(node -> (VisualNodeElement<?>) node)
+				.filter(node -> node.getID() != requester.getID())
+				.forEach(element -> element.onSelected(false));
+		}
 		
 		requester.onSelected(true);
 	}
