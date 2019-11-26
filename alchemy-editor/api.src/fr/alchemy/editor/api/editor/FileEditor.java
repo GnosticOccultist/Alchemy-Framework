@@ -80,10 +80,13 @@ public interface FileEditor extends EditorComponent {
 	Pane getUIPage();
 	
 	/**
-	 * Return the currently edited file name.
+	 * Return the currently edited file name by the <code>FileEditor</code>.
+	 * 
+	 * @return The name of the edited file.
 	 */
 	@Override
 	default String getName() {
-		return getFile() != null ? getFile().getFileName().toString() : "";
+		String suffix = readOnlyProperty().get() ? " (read-only)" : "";
+		return getFile() != null ? getFile().getFileName().toString() + suffix : "";
 	}
 }
