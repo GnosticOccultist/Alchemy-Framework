@@ -316,6 +316,25 @@ public class VisualNodeElement<E> extends VBox {
 		
 		return ResizeRegion.get(north, south, east, west, true);
 	}
+	
+	/**
+	 * Return whether the provided {@link VisualNodeParameter} can be attached together.
+	 * 
+	 * @param in  The in visual node parameter (not null).
+	 * @param out The out visual node parameter (not null).
+	 * @return	  Whether the two parameters can be attached.
+	 */
+	public boolean canAttach(VisualNodeParameter in, VisualNodeParameter out) {
+		if(in.getElement().getID().equals(out.getElement().getID())) {
+			return false;
+		}
+		
+		if(!in.isInput() || out.isInput()) {
+			return false;
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Return the title text of the <code>VisualNodeElement</code>, which is displayed

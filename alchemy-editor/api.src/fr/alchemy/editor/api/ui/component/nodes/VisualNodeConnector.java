@@ -32,9 +32,9 @@ public class VisualNodeConnector extends Pane {
 	};
 	
 	/**
-	 * The visual node element owning the connector.
+	 * The parameter owning the connector.
 	 */
-	protected final VisualNodeElement element;
+	protected final VisualNodeParameter parameter;
 	/**
 	 * The X coordinate property of the connector.
 	 */
@@ -45,14 +45,14 @@ public class VisualNodeConnector extends Pane {
 	protected final DoubleProperty yProperty;
 	
 	/**
-	 * Instantiates a new <code>VisualNodeConnector</code> for the provided {@link VisualNodeElement}.
+	 * Instantiates a new <code>VisualNodeConnector</code> for the provided {@link VisualNodeParameter}.
 	 * 
-	 * @param element The node element for which to create the connector (not null).
+	 * @param parameter The node parameter for which to create the connector (not null).
 	 */
-	public VisualNodeConnector(VisualNodeElement element) {
-		Validator.nonNull(element, "The node element can't be null!");
+	public VisualNodeConnector(VisualNodeParameter parameter) {
+		Validator.nonNull(parameter, "The node parameter can't be null!");
 		
-		this.element = element;
+		this.parameter = parameter;
 		this.xProperty = new SimpleDoubleProperty();
 		this.yProperty = new SimpleDoubleProperty();
 	}
@@ -73,5 +73,14 @@ public class VisualNodeConnector extends Pane {
 	 */
 	public void setConnected(boolean connected) {
 		this.connected.setValue(connected);
+	}
+	
+	/**
+	 * Return the {@link VisualNodeParameter} owning the <code>VisualNodeConnector</code>.
+	 * 
+	 * @return The parameter owning the connector.
+	 */
+	public VisualNodeParameter getParameter() {
+		return parameter;
 	}
 }
