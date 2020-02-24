@@ -180,13 +180,9 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 	}
 
 	@Override
-	public boolean open(Path file) {
-		super.open(file);
-		
+	protected void doOpen() throws IOException {
 		this.properties = FileUtils.getProperties(file, properties);
 		loadFromProperties();
-		
-		return true;
 	}
 	
 	@Override
