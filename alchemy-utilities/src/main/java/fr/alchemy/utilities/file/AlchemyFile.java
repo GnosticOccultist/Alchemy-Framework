@@ -27,6 +27,10 @@ public class AlchemyFile {
 	 * The extension of the file.
 	 */
     protected String extension;
+    
+    public AlchemyFile() {
+		this("");
+	}
 
     /**
      * Instantiates a new <code>AlchemyFile</code> with the

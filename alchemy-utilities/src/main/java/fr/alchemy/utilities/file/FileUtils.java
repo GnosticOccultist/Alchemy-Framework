@@ -26,25 +26,9 @@ public final class FileUtils {
 	 */
 	public static final String SEPARATOR = "/";
 	/**
-	 * An internal only file to limit the number of instantiations.
+	 * An internal only file thread specific to limit the number of instantiations.
 	 */
-	private static AlchemyFile file = new AlchemyFile("");
-	
-	/**
-	 * Return the potential extension of the file, or
-	 * an empty string if null.
-	 * 
-	 * @param path The path of the file to get the extension.
-	 * @return	   The file's extension.
-	 */
-	public static String getExtension(String path) {
-		int index = path.lastIndexOf(".");
-		if (index <= 0 || index == path.length() - 1) {
-            return "";
-        } else {
-            return path.substring(index + 1).toLowerCase();
-        }
-	}
+	private static final ThreadLocal<AlchemyFile> file = ThreadLocal.withInitial(AlchemyFile::new);
 	
 	/**
 	 * Return the potential extension of the file, or
@@ -54,12 +38,68 @@ public final class FileUtils {
 	 * @return	   The file's extension.
 	 */
 	public static String getExtension(Path path) {
-		
-		if(Files.isDirectory(path)) {
+		if(path == null || Files.isDirectory(path)) {
 			return "";
 		}
 		
 		return getExtension(Objects.toString(path.getFileName()));
+	}
+	
+	/**
+	 * Return the potential extension of the file, or
+	 * an empty string if null.
+	 * 
+	 * @param path The path of the file to get the extension.
+	 * @return	   The file's extension.
+	 */
+	public static String getExtension(String path) {
+		if(path == null) {
+			return "";
+		}
+		
+		int index = path.lastIndexOf(".");
+		if (index <= 0 || index == path.length() - 1) {
+            return "";
+        } else {
+            return path.substring(index + 1).toLowerCase();
+        }
+	}
+	
+	/**
+	 * Return the potential name of the file, or
+	 * an empty string if null.
+	 * 
+	 * @param path The path of the file to get the name.
+	 * @return	   The file's name.
+	 */
+	public static String getFileName(Path path) {
+		if(path == null || Files.isDirectory(path)) {
+			return "";
+		}
+		
+		return getFileName(Objects.toString(path.getFileName()));
+	}
+	
+	/**
+	 * Return the name of the file or an empty string if null.
+	 * 
+	 * @param path The path for which to get the name of the file.
+	 * @return	   The file's name.
+	 */
+	public static String getFileName(String path) {
+		if(path == null) {
+			return "";
+		}
+		
+		int endIndex = path.lastIndexOf(".");
+		if(endIndex <= 0) {
+            return "";
+        }
+		int beginIndex = path.lastIndexOf("/");
+		if(beginIndex <= 0) {
+            return "";
+        }
+		return path.substring(beginIndex + 1, endIndex);
 	}
 	
 	/**
@@ -119,43 +159,19 @@ public final class FileUtils {
 			throw new UncheckedIOException(ex);
 		}
 	}
-
-	/**
-	 * Open an {@link InputStream} from the provided path of a file.
-	 * <p>
-	 * The path cannot be null or empty.
-	 * 
-	 * @param path The path of the file to get an input stream.
-	 * @return	   The input stream to the file.
-	 */
-	public static InputStream openStream(String path) {
-		Validator.nonEmpty(path, 
-				"The path for the file cannot be null or empty!");
-		
-		if(!file.getPath().equals(path)) {
-			file.changePath(path);
-		}
-		
-		return file.openStream();
-	}
 	
 	/**
-	 * Open a {@link InputStreamReader} from the provided path of a file.
-	 * <p>
-	 * The path cannot be null or empty.
+	 * Update internally the path of the {@link AlchemyFile} if needed.
 	 * 
-	 * @param path The path of the file to get the buffered reader.
-	 * @return	   The input stream reader from the file.
+	 * @param path The path to change to.
+	 * @return	   The alchemy file pointing to the new path.
 	 */
-	public static InputStreamReader readStream(String path) {
-		Validator.nonEmpty(path, 
-				"The path for the file cannot be null or empty!");
-		
-		if(!file.getPath().equals(path)) {
-			file.changePath(path);
+	private static AlchemyFile updateInternalFile(String path) {
+		AlchemyFile alchemyFile = file.get();
+		if(!alchemyFile.getPath().equals(path)) {
+			alchemyFile.changePath(path);
 		}
-		
-		return new InputStreamReader(openStream(path));
+		return alchemyFile;
 	}
 	
 	/**
@@ -167,14 +183,21 @@ public final class FileUtils {
 	 * @return	   The buffered reader from the file.
 	 */
 	public static BufferedReader readBuffered(String path) {
-		Validator.nonEmpty(path, 
-				"The path for the file cannot be null or empty!");
-		
-		if(!file.getPath().equals(path)) {
-			file.changePath(path);
-		}
-		
+		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
 		return new BufferedReader(readStream(path));
+	}
+
+	/**
+	 * Open a {@link InputStreamReader} from the provided path of a file.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param path The path of the file to get the buffered reader.
+	 * @return	   The input stream reader from the file.
+	 */
+	public static InputStreamReader readStream(String path) {
+		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
+		return new InputStreamReader(openStream(path));
 	}
 	
 	/**
@@ -186,14 +209,21 @@ public final class FileUtils {
 	 * @return	   The readable byte channel from the file.
 	 */
 	public static ReadableByteChannel readByteChannel(String path) {
-		Validator.nonEmpty(path, 
-				"The path for the file cannot be null or empty!");
-		
-		if(!file.getPath().equals(path)) {
-			file.changePath(path);
-		}
-		
+		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
 		return Channels.newChannel(openStream(path));
+	}
+	
+	/**
+	 * Open an {@link InputStream} from the provided path of a file.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param path The path of the file to get an input stream.
+	 * @return	   The input stream to the file.
+	 */
+	public static InputStream openStream(String path) {
+		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
+		return updateInternalFile(path).openStream();
 	}
 	
 	/**
@@ -227,6 +257,14 @@ public final class FileUtils {
         return buffer;
     }
 	
+	/**
+	 * Loads and return the {@link Properties} from the provided path using the given store,
+	 * or a new instance if null. 
+	 * 
+	 * @param path		 The path of the property file to load (not null, not empty).
+	 * @param properties The properties to populate with the loaded data.
+	 * @return			 The store properties or a new instance one with the loaded data.
+	 */
 	public static Properties getProperties(String path, Properties properties) {
 		Validator.nonEmpty(path, "The provided path can't be empty or null!");
 		if(properties == null) {
@@ -242,6 +280,14 @@ public final class FileUtils {
 		return properties;
 	}
 	
+	/**
+	 * Loads and return the {@link Properties} from the provided {@link Path} using the given store,
+	 * or a new instance if null. 
+	 * 
+	 * @param path		 The path of the property file to load (not null, not empty).
+	 * @param properties The properties to populate with the loaded data.
+	 * @return			 The store properties or a new instance one with the loaded data.
+	 */
 	public static Properties getProperties(Path path, Properties properties) {
 		if(properties == null) {
 			properties = new Properties();
@@ -255,5 +301,43 @@ public final class FileUtils {
 		}
 		
 		return properties;
+	}
+	
+	/**
+	 * Creates all directories contained in the {@link Path} if they don't already exist.
+	 * 
+	 * @param directory The path from which to create the hierarchy of directories.
+	 * @return			Whether the directory has been created or already existed.
+	 */
+	public static boolean createDirectories(Path directory) {
+		try {
+			if(!Files.exists(directory)) {
+				Files.createDirectories(directory);
+				return true;
+			}
+		} catch (IOException ex) {
+			System.err.println("Failed to create directories from path '" + directory + "'");
+			ex.printStackTrace();
+		}
+		return false;
+	}
+	
+	/**
+	 * Creates a file contained in the given {@link Path} if it doesn't already exist.
+	 * 
+	 * @param directory The path from which to create the file.
+	 * @return			Whether the file has been created or already existed.
+	 */
+	public static boolean createFile(Path file) {
+		try {
+			if(!Files.exists(file)) {
+				Files.createFile(file);
+				return true;
+			}
+		} catch (IOException ex) {
+			System.err.println("Failed to create file from path '" + file + "'");
+			ex.printStackTrace();
+		}
+		return false;
 	}
 }
