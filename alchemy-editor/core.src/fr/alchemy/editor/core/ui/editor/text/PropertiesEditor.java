@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import com.ss.rlib.common.util.array.Array;
-
 import fr.alchemy.editor.api.editor.AbstractFileEditor;
 import fr.alchemy.editor.api.editor.BaseFileEditor;
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
@@ -21,6 +19,7 @@ import fr.alchemy.editor.core.ui.component.dialog.AddPropertyDialog;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.editor.core.ui.editor.undo.ModifyCountPropertyOperation;
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.array.Array;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

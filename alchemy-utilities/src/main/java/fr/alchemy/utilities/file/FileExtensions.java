@@ -11,6 +11,11 @@ package fr.alchemy.utilities.file;
  */
 public interface FileExtensions {
 	
+	/**
+	 * The universal extension to allow every extension to be used '*'.
+	 */
+	String UNIVERSAL_EXTENSION = "*";
+	
 	///////////////////////////////////////////////////////////
 	////////////		 ALCHEMY FILES		    //////////////
 	//////////////////////////////////////////////////////////

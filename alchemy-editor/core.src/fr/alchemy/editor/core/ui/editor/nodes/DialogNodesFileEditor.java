@@ -2,10 +2,9 @@ package fr.alchemy.editor.core.ui.editor.nodes;
 
 import java.io.IOException;
 
-import com.ss.rlib.common.util.array.Array;
-
 import fr.alchemy.editor.api.editor.VisualNodesFileEditor;
 import fr.alchemy.editor.core.ui.component.nodes.DialogNodesContainer;
+import fr.alchemy.utilities.array.Array;
 
 public class DialogNodesFileEditor extends VisualNodesFileEditor<DialogNodesContainer> {
 

@@ -2,8 +2,7 @@ package fr.alchemy.editor.api.editor;
 
 import java.nio.file.Path;
 
-import com.ss.rlib.common.util.array.Array;
-
+import fr.alchemy.utilities.array.Array;
 import javafx.beans.binding.BooleanExpression;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;

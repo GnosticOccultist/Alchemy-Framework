@@ -3,6 +3,7 @@ package fr.alchemy.utilities;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * <code>Instantiator</code> is a utility class designed to create an 
@@ -13,7 +14,12 @@ import java.util.function.Consumer;
  * 
  * @author GnosticOccultist
  */
-public class Instantiator {
+public final class Instantiator {
+	
+	/**
+	 * Private constructor to inhibit instantiation of <code>Instantiator</code>.
+	 */
+	private Instantiator() {}
 	
 	/**
 	 * Creates a new instance with the provided class name.
@@ -77,15 +83,19 @@ public class Instantiator {
 	}
 	
 	/**
-	 * Creates a new instance with the provided class.
+	 * Creates a new instance with the provided class and performs the provided
+	 * action with it.
 	 * <p>
 	 * The class cannot be null.
 	 * 
-	 * @param clazz The class to create the instance from.
-	 * @return	    A new instance of the class or null if an error occured.
+	 * @param clazz  The class to create the instance from.
+	 * @param action The action to perform on the new instance.
+	 * @return	     A new instance of the class or null if an error occured.
 	 */
-	public static <T> T fromClass(Class<T> clazz) {
-		return fromClass(clazz, null);
+	public static <T> T fromClassAndApply(Class<T> clazz, Consumer<T> action) {
+		T obj = fromClass(clazz);
+		action.accept(obj);
+		return obj;
 	}
 	
 	/**
@@ -98,7 +108,22 @@ public class Instantiator {
 	 * @param action The action to perform on the new instance.
 	 * @return	     A new instance of the class or null if an error occured.
 	 */
-	public static <T> T fromClass(Class<T> clazz, Consumer<T> action) {
+	public static <T, C> C fromClass(Class<T> clazz, Function<? super T, ? extends C> map) {
+		Validator.nonNull(map);
+		
+		T obj = fromClass(clazz);
+		return map.apply(obj);
+	}
+	
+	/**
+	 * Creates a new instance with the provided class.
+	 * <p>
+	 * The class cannot be null.
+	 * 
+	 * @param clazz The class to create the instance from.
+	 * @return	    A new instance of the class or null if an error occured.
+	 */
+	public static <T> T fromClass(Class<T> clazz) {
 		Validator.nonNull(clazz);
 		
 		T obj = null;
@@ -111,10 +136,7 @@ public class Instantiator {
 					"'! Make sure the constructor is empty.");
 		}
 		
-		if(obj != null && action != null) {
-			action.accept(obj);
-		}
-		return obj;		
+		return obj;
 	}
 	
 	/**

@@ -60,6 +60,13 @@ public interface ObjectDictionary<K, V> extends Dictionary<K, V> {
     default Optional<V> getOptional(K key) {
         return Optional.ofNullable(get(key));
     }
+    
+    default V getOrDefault(K key, V def) {
+    	if(containsKey(key)) {
+    		return get(key);
+    	}
+    	return def;
+    }
 
     /**
      * Get the value for the key. If the value doesn't exists, the factory will create new value,
