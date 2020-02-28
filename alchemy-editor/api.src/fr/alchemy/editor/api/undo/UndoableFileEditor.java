@@ -9,28 +9,6 @@ import fr.alchemy.editor.api.editor.FileEditor;
  * @author GnosticOccultist
  */
 public interface UndoableFileEditor extends FileEditor {
-
-	/**
-	 * Performs the provided {@link UndoableOperation} on this <code>UndoableFileEditor</code>.
-	 * The method is intended to keep track of this operation so it can later be undone or redone.
-	 * 
-	 * @param operation The operation to perform on this editor.
-	 */
-	void perform(UndoableOperation operation);
-	
-	/**
-	 * Handles the provided new property object within this <code>UndoableFileEditor</code>.
-	 * 
-	 * @param property The property that have been added.
-	 */
-	void handleAddedProperty(Object property);
-	
-	/**
-	 * Handles the provided removed property object within this <code>UndoableFileEditor</code>.
-	 * 
-	 * @param property The property that have been removed.
-	 */
-	void handleRemovedProperty(Object property);
 	
 	/**
 	 * Undo the last {@link UndoableOperation} which was performed for this 

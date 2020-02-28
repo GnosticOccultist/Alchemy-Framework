@@ -3,7 +3,7 @@ package fr.alchemy.editor.core.ui.component.dialog;
 import java.awt.Point;
 
 import fr.alchemy.editor.api.AlchemyDialog;
-import fr.alchemy.editor.api.undo.UndoableFileEditor;
+import fr.alchemy.editor.api.undo.OperationConsumer;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.editor.core.ui.editor.undo.ModifyCountPropertyOperation;
@@ -36,16 +36,16 @@ public class AddPropertyDialog extends AlchemyDialog {
 	/**
 	 * The consumer of the operation.
 	 */
-	private final UndoableFileEditor editor;
+	private final OperationConsumer consumer;
 	
 	/**
-	 * Instantiates a new <code>AddPropertyDialog</code> for the provided {@link UndoableFileEditor} to handle
-	 * the operation.
+	 * Instantiates a new <code>AddPropertyDialog</code> for the provided {@link OperationConsumer} to handle
+	 * the operation changes.
 	 * 
-	 * @param editor The editor to handle the operation.
+	 * @param consumer The consumer to handle the operation changes.
 	 */
-	public AddPropertyDialog(UndoableFileEditor editor) {
-		this.editor = editor;
+	public AddPropertyDialog(OperationConsumer consumer) {
+		this.consumer = consumer;
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class AddPropertyDialog extends AlchemyDialog {
 	protected void processOK() {
 		super.processOK();
 	
-		editor.perform(new ModifyCountPropertyOperation(new PropertyPair(
+		consumer.perform(new ModifyCountPropertyOperation(new PropertyPair(
 				propertyNameField.getText(), propertyValueField.getText()), false));
 	}
 	

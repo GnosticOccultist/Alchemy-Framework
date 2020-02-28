@@ -2,6 +2,7 @@ package fr.alchemy.editor.api.editor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import fr.alchemy.editor.api.undo.OperationConsumer;
 import fr.alchemy.editor.api.undo.UndoableFileEditor;
 import fr.alchemy.editor.api.undo.UndoableOperation;
 import fr.alchemy.editor.api.undo.UndoableOperationControl;
@@ -22,7 +23,7 @@ import javafx.scene.layout.Region;
  * 
  * @author GnosticOccultist
  */
-public abstract class BaseFileEditor<R extends Region> extends AbstractFileEditor<R> implements UndoableFileEditor {
+public abstract class BaseFileEditor<R extends Region> extends AbstractFileEditor<R> implements UndoableFileEditor, OperationConsumer {
 
 	/**
 	 * The counter keeping track of the changes.

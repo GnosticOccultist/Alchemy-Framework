@@ -3,7 +3,7 @@ package fr.alchemy.editor.core.ui.editor.undo;
 import java.util.Collection;
 
 import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
-import fr.alchemy.editor.api.undo.UndoableFileEditor;
+import fr.alchemy.editor.api.undo.OperationConsumer;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;
@@ -71,9 +71,7 @@ public final class ModifyCountPropertyOperation extends AbstractUndoableOperatio
 	}
 	
 	@Override
-	public void undo(UndoableFileEditor editor) {
-		super.undo(editor);
-		
+	protected void doUndo(OperationConsumer editor) {
 		if(removed) {
 			editor.handleAddedProperty(pairs);
 		} else {
@@ -82,13 +80,23 @@ public final class ModifyCountPropertyOperation extends AbstractUndoableOperatio
 	}
 	
 	@Override
-	public void redo(UndoableFileEditor editor) {
-		super.redo(editor);
-		
+	protected void doRedo(OperationConsumer editor) {
 		if(removed) {
 			editor.handleRemovedProperty(pairs);
 		} else {
 			editor.handleAddedProperty(pairs);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		String prefix = removed ? "Removed " : "Added ";
+		if(pairs.size() == 1) {
+			PropertyPair pair = pairs.get(0);
+			prefix += "'" + pair.getKey() + "' -> " + pair.getValue() + ".";
+		} else {
+			prefix += pairs.size() + " properties.";
+		}
+		return prefix;
 	}
 }

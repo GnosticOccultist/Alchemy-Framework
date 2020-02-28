@@ -13,7 +13,7 @@ import fr.alchemy.editor.api.editor.AbstractFileEditor;
 import fr.alchemy.editor.api.editor.BaseFileEditor;
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
 import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
-import fr.alchemy.editor.api.undo.UndoableFileEditor;
+import fr.alchemy.editor.api.undo.OperationConsumer;
 import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.ui.component.dialog.AddPropertyDialog;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
@@ -306,18 +306,14 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		}
 		
 		@Override
-		public void undo(UndoableFileEditor editor) {
-			super.undo(editor);
-	
+		protected void doUndo(OperationConsumer editor) {
 			properties.setProperty(oldPair.getKey(), oldPair.getValue());
 			properties.remove(newPair.getKey());
 			loadFromProperties();
 		}
 		
 		@Override
-		public void redo(UndoableFileEditor editor) {
-			super.redo(editor);
-			
+		protected void doRedo(OperationConsumer editor) {
 			properties.setProperty(newPair.getKey(), newPair.getValue());
 			properties.remove(oldPair.getKey());
 			loadFromProperties();
