@@ -11,21 +11,27 @@ import fr.alchemy.utilities.pool.Reusable;
 
 public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneable, RandomAccess {
 	
-    static <T> Array<T> ofType(Class<? super T> type) {
-        return new FastArray<T>(type);
-    }
+	static <T> Array<T> ofType(Class<? super T> type) {
+		return new FastArray<T>(type);
+	}
     
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	static <T> ReadOnlyArray<T> of(T[] elements) {
-        return (ReadOnlyArray<T>) new ReadOnlyFastArray(ArrayUtil.copyOf(elements, 0));
-    }
+		return (ReadOnlyArray<T>) new ReadOnlyFastArray(ArrayUtil.copyOf(elements, 0));
+	}
     
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	static <T> ReadOnlyArray<T> of(T element) {
     	T[] newArray = (T[]) ArrayUtil.create(element.getClass(), 1);
-        newArray[0] = element;
+    	newArray[0] = element;
 
-        return new ReadOnlyFastArray(newArray);
+    	return new ReadOnlyFastArray(newArray);
+    }
+    
+    static ReadOnlyArray<Object> ofAll(Collection<Object> elements) {
+    	Object[] newArray = ArrayUtil.create(Object.class, elements.size());
+       	
+    	return Array.of(elements.toArray(newArray));
     }
     
     @SuppressWarnings("unchecked")
