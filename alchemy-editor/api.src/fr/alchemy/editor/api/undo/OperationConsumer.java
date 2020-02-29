@@ -17,6 +17,10 @@ public interface OperationConsumer {
 	 */
 	default void handleAddedProperty(Object property) {}
 	
+	default void handleAddedChild(Object parent, Object child) {}
+	
+	default void handleRemovedChild(Object parent, Object child) {}
+	
 	/**
 	 * Handles the provided removed property object using this <code>OperationConsumer</code>.
 	 * 

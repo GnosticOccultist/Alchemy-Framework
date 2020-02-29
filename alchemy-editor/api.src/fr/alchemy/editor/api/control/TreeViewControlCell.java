@@ -1,5 +1,6 @@
 package fr.alchemy.editor.api.control;
 
+import fr.alchemy.editor.api.undo.OperationConsumer;
 import fr.alchemy.utilities.Validator;
 import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
@@ -16,19 +17,19 @@ import javafx.scene.input.MouseEvent;
  * 
  * @author GnosticOccultist
  */
-public class TreeViewControlCell<E> extends TextFieldTreeCell<E> {
+public class TreeViewControlCell<O extends OperationConsumer, E> extends TextFieldTreeCell<E> {
 
 	/**
 	 * The tree view control.
 	 */
-	private final TreeViewControl<E> treeViewControl;
+	private final TreeViewControl<O, E> treeViewControl;
 	
 	/**
 	 * Instantiates a new <code>TreeViewControlCell</code> for the provided {@link TreeViewControl}.
 	 * 
 	 * @param treeViewControl The tree view control (not null).
 	 */
-	protected TreeViewControlCell(TreeViewControl<E> treeViewControl) {
+	protected TreeViewControlCell(TreeViewControl<O, E> treeViewControl) {
 		Validator.nonNull(treeViewControl, "The tree view control can't be null!");
 		this.treeViewControl = treeViewControl;
 		

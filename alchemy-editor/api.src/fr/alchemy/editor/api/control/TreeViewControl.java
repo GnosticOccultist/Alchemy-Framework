@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import fr.alchemy.editor.api.undo.OperationConsumer;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.array.Array;
 import javafx.scene.control.ContextMenu;
@@ -25,7 +26,7 @@ import javafx.scene.layout.VBox;
  * 
  * @author GnosticOccultist
  */
-public abstract class TreeViewControl<E> extends VBox {
+public abstract class TreeViewControl<O extends OperationConsumer, E> extends VBox {
 
 	/**
 	 * The tree to visualize a hierarchy of elements.
@@ -35,6 +36,10 @@ public abstract class TreeViewControl<E> extends VBox {
 	 * The consumer to invoke when selecting elements.
 	 */
 	private final Consumer<Array<?>> selectionConsumer;
+	/**
+	 * The operation consumer.
+	 */
+	private final O operationConsumer;
 	
 	/**
 	 * Instantiates a new <code>TreeViewControl</code> with no elements in the tree.
@@ -42,11 +47,12 @@ public abstract class TreeViewControl<E> extends VBox {
 	 * @param selectionMode     The selection mode for the tree (not null).
 	 * @param selectionConsumer The consumer to invoke when selecting elements (not null).
 	 */
-	public TreeViewControl(SelectionMode selectionMode, Consumer<Array<?>> selectionConsumer) {
+	public TreeViewControl(SelectionMode selectionMode, Consumer<Array<?>> selectionConsumer, O operationConsumer) {
 		Validator.nonNull(selectionMode, "The selection mode can't be null!");
 		Validator.nonNull(selectionConsumer, "The selection consumer can't be null!");
 		
 		this.selectionConsumer = selectionConsumer;
+		this.operationConsumer = operationConsumer;
 		createContent(selectionMode);
 	}
 	
@@ -80,7 +86,7 @@ public abstract class TreeViewControl<E> extends VBox {
 	 * 
 	 * @return A new control cell instance (not null).
 	 */
-	protected TreeViewControlCell<E> createControlCell() {
+	protected TreeViewControlCell<O, E> createControlCell() {
 		return new TreeViewControlCell<>(this);
 	}
 	
@@ -116,5 +122,9 @@ public abstract class TreeViewControl<E> extends VBox {
 	 */
 	protected TreeView<E> getTreeView() {
 		return treeView;
+	}
+	
+	public O getOperationConsumer() {
+		return operationConsumer;
 	}
 }

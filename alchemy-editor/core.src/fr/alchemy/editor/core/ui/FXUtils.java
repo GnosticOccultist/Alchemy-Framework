@@ -1,25 +1,18 @@
 package fr.alchemy.editor.core.ui;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import com.ss.rlib.common.util.array.Array;
-
-import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.array.Array;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseEvent;
@@ -27,82 +20,83 @@ import javafx.scene.input.MouseEvent;
 public final class FXUtils {
 
 	/**
-	 * No instantiation of <code>FXUtils</code>.
+	 * Private constructor to inhibit instantiation of <code>FXUtils</code>.
 	 */
 	private FXUtils() {}
 	
-    public static <T> TreeItem<T> findItemForValue(final TreeItem<T> root, final Object object) {
-
-        if (object == null) {
+	/**
+	 * Finds the {@link TreeItem} containing the provided object value if any in the given {@link TreeView}. 
+	 * The method will do a recursive check starting from the root of the tree to all descending children in the hierarchy.
+	 * 
+	 * @param treeView The tree view in which to search for the item (not null).
+	 * @param object   The object to find in the tree.
+	 * @return		   The tree item containing the provided object, or null if none.
+	 */
+	public static <T> TreeItem<T> findItemForValue(TreeView<T> treeView, Object object) {
+		Validator.nonNull(treeView, "The tree view can't be null!");
+		return findItemForValue(treeView.getRoot(), object);
+	}
+	
+	/**
+	 * Finds the {@link TreeItem} containing the provided object value if any. The method will do a 
+	 * recursive check starting from the provided item to all descending children in the hierarchy.
+	 * 
+	 * @param root	 The root tree item to start from.
+	 * @param object The object to find in the tree.
+	 * @return		 The tree item containing the provided object, or null if none.
+	 */
+    public static <T> TreeItem<T> findItemForValue(TreeItem<T> root, Object object) {
+        if(object == null) {
             return null;
         } else if (Objects.equals(root.getValue(), object)) {
             return root;
         }
 
-        final ObservableList<TreeItem<T>> children = root.getChildren();
-
-        if (!children.isEmpty()) {
-            for (final TreeItem<T> treeItem : children) {
-                final TreeItem<T> result = findItemForValue(treeItem, object);
-                if (result != null) {
+        ObservableList<TreeItem<T>> children = root.getChildren();
+        if(!children.isEmpty()) {
+            for(TreeItem<T> treeItem : children) {
+                TreeItem<T> result = findItemForValue(treeItem, object);
+                if(result != null) {
                     return result;
                 }
             }
         }
-
         return null;
     }
     
+    /**
+     * Return a {@link Stream} of all items present in a hierarchy starting from the given {@link TreeItem}.
+     * Note that it will only add non-null item to the stream.
+     * 
+     * @param root The root tree item to start from.
+     * @return	   A stream of all the tree items (not null).
+     */
     public static <T> Stream<TreeItem<T>> allItems(TreeItem<T> root) {
-    	List<TreeItem<T>> container = new ArrayList<>();
-        collectAllItems(container, root);
-        return container.stream();
+        return collectAllItems(null, root).stream();
     }
 
-    public static <T> void collectAllItems(final List<TreeItem<T>> container, final TreeItem<T> root) {
-        container.add(root);
+    /**
+     * Return an {@link Array} containing all items present in a hierarchy starting from the given {@link TreeItem}.
+     * Note that it will only add non-null item to the array.
+     * 
+     * @param store The array to store the items in, or null to create a new array.
+     * @param root  The root tree item to start from.
+     * @return		An array of all the tree items either the store or a new instance one.
+     */
+    public static <T> Array<TreeItem<T>> collectAllItems(Array<TreeItem<T>> store, TreeItem<T> root) {
+    	if(store == null) {
+    		store = Array.ofType(TreeItem.class);
+    	}
+    	if(root != null) {
+    		store.add(root);
+    	}
 
-        final ObservableList<TreeItem<T>> children = root.getChildren();
-
-        for (final TreeItem<T> child : children) {
-            collectAllItems(container, child);
-        }
-    }
-    
-    public static void fillComponents(Array<EditorComponent> container, Node node) {
-
-        if (node instanceof EditorComponent) {
-            container.add((EditorComponent) node);
-        }
-
-        if (node instanceof SplitPane) {
-        	ObservableList<Node> items = ((SplitPane) node).getItems();
-            items.forEach(child -> fillComponents(container, child));
-        } else if (node instanceof TabPane) {
-        	ObservableList<Tab> tabs = ((TabPane) node).getTabs();
-            tabs.forEach(tab -> fillComponents(container, tab.getContent()));
+    	ObservableList<TreeItem<T>> children = root.getChildren();
+        for(TreeItem<T> child : children) {
+            collectAllItems(store, child);
         }
         
-        if (!(node instanceof Parent)) {
-            return;
-        }
-
-        ObservableList<Node> nodes = ((Parent) node).getChildrenUnmodifiable();
-        nodes.forEach(child -> fillComponents(container, child));
-    }
-    
-    public static <T extends Node> void fillComponents(Array<T> container, Node node, Class<T> type) {
-
-    	if (type.isInstance(container)) {
-    		container.add(type.cast(node));
-    	}
-
-    	if (!(node instanceof Parent)) {
-    		return;
-    	}
-
-    	final ObservableList<Node> nodes = ((Parent) node).getChildrenUnmodifiable();
-    	nodes.forEach(child -> fillComponents(container, child, type));
+        return store;
     }
     
     /**
@@ -121,54 +115,6 @@ public final class FXUtils {
 
         final Point2D containerScene = node.localToScene(0, 0);
         return new Point2D(sceneX - containerScene.getX(), sceneY - containerScene.getY());
-    }
-    
-    /**
-     * Sets the vertical scroll speed of the provided {@link ScrollPane} using the given
-     * factor. It applies the factor to the delta Y of a scrolling event and compute the
-     * corresponding vertical scroll position.
-     * <p>
-     * Note that the content of the scroll-pane is expected to not be null, in order to
-     * listen to the scrolling events.
-     * 
-     * @param pane	 The scroll pane to change scrolling speed (not null).
-     * @param factor The factor to apply to the scrolling event.
-     */
-    public static void setVScrollSpeed(ScrollPane pane, float factor) {
-    	Validator.nonNull(pane, "The scroll-pane can't be null!");
-    	
-    	Node content = pane.getContent();
-    	assert content != null;
-    	
-    	content.setOnScroll(event -> {
-			double dy = event.getDeltaY() * factor;
-			double width = content.getBoundsInLocal().getWidth();
-			double vvalue = pane.getVvalue();
-			pane.setVvalue(vvalue - (dy / width));
-		});
-    }
-    
-    /**
-     * Moves an X or Y position value on-pixel.
-     * Lines drawn off-pixel look blurry. They should therefore have integer X and Y values.
-     * 
-     * @param position The position to move on-pixel.
-     * @return		   The position rounded to the nearest integer.
-     */
-    public static double moveOnPixel(final double position) {
-    	return Math.ceil(position);
-    }
-    
-    /**
-     * Moves an X or Y position value off-pixel.
-     * This is useful for a 1-pixel-wide stroke with a stroke-type of centered. The X and Y
-     * coordinates need to be off-pixel so that the stroke is on-pixel.
-     * 
-     * @param position The position to move on-pixel.
-     * @return		   The position rounded to the nearest integer.
-     */
-    public static double moveOffPixel(final double position) {
-    	return Math.ceil(position) - 0.5D;
     }
     
     /**
