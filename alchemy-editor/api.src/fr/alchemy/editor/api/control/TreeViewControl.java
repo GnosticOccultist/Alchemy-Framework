@@ -124,6 +124,12 @@ public abstract class TreeViewControl<O extends OperationConsumer, E> extends VB
 		return treeView;
 	}
 	
+	/**
+	 * Return the {@link OperationConsumer} in charge of handling the operation changes
+	 * for the <code>TreeViewControl</code>.
+	 * 
+	 * @return The operation consumer of the control.
+	 */
 	public O getOperationConsumer() {
 		return operationConsumer;
 	}

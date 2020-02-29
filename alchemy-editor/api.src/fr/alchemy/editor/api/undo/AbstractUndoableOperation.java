@@ -26,7 +26,7 @@ public abstract class AbstractUndoableOperation<O extends OperationConsumer> imp
 		doUndo(cast(editor));
 	}
 
-	protected abstract void doUndo(O editor);
+	protected abstract void doUndo(O consumer);
 
 	@Override
 	public final void redo(UndoableFileEditor editor) {
@@ -35,7 +35,7 @@ public abstract class AbstractUndoableOperation<O extends OperationConsumer> imp
 		doRedo(cast(editor));
 	}
 	
-	protected abstract void doRedo(O editor);
+	protected abstract void doRedo(O consumer);
 
 	@Override
 	public boolean canUndo() {
