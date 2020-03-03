@@ -2,10 +2,10 @@ package fr.alchemy.editor.api.editor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import fr.alchemy.editor.api.undo.OperationConsumer;
-import fr.alchemy.editor.api.undo.UndoableFileEditor;
-import fr.alchemy.editor.api.undo.UndoableOperation;
-import fr.alchemy.editor.api.undo.UndoableOperationControl;
+import fr.alchemy.editor.api.model.undo.OperationConsumer;
+import fr.alchemy.editor.api.model.undo.UndoableFileEditor;
+import fr.alchemy.editor.api.model.undo.UndoableOperation;
+import fr.alchemy.editor.api.model.undo.UndoableOperationControl;
 import fr.alchemy.utilities.Validator;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;

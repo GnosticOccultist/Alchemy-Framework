@@ -3,10 +3,10 @@ package fr.alchemy.editor.core.ui.component.dialog;
 import java.awt.Point;
 
 import fr.alchemy.editor.api.AlchemyDialog;
-import fr.alchemy.editor.api.undo.OperationConsumer;
+import fr.alchemy.editor.api.model.undo.OperationConsumer;
+import fr.alchemy.editor.core.model.undo.ModifyCountPropertyOperation;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
-import fr.alchemy.editor.core.ui.editor.undo.ModifyCountPropertyOperation;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;

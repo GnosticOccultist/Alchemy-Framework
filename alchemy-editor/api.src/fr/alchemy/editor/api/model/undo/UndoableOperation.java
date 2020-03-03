@@ -1,4 +1,4 @@
-package fr.alchemy.editor.api.undo;
+package fr.alchemy.editor.api.model.undo;
 
 /**
  * <code>UndoableOperation</code> represents an interface to implement an undoable operation which is executed inside

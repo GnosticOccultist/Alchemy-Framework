@@ -1,6 +1,6 @@
 package fr.alchemy.editor.api.control;
 
-import fr.alchemy.editor.api.undo.OperationConsumer;
+import fr.alchemy.editor.api.model.undo.OperationConsumer;
 import fr.alchemy.utilities.Validator;
 import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
@@ -44,15 +44,16 @@ public class TreeViewControlCell<O extends OperationConsumer, E> extends TextFie
 	 */
 	private void handleMouseClick(MouseEvent event) {
 		MouseButton button = event.getButton();
-		
-		if(button == MouseButton.SECONDARY) {
-			E element = getItem();
-			if(element == null) {
-				return;
-			}
-			
-			treeViewControl.requestContextMenu(getItem()).
-				ifPresent(menu -> menu.show(this, Side.BOTTOM, 0, 0));
+		if(button != MouseButton.SECONDARY) {
+			return;
 		}
+		
+		E element = getItem();
+		if(element == null) {
+			return;
+		}
+			
+		treeViewControl.requestContextMenu(getItem()).
+			ifPresent(menu -> menu.show(this, Side.BOTTOM, 0, 0));
 	}
 }

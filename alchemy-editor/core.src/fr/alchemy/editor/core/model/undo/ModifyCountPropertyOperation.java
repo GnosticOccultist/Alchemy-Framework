@@ -1,9 +1,9 @@
-package fr.alchemy.editor.core.ui.editor.undo;
+package fr.alchemy.editor.core.model.undo;
 
 import java.util.Collection;
 
-import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
-import fr.alchemy.editor.api.undo.OperationConsumer;
+import fr.alchemy.editor.api.model.undo.AbstractUndoableOperation;
+import fr.alchemy.editor.api.model.undo.OperationConsumer;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;

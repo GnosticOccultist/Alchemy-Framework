@@ -1,4 +1,4 @@
-package fr.alchemy.editor.api.undo;
+package fr.alchemy.editor.api.model.undo;
 
 /**
  * <code>AbstractUndoableOperation</code> is an abstract implementation of {@link UndoableOperation}.

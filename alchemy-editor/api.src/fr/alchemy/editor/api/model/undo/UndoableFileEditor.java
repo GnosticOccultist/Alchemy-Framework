@@ -1,4 +1,4 @@
-package fr.alchemy.editor.api.undo;
+package fr.alchemy.editor.api.model.undo;
 
 import fr.alchemy.editor.api.editor.FileEditor;
 
