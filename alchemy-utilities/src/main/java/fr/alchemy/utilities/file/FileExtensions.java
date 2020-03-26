@@ -51,7 +51,7 @@ public interface FileExtensions {
 	 * The Tab-seperated values format (TSV), values are seperated by 'tabs'
 	 * (columns) and lines (rows).
 	 */
-	String TSV_FORMAT = "csv";
+	String TSV_FORMAT = "tsv";
 	/**
 	 * The 'Ain't Markup Language' YAML format is a minimal syntax language.
 	 */

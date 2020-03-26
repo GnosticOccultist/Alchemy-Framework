@@ -242,7 +242,7 @@ public final class EventBus {
 				Class<?>[] parametersTypes = method.getParameterTypes();
 				if(parametersTypes.length == 0) {
 					throw new IllegalArgumentException("Method " + method + " has @EventSubscriber "
-							+ "annotation but requires no arguments. Such methods must require at "
+							+ "annotation but has no arguments. Such methods must require at "
 							+ "least one argument.");
 				}
 				
