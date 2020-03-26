@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import fr.alchemy.editor.api.editor.VisualNodesFileEditor;
 import fr.alchemy.editor.core.ui.component.nodes.DialogNodesContainer;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 
 public class DialogNodesFileEditor extends VisualNodesFileEditor<DialogNodesContainer> {
 

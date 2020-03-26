@@ -19,7 +19,7 @@ import fr.alchemy.editor.core.model.undo.ModifyCountPropertyOperation;
 import fr.alchemy.editor.core.ui.component.dialog.AddPropertyDialog;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

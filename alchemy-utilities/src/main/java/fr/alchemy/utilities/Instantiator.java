@@ -4,10 +4,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.jar.JarEntry;
 
 /**
- * <code>Instantiator</code> is a utility class designed to create an 
- * instance of a class easily and without handling the exceptions.
+ * <code>Instantiator</code> is a utility class designed to create an instance of a class easily and without handling the exceptions.
  * 
  * @version 0.1.0
  * @since 0.1.0
@@ -137,6 +138,54 @@ public final class Instantiator {
 		}
 		
 		return obj;
+	}
+	
+	/**
+	 * Creates a new instance with the provided {@link ClassLoader} and {@link JarEntry} and execute the given
+	 * {@link Predicate} on the new instance before returning it.
+	 * 
+	 * @param loader The class loader to load the class from a name (not null).
+	 * @param entry  The JAR entry corresponding to the class file to instantiate.
+	 * @param test	 The predicate to execute on the new instance.
+	 * @return	     A new instance of the class corresponding to the JAR entry or null if failed.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T fromJarEntry(ClassLoader loader, JarEntry entry, Predicate<Class<?>> test) {
+		Validator.nonNull(entry, "The JAR entry to load class from can't be null!");
+		Validator.check(entry.getName().endsWith(".class"), "The JAR entry must be a class file!");
+		
+		String translatedName = asReadableClassName(entry.getName());
+		try {
+			Class<?> clazz = loader.loadClass(translatedName);
+			if(test.test(clazz)) {
+				return (T) Instantiator.fromClass(clazz);
+			}
+		} catch (ClassNotFoundException ex) {
+			System.err.println("Instantiation failed, impossible to found class '" + translatedName + "'!");
+			ex.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Return a readable class name using the given initial name.
+	 * 
+	 * @param name The name of the class to translate (not null, not empty).
+	 * @return	   A readable class name which can be used to instantiate a class.
+	 */
+	private static String asReadableClassName(String name) {
+		Validator.nonEmpty(name, "The class name can't be null!");
+		StringBuilder result = new StringBuilder(name.length() - ".class".length());
+		for(int i = 0, length = name.length() - ".class".length(); i < length; i++) {
+			char ch = name.charAt(i);
+			if(ch == '/' || ch == '\\') {
+				ch = '.';
+			}
+			result.append(ch);
+		}
+
+		return result.toString();
 	}
 	
 	/**

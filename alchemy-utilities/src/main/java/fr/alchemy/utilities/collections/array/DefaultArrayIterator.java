@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.array;
+package fr.alchemy.utilities.collections.array;
 
 public class DefaultArrayIterator<E> implements ArrayIterator<E> {
 	

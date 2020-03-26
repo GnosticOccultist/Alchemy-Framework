@@ -1,6 +1,9 @@
-package fr.alchemy.utilities.array;
+package fr.alchemy.utilities.collections.array;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 public final class ArrayUtil {
 	
@@ -103,5 +106,21 @@ public final class ArrayUtil {
         }
 
         return result;
+    }
+    
+    public static <T> List<T> toList(T[] array) {
+    	List<T> list = new ArrayList<>(array.length);
+    	for(T element : array) {
+    		list.add(element);
+    	}
+    	
+    	return list;
+    }
+    
+    public static <T> T[] fill(T[] array, Supplier<T> factory) {
+    	for(int i = 0; i < array.length; i++) {
+    		array[i] = factory.get();
+    	}
+    	return array;
     }
 }

@@ -4,9 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import fr.alchemy.utilities.file.io.ProgressInputStream;
+import fr.alchemy.utilities.file.io.ProgressInputStream.ProgressListener;
 
 /**
  * <code>AlchemyFile</code> is a more complex implementation of {@link File} to manage
@@ -140,6 +146,55 @@ public class AlchemyFile {
 			}
 		}
 		return null;
+    }
+    
+    /**
+     * Open a {@link ProgressInputStream} using the URL of the file obtained
+     * by {@link #acquireInternalURL()}.
+     * 
+     * @return The progress input stream of the file.
+     */
+    public ProgressInputStream openProgressStream() {
+    	return openProgressStream(null);
+    }
+    
+    /**
+     * Open a {@link ProgressInputStream} using the URL of the file obtained by {@link #acquireInternalURL()},
+     * and the given {@link ProgressListener} to keep track of bytes read.
+     * 
+     * @return The progress input stream of the file.
+     */
+    public ProgressInputStream openProgressStream(ProgressListener listener) {
+    	URL url = acquireInternalURL();
+		if(url != null) {
+			try {
+				URLConnection connection = url.openConnection();
+				connection.setUseCaches(false);
+				
+				int size = connection.getContentLength();
+				return new ProgressInputStream(connection.getInputStream(), asPath(), size, listener);
+			} catch (IOException e) {
+				System.err.println("Error while opening input stream for file: " + toString());
+				e.printStackTrace();
+			}
+		}
+		return null;
+    }
+    
+    /**
+     * Return the <code>AlchemyFile</code> as a {@link Path} instance using a corresponding {@link URI}.
+     * 
+     * @return A path instance representing the file.
+     */
+    public Path asPath() {
+    	try {
+    		URL url = acquireInternalURL();
+			return Paths.get(url.toURI());
+		} catch (URISyntaxException e) {
+			System.err.println("Error while parsing String to URI for file: " + toString());
+			e.printStackTrace();
+		}
+    	return null;
     }
     
     @Override

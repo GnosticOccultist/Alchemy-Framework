@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.dictionnary;
+package fr.alchemy.utilities.collections.dictionnary;
 
 public class FastObjectDictionary<K, V> extends AbstractObjectDictionary<K, V> {
 

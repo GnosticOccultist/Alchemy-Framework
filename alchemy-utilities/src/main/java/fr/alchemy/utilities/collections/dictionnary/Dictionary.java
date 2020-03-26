@@ -1,7 +1,7 @@
-package fr.alchemy.utilities.dictionnary;
+package fr.alchemy.utilities.collections.dictionnary;
 
-import fr.alchemy.utilities.array.Array;
-import fr.alchemy.utilities.array.FastArray;
+import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.collections.array.FastArray;
 import fr.alchemy.utilities.pool.Reusable;
 
 public interface Dictionary<K, V> extends Iterable<V>, Reusable {

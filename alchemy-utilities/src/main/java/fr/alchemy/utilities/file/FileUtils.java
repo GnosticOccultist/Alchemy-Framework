@@ -1,10 +1,13 @@
 package fr.alchemy.utilities.file;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -16,8 +19,10 @@ import java.util.Objects;
 import java.util.Properties;
 
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.actions.BiModifierAction;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.file.io.ProgressInputStream;
+import fr.alchemy.utilities.file.io.ProgressInputStream.ProgressListener;
+import fr.alchemy.utilities.task.actions.BiModifierAction;
 
 /**
  * <code>FileUtils</code> provides utilities functions concerning files and directories.
@@ -191,6 +196,38 @@ public final class FileUtils {
 	}
 	
 	/**
+	 * Converts the given {@link Path} of multiple files into a {@link URL}.
+	 * 
+	 * @param files The array of file path to convert to URL (not null).
+	 * @return	  	An array of URL corresponding to each file path, or null if a malformation has occured.
+	 */
+	public static URL[] toURL(Array<Path> files) {
+		Validator.nonNull(files, "The array of file path can't be null!");
+		URL[] urls = files.stream()
+				.map(path -> FileUtils.toURL(path))
+				.toArray(URL[]::new);
+		return urls;
+	}
+	
+	/**
+	 * Converts the given {@link Path} of a file into a {@link URL}.
+	 * 
+	 * @param file The file path to convert to URL (not null).
+	 * @return	   A URL corresponding to file path, or null if a malformation has occured.
+	 */
+	public static URL toURL(Path file) {
+		Validator.nonNull(file, "The file path can't be null!");
+		try {
+			URL url = file.toUri().toURL();
+			return url;
+		} catch (MalformedURLException ex) {
+			System.err.println("A malformed URL as occured for file '" + file + "'");
+			ex.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * Update internally the path of the {@link AlchemyFile} if needed.
 	 * 
 	 * @param path The path to change to.
@@ -254,6 +291,33 @@ public final class FileUtils {
 	public static InputStream openStream(String path) {
 		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
 		return updateInternalFile(path).openStream();
+	}
+	
+	/**
+	 * Open a {@link ProgressInputStream} from the provided path of a file.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param path The path of the file to get an input stream.
+	 * @return	   The input stream to the file.
+	 */
+	public static ProgressInputStream openProgressStream(String path) {
+		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
+		return updateInternalFile(path).openProgressStream();
+	}
+	
+	/**
+	 * Open a {@link ProgressInputStream} from the provided path of a file using the given
+	 * {@link ProgressListener} to keep track of bytes being read.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param path The path of the file to get an input stream.
+	 * @return	   The input stream to the file.
+	 */
+	public static ProgressInputStream openProgressStream(String path, ProgressListener listener) {
+		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
+		return updateInternalFile(path).openProgressStream(listener);
 	}
 	
 	/**
@@ -369,5 +433,14 @@ public final class FileUtils {
 			ex.printStackTrace();
 		}
 		return false;
+	}
+	
+	public static void safeClose(Closeable resource) {
+		try {
+			resource.close();
+		} catch (IOException ex) {
+			System.err.println("An error has occured while trying to close " + resource + "!");
+			ex.printStackTrace();
+		}
 	}
 }

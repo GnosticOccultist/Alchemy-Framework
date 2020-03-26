@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;

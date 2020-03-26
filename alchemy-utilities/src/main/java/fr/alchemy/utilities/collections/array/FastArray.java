@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.array;
+package fr.alchemy.utilities.collections.array;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -157,11 +157,6 @@ public class FastArray<E> extends AbstractArray<E> {
 
 	@Override
 	public boolean removeAll(Collection<?> arg0) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> arg0) {
 		throw new UnsupportedOperationException();
 	}
 }

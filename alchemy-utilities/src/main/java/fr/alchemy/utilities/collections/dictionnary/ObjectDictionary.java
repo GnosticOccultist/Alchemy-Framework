@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.dictionnary;
+package fr.alchemy.utilities.collections.dictionnary;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -6,8 +6,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import fr.alchemy.utilities.array.Array;
-import fr.alchemy.utilities.array.FastArray;
+import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.collections.array.FastArray;
 
 public interface ObjectDictionary<K, V> extends Dictionary<K, V> {
 

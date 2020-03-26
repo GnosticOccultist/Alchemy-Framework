@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

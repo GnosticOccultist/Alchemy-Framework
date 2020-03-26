@@ -3,7 +3,7 @@ package fr.alchemy.editor.api.ui.component.nodes;
 import java.util.Collection;
 
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;

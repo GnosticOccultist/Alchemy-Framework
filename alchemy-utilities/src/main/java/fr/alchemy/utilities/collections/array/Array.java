@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.array;
+package fr.alchemy.utilities.collections.array;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -13,6 +13,10 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	
 	static <T> Array<T> ofType(Class<? super T> type) {
 		return new FastArray<T>(type);
+	}
+	
+	static <T> Array<T> ofType(Class<? super T> type, int size) {
+		return new FastArray<T>(type, size);
 	}
     
 	@SuppressWarnings("unchecked")
@@ -191,6 +195,28 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
      */
     default boolean isEmpty() {
         return size() < 1;
+    }
+    
+    default boolean retainAll(Array<?> target) {
+        E[] array = array();
+        for(int i = 0, length = size(); i < length; i++) {
+            if(!target.contains(array[i])) {
+                fastRemove(i--);
+                length--;
+            }
+        }
+        return true;
+    }
+    
+    default boolean retainAll(Collection<?> target) {
+        E[] array = array();
+        for(int i = 0, length = size(); i < length; i++) {
+            if(!target.contains(array[i])) {
+                fastRemove(i--);
+                length--;
+            }
+        }
+        return true;
     }
     
     default ReadOnlyArray<E> readOnly() {

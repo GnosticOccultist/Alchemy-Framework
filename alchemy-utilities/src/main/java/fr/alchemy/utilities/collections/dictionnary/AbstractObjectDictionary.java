@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.dictionnary;
+package fr.alchemy.utilities.collections.dictionnary;
 
 import java.util.Iterator;
 import java.util.function.BiFunction;
@@ -6,7 +6,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 
 public abstract class AbstractObjectDictionary<K, V> extends AbstractDictionary<K, V, ObjectEntry<K, V>> implements ObjectDictionary<K, V> {
 

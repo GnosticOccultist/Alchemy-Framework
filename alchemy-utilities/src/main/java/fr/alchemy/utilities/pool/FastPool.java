@@ -2,7 +2,7 @@ package fr.alchemy.utilities.pool;
 
 import java.util.Optional;
 
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 
 /**
  * <code>FastPool</code> is wrapper around an {@link Array} to easily retrieve and re-inject element instances.

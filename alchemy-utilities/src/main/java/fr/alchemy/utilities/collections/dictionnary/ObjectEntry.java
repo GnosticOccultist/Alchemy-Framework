@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.dictionnary;
+package fr.alchemy.utilities.collections.dictionnary;
 
 public class ObjectEntry<K, V> implements Entry<ObjectEntry<K, V>, V> {
 

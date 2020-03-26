@@ -11,7 +11,7 @@ import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.event.EventBus;
 import fr.alchemy.utilities.event.EventListener;
 import fr.alchemy.utilities.event.EventType;

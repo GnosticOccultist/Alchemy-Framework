@@ -7,7 +7,7 @@ import fr.alchemy.editor.api.model.undo.OperationConsumer;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 
 /**
  * <code>ModifyCountPropertyOperation</code> is an implementation of {@link AbstractUndoableOperation}, which is 

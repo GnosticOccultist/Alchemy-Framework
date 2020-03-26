@@ -6,7 +6,7 @@ import fr.alchemy.editor.core.ui.editor.nodes.DialogNodesFileEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.dictionnary.ObjectDictionary;
+import fr.alchemy.utilities.collections.dictionnary.ObjectDictionary;
 import fr.alchemy.utilities.logging.FactoryLogger;
 import fr.alchemy.utilities.logging.Logger;
 

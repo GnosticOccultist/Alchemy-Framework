@@ -1,10 +1,10 @@
-package fr.alchemy.utilities.dictionnary;
+package fr.alchemy.utilities.collections.dictionnary;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import fr.alchemy.utilities.array.Array;
-import fr.alchemy.utilities.array.ArrayUtil;
+import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.collections.array.ArrayUtil;
 import fr.alchemy.utilities.pool.FastReusablePool;
 
 public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements Dictionary<K, V> {
