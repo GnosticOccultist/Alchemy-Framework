@@ -4,8 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * <code>SystemUtils</code> provides utilities functions concerning the system and
- * its properties.
+ * <code>SystemUtils</code> provides utility functions concerning the system and its properties.
  * 
  * @version 0.1.0
  * @since 0.1.0

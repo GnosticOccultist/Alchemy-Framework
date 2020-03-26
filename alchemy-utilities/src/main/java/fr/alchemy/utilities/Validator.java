@@ -309,6 +309,37 @@ public final class Validator {
 	}
 	
 	/**
+	 * Validate a non-null and non-empty byte array as a method argument.
+	 * 
+	 * @param value	The byte array to validate (not null, not empty).
+	 * @return 		The byte array validated.
+	 * 
+	 * @throws IllegalArgumentException If the value is null or empty.
+	 */
+	public static byte[] nonEmpty(byte[] value) {
+		return nonEmpty(value, DEFAULT_EMPTY_MESSAGE);
+	}
+	
+	/**
+	 * Validate a non-null and non-empty byte array as a method argument.
+	 * 
+	 * @param value	  The byte array to validate (not null, not empty).
+	 * @param message The message to be thrown with the exception.
+	 * @return 		  The byte array validated.
+	 * 
+	 * @throws IllegalArgumentException If the value is null or empty, with the specified message.
+	 */
+	public static byte[] nonEmpty(byte[] value, String message) {
+		nonNull(value, DEFAULT_NULL_MESSAGE);
+		
+		if(value.length == 0) {
+			throw new IllegalArgumentException(message);
+		}
+		
+		return value;
+	}
+	
+	/**
 	 * Validate a non-null and non-empty object collection as a method argument.
 	 * 
 	 * @param value	The object collection to validate (not null, not empty).

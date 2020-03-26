@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.actions;
+package fr.alchemy.utilities.task.actions;
 
 /**
  * A functional interface allowing the user to perform a certain type of action to the first invoked object

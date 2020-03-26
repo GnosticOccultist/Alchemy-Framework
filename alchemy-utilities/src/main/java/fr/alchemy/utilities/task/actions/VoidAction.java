@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.actions;
+package fr.alchemy.utilities.task.actions;
 
 import java.util.function.Consumer;
 

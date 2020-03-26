@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.concurrent;
+package fr.alchemy.utilities.task;
 
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
  * method invocation.
  * <p>
  * This implementation is very simple and doesn't support waiting for tasks to complete during shutdown.
+ * 
+ * @version 0.1.0
+ * @since 0.1.0
  * 
  * @author GnosticOccultist
  */
