@@ -44,7 +44,7 @@ public abstract class AbstractObjectDictionary<K, V> extends AbstractDictionary<
         ObjectEntry<K, V>[] entries = entries();
         ObjectEntry<K, V> entry = entries[index];
 
-        ObjectEntry<K, V> newEntry = entryPool.take(ObjectEntry::new);
+        ObjectEntry<K, V> newEntry = entryPool.retrieve(ObjectEntry::new);
         newEntry.set(hash, key, value, entry);
 
         entries[index] = newEntry;
@@ -169,7 +169,7 @@ public abstract class AbstractObjectDictionary<K, V> extends AbstractDictionary<
         V value = old == null ? null : old.getValue();
 
         if(old != null) {
-            entryPool.put(old);
+            entryPool.inject(old);
         }
 
         return value;

@@ -136,7 +136,7 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
         for(E entry : entries) {
             while (entry != null) {
                 next = entry.getNext();
-                entryPool.put(entry);
+                entryPool.inject(entry);
                 entry = next;
             }
         }
