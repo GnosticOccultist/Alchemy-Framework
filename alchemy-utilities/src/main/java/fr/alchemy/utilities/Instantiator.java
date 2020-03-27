@@ -106,7 +106,7 @@ public final class Instantiator {
 	 * The class cannot be null.
 	 * 
 	 * @param clazz  The class to create the instance from.
-	 * @param action The action to perform on the new instance.
+	 * @param map	 The action to perform on the new instance.
 	 * @return	     A new instance of the class or null if an error occured.
 	 */
 	public static <T, C> C fromClass(Class<T> clazz, Function<? super T, ? extends C> map) {

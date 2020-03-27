@@ -121,7 +121,7 @@ public class AlchemyLogger implements Logger {
 	 * 
 	 * @param level		The level of the message (not null).
 	 * @param message   The message to print.
-	 * @param throwable The exception to print (not null).
+	 * @param exception The exception to print (not null).
 	 */
 	@Override
 	public void print(LoggerLevel level, String message, Throwable exception) {

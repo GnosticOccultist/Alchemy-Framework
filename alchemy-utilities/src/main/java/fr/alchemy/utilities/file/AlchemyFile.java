@@ -162,7 +162,8 @@ public class AlchemyFile {
      * Open a {@link ProgressInputStream} using the URL of the file obtained by {@link #acquireInternalURL()},
      * and the given {@link ProgressListener} to keep track of bytes read.
      * 
-     * @return The progress input stream of the file.
+     * @param listener The listener to assign to the input stream, or null for none.
+     * @return 		   The progress input stream of the file.
      */
     public ProgressInputStream openProgressStream(ProgressListener listener) {
     	URL url = acquireInternalURL();

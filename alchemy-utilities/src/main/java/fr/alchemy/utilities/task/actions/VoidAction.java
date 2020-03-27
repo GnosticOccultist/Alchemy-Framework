@@ -17,9 +17,9 @@ public interface VoidAction<T> extends Consumer<T> {
 	/**
 	 * Perform the action. 
 	 * 
-	 * @param object The object to perform the action with.
+	 * @param element The element to perform the action with.
 	 */
-	void perform(final T object);
+	void perform(T element);
 	
 	@Override
 	default void accept(T t) {

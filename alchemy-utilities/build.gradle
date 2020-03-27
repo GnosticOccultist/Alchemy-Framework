@@ -1,12 +1,3 @@
-
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-
-group = 'fr.alchemy'
-version = '0.1.0'
-
 buildscript {
 	repositories {
 		mavenCentral()
@@ -14,44 +5,71 @@ buildscript {
 	}
 	
 	dependencies {
-	
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
 	}
 }
+
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+rootProject.version = '0.1.0'
+group = 'com.github.gnosticoccultist'
 
 repositories {
 	jcenter()
     mavenCentral()
-    maven {
-      url = uri("https://repo1.maven.org/maven2")
-    }
 }
 
-jar {
-    baseName = 'alchemy-utilities'
-    version =  '0.1.0'
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
 }
 
 task sourcesJar(type: Jar) {
-    from sourceSets.main.java
     classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    from 'build/docs/javadoc'
-    classifier 'javadoc'
+artifacts {
+    archives javadocJar, sourcesJar
 }
 
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
-            artifact sourcesJar
-            artifact javadocJar
+			artifact sourcesJar
+			artifact javadocJar
+			version = rootProject.version
+			afterEvaluate {
+				artifactId = 'alchemy-utilities'
+				groupId = rootProject.group
+			}
 		}
 	}
-	repositories {
-  	     maven {
-    	  url = uri("https://repo1.maven.org/maven2")
-    	}
-    }
+}
+
+bintray {
+	afterEvaluate {
+ 		user = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : ""
+ 		key = project.hasProperty("bintrayKey") ?  project.property("bintrayKey") : ""
+ 		publications = ['mavenJava']
+ 		pkg {
+ 			repo = 'maven'
+ 			name = 'com.github.gnosticoccultist.' + 'alchemy.utilities'
+ 			licenses = ['MIT']
+ 			websiteUrl = 'https://github.com/GnosticOccultist/Alchemy-Framework'
+	 		vcsUrl = 'https://github.com/GnosticOccultist/Alchemy-Framework.git'
+	 		issueTrackerUrl = 'https://github.com/GnosticOccultist/Alchemy-Framework/issues'
+	 		githubRepo = 'GnosticOccultist/Alchemy-Framework'
+	 		githubReleaseNotesFile = 'README.md'
+	 		version {
+   				name = rootProject.version
+                desc = rootProject.version
+                released = new Date()
+			}
+		}
+	}
 }

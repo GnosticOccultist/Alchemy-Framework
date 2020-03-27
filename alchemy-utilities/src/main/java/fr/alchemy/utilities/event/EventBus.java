@@ -67,7 +67,7 @@ public final class EventBus {
 	}
 	
 	/**
-	 * Private constructor to inhibit instantiation of this class.
+	 * Private constructor to inhibit instantiation of <code>EventBus</code>.
 	 */
 	private EventBus() {}
 	
@@ -77,6 +77,8 @@ public final class EventBus {
 	 * <p>
 	 * This is the same as calling {@link EventBus#publishEvent(EventType, Object)}, 
 	 * except it first get the singleton-instance of the event bus.
+	 * 
+	 * @param <E> The event's type.
 	 * 
 	 * @param type	The type of event to be delivered.
 	 * @param event The event to publish.
@@ -88,6 +90,8 @@ public final class EventBus {
 	/**
 	 * Publishes the specified event to the <code>EventBus</code>, delivering it 
 	 * to all listeners registered for the particular {@link EventType}.
+	 * 
+	 * @param <E> The event's type.
 	 * 
 	 * @param type  The type of event to be delivered.
 	 * @param event The event to publish.
@@ -114,6 +118,8 @@ public final class EventBus {
 	 * This is the same as calling {@link #addEventListener(EventType, EventListener)},
 	 * except it first get the singleton-instance of the event bus.
 	 * 
+	 * @param <E> The event's type.
+	 * 
 	 * @param type	   The type of event.
 	 * @param listener The event listener to register.
 	 */
@@ -124,6 +130,8 @@ public final class EventBus {
 	/**
 	 * Adds an {@link EventListener} object that will be notified about events of the
 	 * specified {@link EventType}.
+	 * 
+	 * @param <E> The event's type.
 	 * 
 	 * @param type	   The type of event.
 	 * @param listener The event listener to register.
@@ -139,6 +147,8 @@ public final class EventBus {
 	 * This is the same as calling {@link #removeEventListener(EventType, EventListener)},
 	 * except it first get the singleton-instance of the event bus.
 	 * 
+	 * @param <E> The event's type.
+	 * 
 	 * @param type	   The type of event.
 	 * @param listener The event listener to unregister.
 	 */
@@ -150,6 +160,8 @@ public final class EventBus {
 	 * Removes the {@link EventListener} object that will be notified about events of the
 	 * specified {@link EventType}.
 	 * 
+	 * @param <E> The event's type.
+	 * 
 	 * @param type	   The type of event.
 	 * @param listener The event listener to unregister.
 	 */
@@ -159,7 +171,9 @@ public final class EventBus {
 	
 	/**
 	 * Removes the {@link EventListener} object that will be notified about events of any
-	 * {@link EventType}
+	 * {@link EventType}.
+	 * 
+	 * @param <E> The event's type.
 	 * 
 	 * @param listener The event listener to unregister from every types.
 	 */
@@ -203,8 +217,8 @@ public final class EventBus {
 	 * Removes a generic listener which have been registered using {@link #addListenerMethods(Object, EventType...)}
 	 * from any of the specified registered {@link EventType}.
 	 * 
-	 * @param type	   The type of event.
 	 * @param listener The event listener to unregister.
+	 * @param types	   The types of event.
 	 */
 	@SuppressWarnings("unchecked")
 	public void removeListenerMethods(Object listener, EventType...types) {

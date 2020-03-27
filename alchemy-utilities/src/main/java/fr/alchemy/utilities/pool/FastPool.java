@@ -38,7 +38,7 @@ public class FastPool<E> {
 	 * and of the given initial size.
 	 * 
 	 * @param type The type of element instances to contain (not null).
-	 * @param size The size of the pool (&gl;0).
+	 * @param size The size of the pool (&gt;0).
 	 */
 	public FastPool(Class<? super E> type, int size) {
 		this.pool = Array.ofType(type, size);
@@ -81,13 +81,13 @@ public class FastPool<E> {
 	 * @see #remove(Object)
 	 */
 	public E retrieve() {
-		E object = pool.pop();
+		E element = pool.pop();
 		
-		if(object == null) {
+		if(element == null) {
 			return null;
 		}
 		
-		return object;
+		return element;
 	}
 	
 	/**

@@ -31,7 +31,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	 * to contain and of the given initial size.
 	 * 
 	 * @param type The type of element instances to contain (not null).
-	 * @param size The size of the pool (&gl;0).
+	 * @param size The size of the pool (&gt;0).
 	 */
 	public FastReusablePool(Class<? super E> type, int size) {
 		super(type, size);
@@ -43,10 +43,10 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	 * @param element The element to inject into the pool (not null).
 	 */
 	@Override
-	public void inject(E object) {
-		Validator.nonNull(object, "The element to inject can't be null!");
-		object.free();
-		super.inject(object);
+	public void inject(E element) {
+		Validator.nonNull(element, "The element to inject can't be null!");
+		element.free();
+		super.inject(element);
 	}
 	
 	/**
@@ -60,13 +60,13 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	 */
 	@Override
 	public E retrieve() {
-		E object = super.retrieve();
+		E element = super.retrieve();
 		
-		if(object != null) {
-			object.reuse();
+		if(element != null) {
+			element.reuse();
 		}
 		
-		return object;
+		return element;
 	}
 
 	/**

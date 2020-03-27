@@ -13,10 +13,11 @@ package fr.alchemy.utilities.task.actions;
 public interface BiModifierAction<T, U> {
 	
 	/**
-	 * Performs a modification to the provided first element and
-	 * return it.
+	 * Performs a modification to the provided first element and return it.
 	 * 
-	 * @return The modified object.
+	 * @param t The first element to modify with the second.
+	 * @param u The second element to modify the first.
+	 * @return  The modified element.
 	 */
 	T modify(T t, U u);
 }
