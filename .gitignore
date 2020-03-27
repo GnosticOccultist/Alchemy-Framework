@@ -38,3 +38,4 @@ target/
 .metadata/.plugins/
 .recommenders/
 .metadata/
+alchemy-utilities/gradle.properties
