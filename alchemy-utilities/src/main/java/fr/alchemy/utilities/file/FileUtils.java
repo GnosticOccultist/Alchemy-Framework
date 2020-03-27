@@ -312,8 +312,9 @@ public final class FileUtils {
 	 * <p>
 	 * The path cannot be null or empty.
 	 * 
-	 * @param path The path of the file to get an input stream.
-	 * @return	   The input stream to the file.
+	 * @param path 	   The path of the file to get an input stream.
+	 * @param listener The listener to assign to the input stream, or null for none.
+	 * @return		   The input stream to the file.
 	 */
 	public static ProgressInputStream openProgressStream(String path, ProgressListener listener) {
 		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
@@ -419,8 +420,8 @@ public final class FileUtils {
 	/**
 	 * Creates a file contained in the given {@link Path} if it doesn't already exist.
 	 * 
-	 * @param directory The path from which to create the file.
-	 * @return			Whether the file has been created or already existed.
+	 * @param file The path from which to create the file.
+	 * @return	   Whether the file has been created or already existed.
 	 */
 	public static boolean createFile(Path file) {
 		try {

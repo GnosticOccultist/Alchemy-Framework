@@ -1,11 +1,18 @@
 package fr.alchemy.utilities;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
+import java.util.stream.Collectors;
+
+import fr.alchemy.utilities.collections.array.ArrayUtil;
 
 /**
  * <code>Instantiator</code> is a utility class designed to create an instance of a class easily and without handling the exceptions.
@@ -23,53 +30,72 @@ public final class Instantiator {
 	private Instantiator() {}
 	
 	/**
-	 * Creates a new instance with the provided class name.
-	 * <p>
-	 * The class name cannot be empty or null.
+	 * Creates a new instance of the class with the given name using reflection. The class 
+	 * must define a public or protected empty constructor.
 	 * 
-	 * @param className The name to create the class from.
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param className The name of the class to instantiate (not null, not empty).
 	 * @return			A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromNameWith(String, Object...)
+	 * @see #fromNameWith(String, Consumer, Object...)
 	 */
 	public static <T> T fromName(String className) {
-		return fromNameWith(className, null, null);
+		return fromNameWith(className, null, ArrayUtil.EMPTY_OBJECT_ARRAY);
 	}
 
 	/**
-	 * Creates a new instance with the provided class name.
-	 * <p>
-	 * The class name cannot be empty or null.
+	 * Creates a new instance of the class with the given name using reflection. The class 
+	 * must define a public or protected constructor with either no arguments or all the arguments 
+	 * of the given type in order to work correctly.
 	 * 
-	 * @param className The name to create the class from.
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param className The name of the class to instantiate (not null, not empty).
+	 * @param args 		The arguments to use in the constructor, or null for none.
 	 * @return			A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromName(String)
+	 * @see #fromNameWith(String, Consumer, Object...)
 	 */
-	public static <T> T fromNameWith(String className, Object arg) {
-		return fromNameWith(className, null, arg);
+	public static <T> T fromNameWith(String className, Object... args) {
+		return fromNameWith(className, null, args);
 	}
 	
 	/**
-	 * Creates a new instance with the provided class name and performs the provided
-	 * action with it.
+	 * Creates a new instance of the class with the given name using reflection. The class 
+	 * must define a public or protected constructor with either no arguments or all the arguments 
+	 * of the given type in order to work correctly.
 	 * <p>
-	 * The class name cannot be empty or null.
+	 * After the instance has been created the given {@link Consumer} is used on it and the 
+	 * instance is returned.
 	 * 
-	 * @param className The name to create the class from.
-	 * @param action    The action to perform on the new instance.
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param className The name of the class to instantiate (not null, not empty).
+	 * @param action    The action to perform on the new instance (not null).
+	 * @param args 		The arguments to use in the constructor, or null for none.
 	 * @return			A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromName(String)
+	 * @see #fromNameWith(String, Object...)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T fromNameWith(String className, Consumer<T> action, Object arg) {
-		Validator.nonEmpty(className);
+	public static <T> T fromNameWith(String className, Consumer<T> action, Object... args) {
+		Validator.nonEmpty(className, "The class name can't be empty or null!");
 		
 		T obj = null;
 		try {
 			Class<?> clazz = Class.forName(className);
-			if(arg != null) {
-				obj = (T) clazz.getConstructor(arg.getClass()).newInstance(arg);
+			if(args != null && args.length > 0) {
+				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
+				obj = (T) clazz.getConstructor(argTypes.toArray(new Class[argTypes.size()])).newInstance(args);
 			} else {
 				obj = (T) clazz.getConstructor().newInstance();
 			}
 			
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException ex) {
 			System.err.println("Unable to find the class: '" + className + "' !");
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
 				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
@@ -84,13 +110,16 @@ public final class Instantiator {
 	}
 	
 	/**
-	 * Creates a new instance with the provided class and performs the provided
-	 * action with it.
+	 * Creates a new instance of the provided class using reflection. The class must define
+	 * a public or protected empty constructor in order to work correctly.
 	 * <p>
-	 * The class cannot be null.
+	 * After the instance has been created the given {@link Consumer} is used on it and the 
+	 * instance is returned.
 	 * 
-	 * @param clazz  The class to create the instance from.
-	 * @param action The action to perform on the new instance.
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param clazz  The class to instantiate (not null).
+	 * @param action The action to perform on the new instance (not null).
 	 * @return	     A new instance of the class or null if an error occured.
 	 */
 	public static <T> T fromClassAndApply(Class<T> clazz, Consumer<T> action) {
@@ -100,36 +129,49 @@ public final class Instantiator {
 	}
 	
 	/**
-	 * Creates a new instance with the provided class and performs the provided
-	 * action with it.
+	 * Creates a new instance of the provided class using reflection. The class must define
+	 * a public or protected empty constructor in order to work correctly.
 	 * <p>
-	 * The class cannot be null.
+	 * After the instance has been created the given mapping {@link Function} is used on it
+	 * and the result is returned.
 	 * 
-	 * @param clazz  The class to create the instance from.
-	 * @param map	 The action to perform on the new instance.
-	 * @return	     A new instance of the class or null if an error occured.
+	 * @param <T> The type of object to instantiate.
+	 * @param <C> The type of object that the mapping function is returning.
+	 * 
+	 * @param clazz The class to instantiate (not null).
+	 * @param map	The mapping action to perform on the new instance (not null).
+	 * @return	    A new instance of the class or null if an error occured.
 	 */
 	public static <T, C> C fromClass(Class<T> clazz, Function<? super T, ? extends C> map) {
-		Validator.nonNull(map);
+		Validator.nonNull(map, "The mapping action can't be null!");
 		
 		T obj = fromClass(clazz);
 		return map.apply(obj);
 	}
 	
 	/**
-	 * Creates a new instance with the provided class.
-	 * <p>
-	 * The class cannot be null.
+	 * Creates a new instance of the provided class using reflection. The class must define
+	 * a public or protected empty constructor in order to work correctly.
 	 * 
-	 * @param clazz The class to create the instance from.
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param clazz The class to instantiate (not null).
 	 * @return	    A new instance of the class or null if an error occured.
 	 */
 	public static <T> T fromClass(Class<T> clazz) {
-		Validator.nonNull(clazz);
+		Validator.nonNull(clazz, "The class to instantiate can't be null!");
 		
 		T obj = null;
 		try {			
-			obj = (T) clazz.getConstructor().newInstance();
+			Constructor<T> constructor = clazz.getDeclaredConstructor();
+			if(Modifier.isProtected(constructor.getModifiers())) {
+				/*
+				 * Only access protected constructor not private ones for security. 
+				 */
+				constructor.setAccessible(true);
+			}
+			
+			obj = (T) constructor.newInstance();
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
 				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
@@ -143,6 +185,8 @@ public final class Instantiator {
 	/**
 	 * Creates a new instance with the provided {@link ClassLoader} and {@link JarEntry} and execute the given
 	 * {@link Predicate} on the new instance before returning it.
+	 * 
+	 * @param <T> The type of object to instantiate.
 	 * 
 	 * @param loader The class loader to load the class from a name (not null).
 	 * @param entry  The JAR entry corresponding to the class file to instantiate.
@@ -189,21 +233,21 @@ public final class Instantiator {
 	}
 	
 	/**
-	 * Invokes the specified {@link Method} contained in the given class instance using
-	 * the argument. The function also return whether the invokation has been successfully made. 
+	 * Invokes the specified {@link Method} contained in the given class instance using the provided
+	 * objects as arguments. The function also return whether the invokation has been successfully made. 
 	 * 
-	 * @param method		The method to invoke (should be accessible).
-	 * @param classInstance The instance of the class containing the method.
-	 * @param arg			The argument to use for the method.
+	 * @param method		The method to invoke which should be accessible (not null).
+	 * @param classInstance The instance of the class containing the method (not null).
+	 * @param args			The argument to use for the method or null for none.
 	 * @return				Whether the invokation has been successfully made.
 	 */
-	public static boolean invokeMethod(Method method, Object classInstance, Object arg) {
+	public static boolean invokeMethod(Method method, Object classInstance, Object... args) {
 		try {
-			method.invoke(classInstance, arg);
+			method.invoke(classInstance, args);
 			return true;
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
 			System.err.println("Invokation of the method: " + method.getName() + " failed, for the specified class instance " 
-					+ classInstance.getClass().getSimpleName() + " and for the argument " + arg + "!");
+					+ classInstance.getClass().getSimpleName() + " and for the argument " + Arrays.toString(args) + "!");
 		}
 		return false;
 	}
