@@ -48,6 +48,8 @@ public class EventType<E> {
 	 * Creates a new <code>EventType</code> with the given name and for the 
 	 * specified event class.
 	 * 
+	 * @param <E> The event's type.
+	 * 
 	 * @param name		 The name of the event type.
 	 * @param eventClass The class of the event.
 	 * @return			 A new event type instance.
@@ -59,6 +61,8 @@ public class EventType<E> {
 	/**
 	 * Creates a new <code>EventType</code> with the given name and for the 
 	 * specified event class.
+	 * 
+	 * @param <E> The event's type.
 	 * 
 	 * @param name		 The name of the event type.
 	 * @param eventClass The class of the event.

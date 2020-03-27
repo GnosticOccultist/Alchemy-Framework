@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
-import fr.alchemy.editor.api.editor.FileEditorRegistry;
 import fr.alchemy.editor.api.editor.FileEditor;
+import fr.alchemy.editor.api.editor.FileEditorRegistry;
 import fr.alchemy.editor.api.editor.layout.EditorLayout;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
@@ -62,8 +62,11 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 			tab.setContent(editor.getUIPage());
 			tab.setOnCloseRequest(e -> detach(component));
 			getContent().getSelectionModel().select(tab);
-			editor.dirtyProperty().addListener((observable, oldValue, newValue) ->
-			tab.setText(newValue == Boolean.TRUE ? "*" + editor.getName() : editor.getName()));
+			editor.dirtyProperty().addListener((observable, oldValue, newValue) -> {
+				String prefix = newValue == Boolean.TRUE ? "*" : "";
+				tab.setText(prefix + editor.getName());
+			});
+				
 				
 			editor.getUIPage().prefHeightProperty().bind(heightProperty());
 			//EditorConfig.config().addOpenedFile(name, editor.getFile().toString());

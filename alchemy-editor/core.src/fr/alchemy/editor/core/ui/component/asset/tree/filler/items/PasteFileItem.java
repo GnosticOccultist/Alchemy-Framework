@@ -8,7 +8,7 @@ import java.util.List;
 
 import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.image.Image;

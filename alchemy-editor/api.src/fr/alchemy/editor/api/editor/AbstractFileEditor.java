@@ -1,9 +1,10 @@
 package fr.alchemy.editor.api.editor;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
-import fr.alchemy.utilities.array.Array;
+import fr.alchemy.utilities.collections.array.Array;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -107,7 +108,29 @@ public abstract class AbstractFileEditor<R extends Region> implements FileEditor
 	public boolean open(Path file) {
 		this.file = file;
 		
-		return false;
+		try {
+			doOpen();
+			loadState();
+			return true;
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+	
+	/**
+	 * Performs the main operation to open a file in the <code>AbstractFileEditor</code>. The path of
+	 * the opened file is already set with the {@link #open(Path)} method.
+	 * 
+	 * @throws IOException Thrown if the file failed to be read.
+	 */
+	protected abstract void doOpen() throws IOException;
+	
+	/**
+	 * Loads the state of the <code>AbstractFileEditor</code> after opening a file to ensure that the 
+	 * editor options and file are matching.
+	 */
+	protected void loadState() {
+		
 	}
 	
 	@Override

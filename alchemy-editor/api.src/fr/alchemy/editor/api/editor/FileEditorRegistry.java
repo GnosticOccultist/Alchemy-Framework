@@ -2,16 +2,23 @@ package fr.alchemy.editor.api.editor;
 
 import java.util.Optional;
 
+import fr.alchemy.editor.core.ui.editor.nodes.DialogNodesFileEditor;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.dictionnary.ObjectDictionary;
+import fr.alchemy.utilities.collections.dictionnary.ObjectDictionary;
 import fr.alchemy.utilities.logging.FactoryLogger;
 import fr.alchemy.utilities.logging.Logger;
 
 /**
  * <code>EditorRegistry</code> is a registry storing all {@link FileEditor} implementation to use for opening and editing a file of 
  * a specific extension.
+ * <br>
+ * To register your own implementation of {@link FileEditor}, please use {@link #register(String, Class)} by getting the single-instance
+ * of this class with {@link #get()}.
+ * 
+ * @see #register(String, Class)
+ * @see #get()
  * 
  * @author GnosticOccultist
  */
@@ -49,8 +56,10 @@ public final class FileEditorRegistry {
 		this.editors = ObjectDictionary.ofType(String.class, Class.class);
 		
 		register("properties", PropertiesEditor.class);
+		register("nodes", DialogNodesFileEditor.class);
 		
-		logger.info("Sucessfully loaded " + getClass().getSimpleName() + " with " + editors.size() + " file editors.");
+		logger.info("Sucessfully loaded " + getClass().getSimpleName() + " with " + editors.size() 
+			+ " file editors -> \n" + editors.toString());
 	}
 	
 	/**

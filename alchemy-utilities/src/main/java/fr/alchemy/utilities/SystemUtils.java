@@ -4,8 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * <code>SystemUtils</code> provides utilities functions concerning the system and
- * its properties.
+ * <code>SystemUtils</code> provides utility functions concerning the system and its properties.
  * 
  * @version 0.1.0
  * @since 0.1.0
@@ -15,12 +14,35 @@ import java.nio.file.Paths;
 public final class SystemUtils {
 	
 	/**
+	 * Private constructor to inhibit instantiation of <code>SystemUtils</code>.
+	 */
+	private SystemUtils() {}
+	
+	/**
 	 * Return the currently operating system name.
 	 * 
 	 * @return The current operating system name.
 	 */
 	public static String getOS() {
 		return System.getProperty("os.name");
+	}
+	
+	/**
+	 * Return the current working directory as a string.
+	 * 
+	 * @return The current working directory.
+	 */
+	public static String getWorkingDirectory() {
+		return System.getProperty("user.dir");
+	}
+	
+	/**
+	 * Return a path to the current working directory.
+	 * 
+	 * @return The current working directory.
+	 */
+	public static Path pathToWorkingDirectory() {
+		return Paths.get(getWorkingDirectory());
 	}
 	
 	/**

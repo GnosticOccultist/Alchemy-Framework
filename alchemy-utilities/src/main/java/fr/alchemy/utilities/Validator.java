@@ -36,6 +36,18 @@ public final class Validator {
 	 * The default message to use for <code>positive</code> validators.
 	 */
 	public static final String DEFAULT_POSITIVE_MESSAGE = "The provided value must be strictly positive (>0)!";
+	/**
+	 * The default message to use for <code>check</code> or <code>invCheck</code> validators.
+	 */
+	public static final String DEFAULT_CHECK_MESSAGE = "The provided condition isn't respected!";
+	/**
+	 * The default message to use for <code>equals</code> validators.
+	 */
+	public static final String DEFAULT_EQUALITY_MESSAGE = "The provided values aren't equal!";
+	/**
+	 * The default message to use for <code>invEquals</code> validators.
+	 */
+	public static final String DEFAULT_NON_EQUALITY_MESSAGE = "The provided values are equal!";
 	
 	/**
 	 * Private constructor to inhibit instantiation of <code>Validator</code>.
@@ -297,6 +309,37 @@ public final class Validator {
 	}
 	
 	/**
+	 * Validate a non-null and non-empty byte array as a method argument.
+	 * 
+	 * @param value	The byte array to validate (not null, not empty).
+	 * @return 		The byte array validated.
+	 * 
+	 * @throws IllegalArgumentException If the value is null or empty.
+	 */
+	public static byte[] nonEmpty(byte[] value) {
+		return nonEmpty(value, DEFAULT_EMPTY_MESSAGE);
+	}
+	
+	/**
+	 * Validate a non-null and non-empty byte array as a method argument.
+	 * 
+	 * @param value	  The byte array to validate (not null, not empty).
+	 * @param message The message to be thrown with the exception.
+	 * @return 		  The byte array validated.
+	 * 
+	 * @throws IllegalArgumentException If the value is null or empty, with the specified message.
+	 */
+	public static byte[] nonEmpty(byte[] value, String message) {
+		nonNull(value, DEFAULT_NULL_MESSAGE);
+		
+		if(value.length == 0) {
+			throw new IllegalArgumentException(message);
+		}
+		
+		return value;
+	}
+	
+	/**
 	 * Validate a non-null and non-empty object collection as a method argument.
 	 * 
 	 * @param value	The object collection to validate (not null, not empty).
@@ -494,5 +537,125 @@ public final class Validator {
 		}
 		
 		return value;
+	}
+	
+	/**
+	 * Validate a condition provided by the boolean argument as a method argument.
+	 * 
+	 * @param value The condition value to validate (must be true).
+	 * @return		The boolean condition validated.
+	 * 
+	 * @throws IllegalArgumentException If the condition isn't respected, with the specified message.
+	 */
+	public static boolean check(boolean value) {
+		return check(value, DEFAULT_CHECK_MESSAGE);
+	}
+	
+	/**
+	 * Validate a condition provided by the boolean argument as a method argument.
+	 * 
+	 * @param value   The condition value to validate (must be true).
+	 * @param message The message to be thrown with the exception.
+	 * @return		  The boolean condition validated.
+	 * 
+	 * @throws IllegalArgumentException If the condition isn't respected, with the specified message.
+	 */
+	public static boolean check(boolean value, String message) {
+		if(!value) {
+			throw new IllegalArgumentException(message);
+		}
+		
+		return value;
+	}
+	
+	/**
+	 * Validate a condition provided by the boolean argument as a method argument.
+	 * 
+	 * @param value The condition value to validate (must be false).
+	 * @return		The boolean condition validated.
+	 * 
+	 * @throws IllegalArgumentException If the condition isn't respected, with the specified message.
+	 */
+	public static boolean invCheck(boolean value) {
+		return invCheck(value, DEFAULT_CHECK_MESSAGE);
+	}
+	
+	/**
+	 * Validate a condition provided by the boolean argument as a method argument.
+	 * 
+	 * @param value   The condition value to validate (must be false).
+	 * @param message The message to be thrown with the exception.
+	 * @return		  The boolean condition validated.
+	 * 
+	 * @throws IllegalArgumentException If the condition isn't respected, with the specified message.
+	 */
+	public static boolean invCheck(boolean value, String message) {
+		if(value) {
+			throw new IllegalArgumentException(message);
+		}
+		
+		return value;
+	}
+	
+	/**
+	 * Validate the equality of a value with an other as a method argument.
+	 * 
+	 * @param value1 The first value to check equality (must be equal to the second one).
+	 * @param value2 The second value to check equality (must be equal to the first one).
+	 * @return		 The first value validated.
+	 * 
+	 * @throws IllegalArgumentException If the two provided value aren't equal, with the specified message.
+	 */
+	public static <E> E equals(E value1, E value2) {
+		return equals(value1, value2, DEFAULT_EQUALITY_MESSAGE);
+	}
+	
+	/**
+	 * Validate the equality of a value with an other as a method argument.
+	 * 
+	 * @param value1  The first value to check equality (must be equal to the second one).
+	 * @param value2  The second value to check equality (must be equal to the first one).
+	 * @param message The message to be thrown with the exception.
+	 * @return		  The first value validated.
+	 * 
+	 * @throws IllegalArgumentException If the two provided value aren't equal, with the specified message.
+	 */
+	public static <E> E equals(E value1, E value2, String message) {
+		if(!Objects.equals(value1, value2)) {
+			throw new IllegalArgumentException(message);
+		}
+		
+		return value1;
+	}
+	
+	/**
+	 * Validate the non-equality of a value with an other as a method argument.
+	 * 
+	 * @param value1 The first value to check equality (must be equal to the second one).
+	 * @param value2 The second value to check equality (must be equal to the first one).
+	 * @return		 The first value validated.
+	 * 
+	 * @throws IllegalArgumentException If the two provided value are equal, with the specified message.
+	 */
+	public static <E> E invEquals(E value1, E value2) {
+		return invEquals(value1, value2, DEFAULT_NON_EQUALITY_MESSAGE);
+	}
+	
+	/**
+	 * Validate the non-equality of a value with an other as a method argument.
+	 * 
+	 * @param value1  The first value to check equality (must be equal to the second one).
+	 * @param value2  The second value to check equality (must be equal to the first one).
+	 * @param message The message to be thrown with the exception.
+	 * @return		  The first value validated.
+	 * 
+	 * @throws IllegalArgumentException If the two provided value are equal, with the specified message.
+	 */
+	public static <E> E invEquals(E value1, E value2, String message) {
+		if(Objects.equals(value1, value2)) {
+			throw new IllegalArgumentException(message);
+		}
+		
+		return value1;
 	}
 }

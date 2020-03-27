@@ -41,6 +41,8 @@ public class AlchemyEditorScene {
 	}
 
 	public void initialize(double width, double height) {
+		mainScene.getStylesheets().addAll("/resources/css/custom.css");
+		
 		root.setPrefSize(width, height);
 		mainScene.setRoot(root);
 		root.requestFocus();

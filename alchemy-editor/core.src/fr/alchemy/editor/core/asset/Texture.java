@@ -1,6 +1,6 @@
 package fr.alchemy.editor.core.asset;
 
-import fr.alchemy.utilities.actions.ModifierAction;
+import fr.alchemy.utilities.task.actions.ModifierAction;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;

@@ -9,18 +9,17 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import com.ss.rlib.common.util.array.Array;
-
 import fr.alchemy.editor.api.editor.AbstractFileEditor;
 import fr.alchemy.editor.api.editor.BaseFileEditor;
 import fr.alchemy.editor.api.element.ToolbarEditorElement;
-import fr.alchemy.editor.api.undo.AbstractUndoableOperation;
-import fr.alchemy.editor.api.undo.UndoableFileEditor;
+import fr.alchemy.editor.api.model.undo.AbstractUndoableOperation;
+import fr.alchemy.editor.api.model.undo.OperationConsumer;
 import fr.alchemy.editor.core.EditorManager;
+import fr.alchemy.editor.core.model.undo.ModifyCountPropertyOperation;
 import fr.alchemy.editor.core.ui.component.dialog.AddPropertyDialog;
 import fr.alchemy.editor.core.ui.editor.text.PropertiesEditor.PropertyPair;
-import fr.alchemy.editor.core.ui.editor.undo.ModifyCountPropertyOperation;
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -180,13 +179,9 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 	}
 
 	@Override
-	public boolean open(Path file) {
-		super.open(file);
-		
+	protected void doOpen() throws IOException {
 		this.properties = FileUtils.getProperties(file, properties);
 		loadFromProperties();
-		
-		return true;
 	}
 	
 	@Override
@@ -311,18 +306,14 @@ public class PropertiesEditor extends BaseFileEditor<TableView<PropertyPair>> {
 		}
 		
 		@Override
-		public void undo(UndoableFileEditor editor) {
-			super.undo(editor);
-	
+		protected void doUndo(OperationConsumer editor) {
 			properties.setProperty(oldPair.getKey(), oldPair.getValue());
 			properties.remove(newPair.getKey());
 			loadFromProperties();
 		}
 		
 		@Override
-		public void redo(UndoableFileEditor editor) {
-			super.redo(editor);
-			
+		protected void doRedo(OperationConsumer editor) {
 			properties.setProperty(newPair.getKey(), newPair.getValue());
 			properties.remove(oldPair.getKey());
 			loadFromProperties();

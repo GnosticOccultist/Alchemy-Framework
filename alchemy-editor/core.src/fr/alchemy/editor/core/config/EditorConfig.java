@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.AlchemyEditor;
 import fr.alchemy.utilities.ByteUtils;
-import fr.alchemy.utilities.dictionnary.ObjectDictionary;
+import fr.alchemy.utilities.collections.dictionnary.ObjectDictionary;
 
 /**
  * <code>EditorConfig</code> contains the configuration of the Alchemy Editor.
