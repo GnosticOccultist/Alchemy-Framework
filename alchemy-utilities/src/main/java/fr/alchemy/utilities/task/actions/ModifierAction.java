@@ -1,5 +1,7 @@
 package fr.alchemy.utilities.task.actions;
 
+import java.util.function.Function;
+
 /**
  * A functional interface allowing the user to perform a certain type of action to the invoked element
  * and return the modified element.
@@ -9,8 +11,12 @@ package fr.alchemy.utilities.task.actions;
  * 
  * @author GnosticOccultist
  */
-@FunctionalInterface
-public interface ModifierAction<T> {
+public interface ModifierAction<T> extends Function<T, T> {
+	
+	@Override
+	default T apply(T element) {
+		return modify(element);
+	}
 	
 	/**
 	 * Performs a modification to the provided element and return it.

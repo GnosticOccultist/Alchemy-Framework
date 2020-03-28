@@ -1,6 +1,7 @@
 package fr.alchemy.editor.core;
 
 import fr.alchemy.editor.core.asset.AssetManager;
+import fr.alchemy.editor.core.asset.plugins.PluginManager;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import javafx.application.Application;
@@ -59,6 +60,9 @@ public class AlchemyEditor extends Application {
 		});
 		
 		EditorManager.initialize(new AssetManager());
+		
+		// Look for potential editor plugins to load.
+		PluginManager.get().start();
 		
 		// Once everything is prepared, show the window.
 		primaryStage.show();
