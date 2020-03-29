@@ -4,10 +4,10 @@ import java.util.function.Consumer;
 
 /**
  * A functional interface allowing the user to perform a specific action 
- * with the invoked object.
+ * with the invoked element.
  * 
- * @version 0.1.0
- * @since 0.1.0
+ * @version 0.1.1
+ * @since 0.1.1
  * 
  * @author GnosticOccultist
  */
@@ -15,9 +15,9 @@ import java.util.function.Consumer;
 public interface VoidAction<T> extends Consumer<T> {
 	
 	/**
-	 * Perform the action. 
+	 * Perform the action on the given element.
 	 * 
-	 * @param element The element to perform the action with.
+	 * @param element The element to perform the action with (not null).
 	 */
 	void perform(T element);
 	
