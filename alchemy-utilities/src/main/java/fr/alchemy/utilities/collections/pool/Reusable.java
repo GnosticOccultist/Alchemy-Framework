@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.pool;
+package fr.alchemy.utilities.collections.pool;
 
 /**
  * <code>Reusable</code> is an extension interface of {@link AutoCloseable} which is meant to implement a reusable object.

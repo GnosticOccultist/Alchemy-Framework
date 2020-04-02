@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import fr.alchemy.utilities.pool.FastReusablePool;
-import fr.alchemy.utilities.pool.Reusable;
+import fr.alchemy.utilities.collections.pool.FastReusablePool;
+import fr.alchemy.utilities.collections.pool.Reusable;
 
 /**
  * <code>LocalVars</code> is the container with multiple <code>ReusablePoolObject</code>

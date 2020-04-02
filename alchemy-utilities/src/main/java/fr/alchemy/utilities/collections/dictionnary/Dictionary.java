@@ -2,7 +2,7 @@ package fr.alchemy.utilities.collections.dictionnary;
 
 import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.collections.array.FastArray;
-import fr.alchemy.utilities.pool.Reusable;
+import fr.alchemy.utilities.collections.pool.Reusable;
 
 public interface Dictionary<K, V> extends Iterable<V>, Reusable {
 	

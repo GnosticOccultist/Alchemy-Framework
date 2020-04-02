@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.pool;
+package fr.alchemy.utilities.collections.pool;
 
 import java.util.function.Supplier;
 
