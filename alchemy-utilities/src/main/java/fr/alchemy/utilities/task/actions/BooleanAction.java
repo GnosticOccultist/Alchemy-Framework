@@ -13,10 +13,10 @@ package fr.alchemy.utilities.task.actions;
 public interface BooleanAction<T> {
 	
 	/**
-	 * Performs the action and return a boolean value.
+	 * Performs the action on the given element and return a boolean value.
 	 * 
-	 * @param object The object to perform the action with.
-	 * @return		 Either true or false.
+	 * @param element The element to perform the action with (not null).
+	 * @return		  A boolean value either true or false.
 	 */
-	boolean perform(final T object);
+	boolean perform(T element);
 }

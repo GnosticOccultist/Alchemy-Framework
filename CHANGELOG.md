@@ -3,10 +3,11 @@
 # 0.1.1 (Not released yet)
 - Fixed a bug where protected constructor couldn't be accessed by Instantiator (it fixes instantiating of AlchemyLogger too).
 - Changed method that were using an argument to instantiate or invoke a method to now also use multiple ones.
-- Added SafeVoidAction which is the same as VoidAction except it can handle method throwing exception (made safeClose() method 
+- Added SafeVoidAction and SafeBooleanAction which is the same as VoidAction and BooleanAction except it can handle method throwing exception (made safeClose() method 
   use this functional interface and added a more generic safe execution method to FileUtils).
 - BiModifierAction and ModifierAction now extends BiFunction and Function for better usability.
 - Implemented shutdownNow() method of SynchronousExecutorService.
+- Moved fr.alchemy.utilities.pool package to fr.alchemy.utilities.collections.pool.
 - Some JavaDoc polishing and rewriting as always.
  
 # 0.1.0 (Released March 27, 2020)
