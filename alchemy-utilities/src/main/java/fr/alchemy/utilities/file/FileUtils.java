@@ -42,7 +42,7 @@ public final class FileUtils {
 	/**
 	 * An internal only file thread specific to limit the number of instantiations.
 	 */
-	private static final ThreadLocal<AlchemyFile> file = ThreadLocal.withInitial(AlchemyFile::new);
+	private static final ThreadLocal<AlchemyFile> ALCHEMY_FILE = ThreadLocal.withInitial(AlchemyFile::new);
 	
 	/**
 	 * Private constructor to inhibit instantiation of <code>FileUtils</code>.
@@ -235,7 +235,7 @@ public final class FileUtils {
 	 * @return	   The alchemy file pointing to the new path.
 	 */
 	private static AlchemyFile updateInternalFile(String path) {
-		AlchemyFile alchemyFile = file.get();
+		AlchemyFile alchemyFile = ALCHEMY_FILE.get();
 		if(!alchemyFile.getPath().equals(path)) {
 			alchemyFile.changePath(path);
 		}

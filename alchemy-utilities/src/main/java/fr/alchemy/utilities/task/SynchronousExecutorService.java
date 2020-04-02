@@ -1,5 +1,6 @@
 package fr.alchemy.utilities.task;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,8 @@ public class SynchronousExecutorService extends AbstractExecutorService {
 
 	@Override
 	public List<Runnable> shutdownNow() {
-		return null;
+		shutdown();
+		return Collections.emptyList();
 	}
 
 	@Override
