@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.pool;
+package fr.alchemy.utilities.collections.pool;
 
 import java.util.Optional;
 
@@ -9,7 +9,7 @@ import fr.alchemy.utilities.collections.array.Array;
  * 
  * @param <E> The type of element to store into the pool.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @see FastReusablePool

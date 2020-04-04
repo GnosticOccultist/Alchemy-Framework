@@ -1,6 +1,6 @@
 package fr.alchemy.utilities.collections.dictionnary;
 
-import fr.alchemy.utilities.pool.Reusable;
+import fr.alchemy.utilities.collections.pool.Reusable;
 
 public interface Entry<T, V> extends Reusable {
 	

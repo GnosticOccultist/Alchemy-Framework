@@ -1,5 +1,6 @@
 package fr.alchemy.utilities.task;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * This implementation is very simple and doesn't support waiting for tasks to complete during shutdown.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist
@@ -32,7 +33,8 @@ public class SynchronousExecutorService extends AbstractExecutorService {
 
 	@Override
 	public List<Runnable> shutdownNow() {
-		return null;
+		shutdown();
+		return Collections.emptyList();
 	}
 
 	@Override

@@ -14,7 +14,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-rootProject.version = '0.1.0'
+rootProject.version = '0.1.1'
 group = 'com.github.gnosticoccultist'
 
 repositories {
@@ -34,6 +34,20 @@ task sourcesJar(type: Jar) {
 
 artifacts {
     archives javadocJar, sourcesJar
+}
+
+javadoc {
+	failOnError = false
+}
+
+dependencies {
+	
+	testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.2"
+	testRuntime "org.junit.jupiter:junit-jupiter-engine:5.4.2"
+}
+
+test {
+	useJUnitPlatform()
 }
 
 publishing {

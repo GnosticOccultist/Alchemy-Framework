@@ -2,6 +2,7 @@ package fr.alchemy.utilities.file;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,11 +24,12 @@ import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.file.io.ProgressInputStream;
 import fr.alchemy.utilities.file.io.ProgressInputStream.ProgressListener;
 import fr.alchemy.utilities.task.actions.BiModifierAction;
+import fr.alchemy.utilities.task.actions.SafeVoidAction;
 
 /**
  * <code>FileUtils</code> provides utilities functions concerning files and directories.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist
@@ -37,11 +39,11 @@ public final class FileUtils {
 	/**
 	 * The separator character in a path.
 	 */
-	public static final String SEPARATOR = "/";
+	public static final String SEPARATOR = File.separator;
 	/**
 	 * An internal only file thread specific to limit the number of instantiations.
 	 */
-	private static final ThreadLocal<AlchemyFile> file = ThreadLocal.withInitial(AlchemyFile::new);
+	private static final ThreadLocal<AlchemyFile> ALCHEMY_FILE = ThreadLocal.withInitial(AlchemyFile::new);
 	
 	/**
 	 * Private constructor to inhibit instantiation of <code>FileUtils</code>.
@@ -234,7 +236,7 @@ public final class FileUtils {
 	 * @return	   The alchemy file pointing to the new path.
 	 */
 	private static AlchemyFile updateInternalFile(String path) {
-		AlchemyFile alchemyFile = file.get();
+		AlchemyFile alchemyFile = ALCHEMY_FILE.get();
 		if(!alchemyFile.getPath().equals(path)) {
 			alchemyFile.changePath(path);
 		}
@@ -312,8 +314,9 @@ public final class FileUtils {
 	 * <p>
 	 * The path cannot be null or empty.
 	 * 
-	 * @param path The path of the file to get an input stream.
-	 * @return	   The input stream to the file.
+	 * @param path 	   The path of the file to get an input stream.
+	 * @param listener The listener to assign to the input stream, or null for none.
+	 * @return		   The input stream to the file.
 	 */
 	public static ProgressInputStream openProgressStream(String path, ProgressListener listener) {
 		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
@@ -419,8 +422,8 @@ public final class FileUtils {
 	/**
 	 * Creates a file contained in the given {@link Path} if it doesn't already exist.
 	 * 
-	 * @param directory The path from which to create the file.
-	 * @return			Whether the file has been created or already existed.
+	 * @param file The path from which to create the file.
+	 * @return	   Whether the file has been created or already existed.
 	 */
 	public static boolean createFile(Path file) {
 		try {
@@ -435,12 +438,32 @@ public final class FileUtils {
 		return false;
 	}
 	
-	public static void safeClose(Closeable resource) {
+	/**
+	 * Closing safely the given {@link Closeable} implementation without needing to catch potentially
+	 * thrown {@link IOException}.
+	 * 
+	 * @param resource The resource to close safely (not null).
+	 */
+	public static <T extends Closeable> void safeClose(T resource) {
+		safePerform(resource, T::close);
+	}
+	
+	/**
+	 * Performing safely the provided {@link SafeVoidAction} using the given object, without needing to 
+	 * catch potentially thrown {@link Throwable}.
+	 * 
+	 * @param object	 The object to perform an action safely with (not null).
+	 * @param safeAction The safe action to perform with the object (not null).
+	 * @return			 The returned object for chaining purposes (not null).
+	 */
+	public static <T> T safePerform(T object, SafeVoidAction<T> safeAction) {
+		Validator.nonNull(object, "The object can't be null!");
+		Validator.nonNull(safeAction, "The safe action can't be null!");
 		try {
-			resource.close();
-		} catch (IOException ex) {
-			System.err.println("An error has occured while trying to close " + resource + "!");
-			ex.printStackTrace();
+			safeAction.perform(object);
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
+		return object;
 	}
 }

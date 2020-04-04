@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.gnosticoccultist:alchemy-utilities:0.1.0'
+    compile 'com.github.gnosticoccultist:alchemy-utilities:0.1.1'
 }
 ```
 
@@ -22,18 +22,18 @@ dependencies {
 
 ```xml
 <repositories>
-    <repository>
-        <id>bintray-gnosticoccultist-maven</id>
-        <name>bintray</name>
-        <url>https://dl.bintray.com/gnosticoccultist/maven</url>
-    </repository>
+	<repository>
+		<id>bintray-gnosticoccultist-maven</id>
+		<name>bintray</name>
+		<url>https://dl.bintray.com/gnosticoccultist/maven</url>
+	</repository>
 </repositories>
 
 <dependency>
-  <groupId>com.github.gnosticoccultist</groupId>
-  <artifactId>alchemy-utilities</artifactId>
-  <version>0.1.0</version>
-  <type>pom</type>
+	<groupId>com.github.gnosticoccultist</groupId>
+	<artifactId>alchemy-utilities</artifactId>
+	<version>0.1.1</version>
+	<type>pom</type>
 </dependency>
 
 ```

@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import fr.alchemy.utilities.pool.FastReusablePool;
-import fr.alchemy.utilities.pool.Reusable;
+import fr.alchemy.utilities.collections.pool.FastReusablePool;
+import fr.alchemy.utilities.collections.pool.Reusable;
 
 /**
  * <code>LocalVars</code> is the container with multiple <code>ReusablePoolObject</code>
  * registered from which the user can retrieve an object specific to a thread.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist

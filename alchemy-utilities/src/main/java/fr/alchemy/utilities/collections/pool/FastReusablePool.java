@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.pool;
+package fr.alchemy.utilities.collections.pool;
 
 import java.util.function.Supplier;
 
@@ -9,7 +9,7 @@ import fr.alchemy.utilities.Validator;
  * 
  * @param <E> The type of reusable element to store into the pool.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist

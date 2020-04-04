@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.file.io.ProgressInputStream;
 import fr.alchemy.utilities.file.io.ProgressInputStream.ProgressListener;
 
@@ -18,7 +19,7 @@ import fr.alchemy.utilities.file.io.ProgressInputStream.ProgressListener;
  * <code>AlchemyFile</code> is a more complex implementation of {@link File} to manage
  * {@link InputStream} or {@link OutputStream}.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist
@@ -34,13 +35,18 @@ public class AlchemyFile {
 	 */
     protected String extension;
     
-    public AlchemyFile() {
+    /**
+     * Instantiates a new <code>AlchemyFile</code> with an empty path. This constructor should only
+     * be accessed by {@link FileUtils} to instantiate a local variable.
+     */
+    protected AlchemyFile() {
 		this("");
 	}
 
     /**
-     * Instantiates a new <code>AlchemyFile</code> with the
-     * specified path.
+     * Instantiates a new <code>AlchemyFile</code> with the specified path.
+     * 
+     * @param The path of the file (not null).
      */
     public AlchemyFile(String path) {
         this.path = path;
@@ -48,35 +54,46 @@ public class AlchemyFile {
     }
     
     /**
-     * Return the path of the file.
+     * Return the path of the <code>AlchemyFile</code>.
      * 
-     * @return The path of the file.
+     * @return The path of the file (not null).
      */
     public String getPath() {
 		return path;
 	}
     
     /**
-     * Change the path of the <code>AlchemyFile</code>, only virtually,
-     * to the provided one, updating its extension as well.
-     * <p>
-     * It return the previously used path for the file.
+     * Return the extension of the <code>AlchemyFile</code>.
      * 
-     * @param path The new path to set.
-     * @return	   The old path.
+     * @return The extension of the file (not null).
+     */
+    public String getExtension() {
+		return extension;
+	}
+    
+    /**
+     * Change the path of the <code>AlchemyFile</code>, only virtually, to the provided one, updating 
+     * its extension as well, and returns the previous path used by the file.
+     * 
+     * @param path The new path to set (not null, not empty).
+     * @return	   The old path used by the file (not null).
      */
     public String changePath(String path) {
+    	Validator.nonEmpty(path, "The new path can't be null or empty!");
+    	
     	String oldPath = getPath();
-    	this.path = path;
-    	this.extension = FileUtils.getExtension(path);
+    	if(!oldPath.equals(path)) {
+    		this.path = path;
+        	this.extension = FileUtils.getExtension(path);
+    	}
     	
     	return oldPath;
     }
     
     /**
-     * Return the folder path of the file.
+     * Return the folder path of the <code>AlchemyFile</code> or an empty path if the file is a root directory.
      * 
-     * @return The folder path.
+     * @return The folder path of the file (not null).
      */
     public String getFolder() {
         int idx = path.lastIndexOf(FileUtils.SEPARATOR);
@@ -88,28 +105,15 @@ public class AlchemyFile {
     }
     
     /**
-     * Return the extension of the file.
+     * Acquire the internal URL of the <code>AlchemyFile</code>, which can be used to obtain an {@link InputStream}.
      * 
-     * @return The extension of the file.
-     */
-    public String getExtension() {
-		return extension;
-	}
-    
-    /**
-     * Acquire the internal URL of the <code>AlchemyFile</code>, 
-     * which can be used to obtain in {@link InputStream}.
-     * 
-     * @return The URL of the file.
+     * @return The URL of the file, or null if no file with this path was found.
      */
     public URL acquireInternalURL() {
-    	
     	String name = path.startsWith("/") ? path : "/" + path;
-    	
 		URL url = AlchemyFile.class.getResource(name);
-		
-        if (url == null) {
-            return null;
+        if(url == null) {
+        	return null;
         }
         
         if (url.getProtocol().equals("file")) {
@@ -120,18 +124,17 @@ public class AlchemyFile {
             	if (File.separatorChar == '\\') {
                     path = path.replace('\\', '/');
                 }
-        	} catch (URISyntaxException | IOException e) {
-        		e.printStackTrace();
+        	} catch (URISyntaxException | IOException ex) {
+        		ex.printStackTrace();
         	}
         }
         return url;
     }
     
     /**
-     * Open an {@link InputStream} using the URL of the file obtained
-     * by {@link #acquireInternalURL()}.
+     * Open an {@link InputStream} using the URL of the <code>AlchemyFile</code> obtained by {@link #acquireInternalURL()}.
      * 
-     * @return The input stream of the file.
+     * @return The input stream of the file, or null if no file with this path was found.
      */
     public InputStream openStream() {
     	URL url = acquireInternalURL();
@@ -140,30 +143,29 @@ public class AlchemyFile {
 				URLConnection connection = url.openConnection();
 				connection.setUseCaches(false);
 				return connection.getInputStream();
-			} catch (IOException e) {
+			} catch (IOException ex) {
 				System.err.println("Error while opening input stream for file: " + toString());
-				e.printStackTrace();
+				ex.printStackTrace();
 			}
 		}
 		return null;
     }
     
     /**
-     * Open a {@link ProgressInputStream} using the URL of the file obtained
-     * by {@link #acquireInternalURL()}.
+     * Open a {@link ProgressInputStream} using the URL of the <code>AlchemyFile</code> obtained by {@link #acquireInternalURL()}.
      * 
-     * @return The progress input stream of the file.
+     * @return The progress input stream of the file, or null if no file with this path was found.
      */
     public ProgressInputStream openProgressStream() {
     	return openProgressStream(null);
     }
     
     /**
-     * Open a {@link ProgressInputStream} using the URL of the file obtained by {@link #acquireInternalURL()},
+     * Open a {@link ProgressInputStream} using the URL of the <code>AlchemyFile</code> obtained by {@link #acquireInternalURL()},
      * and the given {@link ProgressListener} to keep track of bytes read.
      * 
      * @param listener The listener to assign to the input stream, or null for none.
-     * @return 		   The progress input stream of the file.
+     * @return 		   The progress input stream of the file, or null if no file with this path was found.
      */
     public ProgressInputStream openProgressStream(ProgressListener listener) {
     	URL url = acquireInternalURL();
@@ -174,9 +176,9 @@ public class AlchemyFile {
 				
 				int size = connection.getContentLength();
 				return new ProgressInputStream(connection.getInputStream(), asPath(), size, listener);
-			} catch (IOException e) {
+			} catch (IOException ex) {
 				System.err.println("Error while opening input stream for file: " + toString());
-				e.printStackTrace();
+				ex.printStackTrace();
 			}
 		}
 		return null;
@@ -185,15 +187,15 @@ public class AlchemyFile {
     /**
      * Return the <code>AlchemyFile</code> as a {@link Path} instance using a corresponding {@link URI}.
      * 
-     * @return A path instance representing the file.
+     * @return A path instance representing the file, or null if no file with this path was found.
      */
     public Path asPath() {
     	try {
     		URL url = acquireInternalURL();
 			return Paths.get(url.toURI());
-		} catch (URISyntaxException e) {
+		} catch (URISyntaxException ex) {
 			System.err.println("Error while parsing String to URI for file: " + toString());
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
     	return null;
     }

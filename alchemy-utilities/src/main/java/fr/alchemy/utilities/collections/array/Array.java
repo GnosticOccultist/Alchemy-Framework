@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.RandomAccess;
 
-import fr.alchemy.utilities.pool.Reusable;
+import fr.alchemy.utilities.collections.pool.Reusable;
 
 public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneable, RandomAccess {
 	

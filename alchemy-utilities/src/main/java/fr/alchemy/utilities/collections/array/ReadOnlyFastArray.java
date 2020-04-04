@@ -7,7 +7,7 @@ import fr.alchemy.utilities.ReadOnlyException;
 
 /**
  * <code>ReadOnlyFastArray</code> is an implementation of {@link FastArray} for readable-only usage, meaning 
- * all adding, removing or setting function are disabled and will throw an {@link IllegalStateException} if invoked.
+ * all adding, removing or setting function are disabled and will throw an {@link ReadOnlyException} if invoked.
  * 
  * @param <E> The type of element contained in the array.
  * 

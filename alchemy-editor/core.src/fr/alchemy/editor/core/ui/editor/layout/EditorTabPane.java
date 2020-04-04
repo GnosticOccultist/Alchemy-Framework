@@ -9,7 +9,7 @@ import fr.alchemy.editor.api.editor.FileEditorRegistry;
 import fr.alchemy.editor.api.editor.layout.EditorLayout;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
-import fr.alchemy.utilities.dictionnary.ObjectDictionary;
+import fr.alchemy.utilities.collections.dictionnary.ObjectDictionary;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -127,7 +127,7 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 			getContent().getSelectionModel().select(tab);
 			return;
 		}
-			
+		
 		String ext = FileUtils.getExtension(file);
 		FileEditorRegistry.get().createFor(ext).ifPresent(editor -> {
 			editor.setReadOnly(readOnly);
