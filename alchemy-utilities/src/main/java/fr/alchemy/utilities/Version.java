@@ -14,6 +14,9 @@ import java.util.stream.Stream;
  * <p>
  * However there is no limitation in how much identifier numbers can be append, it is usually up to 3 or 2 if there is no patch. 
  * 
+ * @version 0.1.1
+ * @since 0.1.1
+ * 
  * @author GnosticOccultist
  */
 public final class Version implements Comparable<Version>, Cloneable, Serializable {
@@ -131,13 +134,34 @@ public final class Version implements Comparable<Version>, Cloneable, Serializab
 		}
 		
 		/*
-		 * Secondly check for identifier differences.
+		 * Secondly, check for identifier differences.
 		 */
 		int[] otherIdentifiers = other.identifiers;
 		int commonIdentifiers = Math.min(otherIdentifiers.length, identifiers.length);
 		for(int i = 0; i < commonIdentifiers; i++) {
 			if(identifiers[i] != otherIdentifiers[i]) {
 				return (int) Math.signum(identifiers[i] - otherIdentifiers[i]);
+			}
+		}
+		
+		/**
+		 * Thirdly, check that the patch are the same even if version doesn't declare it fully,
+		 * example: '0.1' and '0.1.0' should be considered the same.
+		 */
+		int maxIdentifiers = Math.max(otherIdentifiers.length, identifiers.length);
+		for(int i = commonIdentifiers; i < maxIdentifiers; i++) {
+			if(identifiers.length == maxIdentifiers && identifiers[i] != 0) {
+				break;
+			}
+			if(otherIdentifiers.length == maxIdentifiers && otherIdentifiers[i] != 0) {
+				break;
+			}
+			
+			/*
+			 * All identifiers from the common are 0, so the versions are the same.
+			 */
+			if(i == maxIdentifiers - 1) {
+				return 0;
 			}
 		}
 		
