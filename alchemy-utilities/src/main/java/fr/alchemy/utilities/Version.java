@@ -1,5 +1,8 @@
 package fr.alchemy.utilities;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -13,7 +16,14 @@ import java.util.stream.Stream;
  * 
  * @author GnosticOccultist
  */
-public final class Version {
+public final class Version implements Comparable<Version>, Cloneable, Serializable {
+	
+	private static final long serialVersionUID = -3609359545455861325L;
+
+	/**
+	 * The indices for the 3 commonly found version identifiers (0&rarr;MAJOR, 1&rarr;MINOR, 2&rarr;PATCH).
+	 */
+	public static final int MAJOR_INDEX = 0, MINOR_INDEX = 1, PATCH_INDEX = 2;
 
 	/**
 	 * The development stage qualifier.
@@ -82,6 +92,79 @@ public final class Version {
 		Validator.nonEmpty(version, "The version string can't be empty or null!");
 		return Stream.of(version.split("\\."))
 				.mapToInt(Integer::parseInt).toArray();
+	}
+	
+	/**
+	 * Return the major identifier number of the <code>Version</code>.
+	 * 
+	 * @return The major identifier of the version (&ge;0).
+	 */
+	public int major() {
+		return identifiers[MAJOR_INDEX];
+	}
+	
+	/**
+	 * Return the minor identifier number of the <code>Version</code>.
+	 * 
+	 * @return The minor identifier of the version (&ge;0).
+	 */
+	public int minor() {
+		return identifiers[MINOR_INDEX];
+	}
+	
+	/**
+	 * Return the patch identifier number of the <code>Version</code>.
+	 * 
+	 * @return The patch identifier of the version (&ge;0).
+	 */
+	public int patch() {
+		return identifiers.length > 2 ? identifiers[PATCH_INDEX] : 0;
+	}
+	
+	@Override
+	public int compareTo(Version other) {
+		/*
+		 * Check qualifier level first.
+		 */
+		if(other.qualifier != qualifier) {
+			return (int) Math.signum(qualifier.ordinal() - other.qualifier.ordinal());
+		}
+		
+		/*
+		 * Secondly check for identifier differences.
+		 */
+		int[] otherIdentifiers = other.identifiers;
+		int commonIdentifiers = Math.min(otherIdentifiers.length, identifiers.length);
+		for(int i = 0; i < commonIdentifiers; i++) {
+			if(identifiers[i] != otherIdentifiers[i]) {
+				return (int) Math.signum(identifiers[i] - otherIdentifiers[i]);
+			}
+		}
+		
+		/*
+		 * Finally check for identifiers length.
+		 */
+		return identifiers.length - otherIdentifiers.length;
+	}
+	
+	@Override
+	protected Version clone(){
+		return new Version(qualifier, identifiers);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(qualifier, identifiers);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Version)) {
+			return false;
+		}
+		
+		Version other = (Version) obj;
+		return qualifier.equals(other.qualifier) && Arrays.equals(identifiers, other.identifiers);
 	}
 	
 	@Override
