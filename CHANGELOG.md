@@ -8,6 +8,7 @@
 - BiModifierAction and ModifierAction now extends BiFunction and Function for better usability.
 - Implemented shutdownNow() method of SynchronousExecutorService.
 - Moved fr.alchemy.utilities.pool package to fr.alchemy.utilities.collections.pool.
+- Added Version class to represent a sequence-based software versioning scheme.
 - Some JavaDoc polishing and rewriting as always.
  
 # 0.1.0 (Released March 27, 2020)
