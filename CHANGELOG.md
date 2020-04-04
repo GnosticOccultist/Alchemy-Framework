@@ -9,6 +9,7 @@
 - Implemented shutdownNow() method of SynchronousExecutorService.
 - Moved fr.alchemy.utilities.pool package to fr.alchemy.utilities.collections.pool.
 - Added Version class to represent and compare sequence-based software versioning schemes.
+- Instantiator can now invoke a method using its name directly (without having the Method instance).
 - Some JavaDoc polishing and rewriting as always.
  
 # 0.1.0 (Released March 27, 2020)

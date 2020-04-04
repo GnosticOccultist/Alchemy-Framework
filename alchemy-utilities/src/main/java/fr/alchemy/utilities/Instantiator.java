@@ -233,6 +233,29 @@ public final class Instantiator {
 	}
 	
 	/**
+	 * Invokes the {@link Method} with the specified name contained in the given class instance using the provided
+	 * objects as arguments. The function also return whether the invokation has been successfully made. 
+	 * 
+	 * @param methodName	The name of the method to invoke which should be accessible (not null, not empty).
+	 * @param classInstance The instance of the class containing the method (not null).
+	 * @param args			The argument to use for the method or null for none.
+	 * @return				Whether the invokation has been successfully made.
+	 */
+	public static boolean invokeMethod(String methodName, Object classInstance, Object... args) {
+		Validator.nonEmpty(methodName, "The name of the method to invoke can't be null or empty!");
+		Validator.nonNull(classInstance, "The class instance can't be null!");
+		try {
+			Method method = classInstance.getClass().getMethod(methodName, 
+					Arrays.asList(args).stream().map(Object::getClass).toArray(i -> new Class[i]));
+			return invokeMethod(method, classInstance, args);
+		} catch (IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
+			System.err.println("Invokation of the method: " + methodName + " failed, for the specified class instance " 
+					+ classInstance.getClass().getSimpleName() + " and for the argument " + Arrays.toString(args) + "!");
+		}
+		return false;
+	}
+	
+	/**
 	 * Invokes the specified {@link Method} contained in the given class instance using the provided
 	 * objects as arguments. The function also return whether the invokation has been successfully made. 
 	 * 
@@ -242,6 +265,8 @@ public final class Instantiator {
 	 * @return				Whether the invokation has been successfully made.
 	 */
 	public static boolean invokeMethod(Method method, Object classInstance, Object... args) {
+		Validator.nonNull(method, "The method to invoke can't be null!");
+		Validator.nonNull(classInstance, "The class instance can't be null!");
 		try {
 			method.invoke(classInstance, args);
 			return true;
