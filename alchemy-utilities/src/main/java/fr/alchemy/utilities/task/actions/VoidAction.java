@@ -7,7 +7,7 @@ import java.util.function.Consumer;
  * with the invoked element.
  * 
  * @version 0.1.1
- * @since 0.1.1
+ * @since 0.1.0
  * 
  * @author GnosticOccultist
  */

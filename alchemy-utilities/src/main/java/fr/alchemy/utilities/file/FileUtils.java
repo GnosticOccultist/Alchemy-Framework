@@ -2,6 +2,7 @@ package fr.alchemy.utilities.file;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,7 +29,7 @@ import fr.alchemy.utilities.task.actions.SafeVoidAction;
 /**
  * <code>FileUtils</code> provides utilities functions concerning files and directories.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist
@@ -38,7 +39,7 @@ public final class FileUtils {
 	/**
 	 * The separator character in a path.
 	 */
-	public static final String SEPARATOR = "/";
+	public static final String SEPARATOR = File.separator;
 	/**
 	 * An internal only file thread specific to limit the number of instantiations.
 	 */

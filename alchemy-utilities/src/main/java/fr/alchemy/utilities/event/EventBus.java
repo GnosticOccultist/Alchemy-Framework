@@ -25,7 +25,7 @@ import fr.alchemy.utilities.logging.Logger;
  * methods (similar to Guava's event bus).
  * </ul>
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @see #addEventListener(EventType, EventListener)

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * This implementation is very simple and doesn't support waiting for tasks to complete during shutdown.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist

@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.gnosticoccultist:alchemy-utilities:0.1.0'
+    compile 'com.github.gnosticoccultist:alchemy-utilities:0.1.1'
 }
 ```
 
@@ -32,7 +32,7 @@ dependencies {
 <dependency>
 	<groupId>com.github.gnosticoccultist</groupId>
 	<artifactId>alchemy-utilities</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<type>pom</type>
 </dependency>
 

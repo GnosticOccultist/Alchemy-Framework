@@ -11,6 +11,9 @@ import fr.alchemy.utilities.Validator;
  * <code>ProgressInputStream</code> is an implementation of {@link InputStream} which allows the monitoring of reading 
  * progress when the number of bytes to be read can be easily determined, for example when using an {@link URLConnection}.
  * 
+ * @version 0.1.1
+ * @since 0.1.0
+ * 
  * @author GnosticOccultist
  */
 public class ProgressInputStream extends InputStream {

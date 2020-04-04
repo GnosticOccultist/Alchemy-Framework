@@ -12,6 +12,9 @@ import java.lang.annotation.Target;
  * A method using the annotation must have at least one parameter representing the event to be listening to,
  * but it can also provides the specific event type if desired so.
  * 
+ * @version 0.1.1
+ * @since 0.1.0
+ * 
  * @author GnosticOccultist
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 /**
  * <code>SystemUtils</code> provides utility functions concerning the system and its properties.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist

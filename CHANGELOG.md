@@ -1,6 +1,6 @@
 # Alchemy-Utilities Changelog
 
-# 0.1.1 (Not released yet)
+# 0.1.1 (Released April 4, 2020)
 - Fixed a bug where protected constructor couldn't be accessed by Instantiator (it fixes instantiating of AlchemyLogger too).
 - Changed method that were using an argument to instantiate or invoke a method to now also use multiple ones.
 - Added SafeVoidAction and SafeBooleanAction which is the same as VoidAction and BooleanAction except it can handle method throwing exception (made safeClose() method 

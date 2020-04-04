@@ -9,7 +9,7 @@ import fr.alchemy.utilities.Validator;
  * <code>AlchemyLogger</code> is an implementation of {@link Logger} for the <code>Alchemy-Framework</code>,
  * and can be reused over multiple projects.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist

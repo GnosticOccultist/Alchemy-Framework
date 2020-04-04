@@ -3,7 +3,7 @@ package fr.alchemy.utilities.logging;
 /**
  * <code>LoggerLevel</code> enumerates all the existent logging levels, from  which the log trace is visible.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist

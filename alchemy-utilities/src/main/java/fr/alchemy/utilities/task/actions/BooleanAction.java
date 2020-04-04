@@ -4,7 +4,7 @@ package fr.alchemy.utilities.task.actions;
  * A functional interface allowing the user to perform a specific action 
  * with the invoked object and return a boolean value.
  * 
- * @version 0.1.0
+ * @version 0.1.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist
