@@ -34,7 +34,7 @@ public class FileEditorTabPane extends EditorLayout<TabPane, FileEditor> {
 
 	@Override
 	protected TabPane attach(FileEditor editor) {
-		DraggableTab tab = new DraggableTab(editor.getName());
+		DraggableTab tab = new DraggableTab(editor);
 		tab.setClosable(true);
 		
 		tab.setContent(editor.getUIPage());

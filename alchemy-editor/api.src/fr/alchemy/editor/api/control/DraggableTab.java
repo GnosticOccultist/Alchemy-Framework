@@ -1,5 +1,6 @@
 package fr.alchemy.editor.api.control;
 
+import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.utilities.Validator;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -47,6 +48,10 @@ public class DraggableTab extends Tab {
 	 * The current tab pane to which the tab is added.
 	 */
 	protected TabPane tabPane;
+	/**
+	 * The editor component contained in the tab.
+	 */
+	protected EditorComponent component;
 	
 	/**
 	 * Instantiates a new <code>DraggableTab</code> with the given title.
@@ -67,11 +72,32 @@ public class DraggableTab extends Tab {
 	}
 	
 	/**
+	 * Instantiates a new <code>DraggableTab</code> with the given title.
+	 * 
+	 * @param title The title to use for the tab (not null, not empty).
+	 */
+	public DraggableTab(EditorComponent component) {
+		Validator.nonNull(component, "The component can't be null!");
+		
+		String title = component.getName();
+		this.titleLabel = new Label(title);
+		this.component = component;
+		
+		this.titleLabel.setOnDragDetected(this::startDrag);
+		this.titleLabel.setOnDragOver(this::dragOver);
+		this.titleLabel.setOnDragDone(this::stopDrag);
+		this.titleLabel.setOnDragDropped(this::dragDropped);
+		
+		construct();
+	}
+	
+	/**
 	 * Construct the <code>DraggableTab</code> by adding its title and an icon if {@link #getIcon()}
 	 * doesn't return null.
 	 */
 	protected void construct() {
 		HBox container = new HBox();
+		container.setSpacing(4D);
 		
 		Image icon = getIcon();
 		if(icon != null) {
@@ -83,6 +109,9 @@ public class DraggableTab extends Tab {
 		tabPaneProperty().addListener((obs, oldVal, newVal) -> {
 			this.tabPane = newVal;
 		});
+		
+		getStyleClass().add("draggable-tab");
+		container.getStyleClass().add("hbox-style");
 		
 		setGraphic(container);
 	}
@@ -203,7 +232,6 @@ public class DraggableTab extends Tab {
 	 * @return The icon image or null to display no icon.
 	 */
 	protected Image getIcon() {
-		// TODO: Link this to an EditorComponent method 
-		return null;
+		return component != null ? component.getIcon() : null;
 	}
 }

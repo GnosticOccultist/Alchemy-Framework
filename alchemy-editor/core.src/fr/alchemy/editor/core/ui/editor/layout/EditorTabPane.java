@@ -66,7 +66,7 @@ public class EditorTabPane extends EditorLayout<TabPane, EditorTool> {
 	 * @return			The updated tab pane.
 	 */
 	public TabPane attach(EditorTool component) {
-		DraggableTab tab = new DraggableTab(component.getName());
+		DraggableTab tab = new DraggableTab(component);
 		tab.setClosable(true);
 			
 		if(component instanceof Pane) {

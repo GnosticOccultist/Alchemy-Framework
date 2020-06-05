@@ -3,9 +3,11 @@ package fr.alchemy.editor.core.ui.component;
 import java.nio.file.Path;
 
 import fr.alchemy.editor.api.editor.EditorTool;
+import fr.alchemy.editor.core.EditorManager;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.component.asset.tree.AssetTree;
 import fr.alchemy.utilities.Validator;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 
 /**
@@ -63,6 +65,16 @@ public class WorkspaceComponent extends VBox implements EditorTool {
 	@Override
 	public String getName() {
 		return "Workspace";
+	}
+	
+	/**
+	 * Return the {@link Image} which is used as an icon for the <code>WorkspaceComponent</code>.
+	 * 
+	 * @return The icon of the component.
+	 */
+	@Override
+	public Image getIcon() {
+		return EditorManager.editor().loadIcon("/resources/icons/workspace.png");
 	}
 	
 	/**
