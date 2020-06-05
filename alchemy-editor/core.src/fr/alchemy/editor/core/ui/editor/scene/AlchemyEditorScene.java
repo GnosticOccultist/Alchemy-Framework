@@ -4,6 +4,7 @@ import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.FXUtils;
 import fr.alchemy.editor.core.ui.editor.bar.AlchemyEditorBar;
 import fr.alchemy.editor.core.ui.editor.layout.EditorTabPane;
+import fr.alchemy.editor.core.ui.editor.layout.FileEditorTabPane;
 import fr.alchemy.utilities.ByteUtils;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
@@ -28,7 +29,7 @@ public class AlchemyEditorScene {
 	/**
 	 * The layout of the editor containing the file editors.
 	 */
-	private final EditorTabPane editorsPane;
+	private final FileEditorTabPane editorsPane;
 	/**
 	 * The container of the scene.
 	 */
@@ -36,7 +37,7 @@ public class AlchemyEditorScene {
 	
 	public AlchemyEditorScene() {
 		this.tabPane = new EditorTabPane("components.tab.pane", this);
-		this.editorsPane = new EditorTabPane("editors.tab.pane", this);
+		this.editorsPane = new FileEditorTabPane("editors.tab.pane", this);
 		this.container = new SplitPane();
 	}
 
@@ -50,6 +51,12 @@ public class AlchemyEditorScene {
 		// Set up the editor bar.
 		AlchemyEditorBar bar = new AlchemyEditorBar();
 		bar.prefWidthProperty().bind(root.widthProperty());
+		
+//		EditorConfig config = EditorConfig.config();
+//		
+//		config.getOpenedComponents("components.tab.pane").clear();
+//		config.getOpenedFiles("editors.tab.pane").clear();
+//		config.getOpenedComponents("editors.tab.pane").clear();
 		
 		tabPane.construct();
 		editorsPane.construct();

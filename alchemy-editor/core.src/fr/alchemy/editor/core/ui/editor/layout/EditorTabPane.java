@@ -1,17 +1,20 @@
 package fr.alchemy.editor.core.ui.editor.layout;
 
-import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
+import fr.alchemy.editor.api.control.DraggableTab;
+import fr.alchemy.editor.api.control.DraggableTabPane;
 import fr.alchemy.editor.api.editor.EditorComponent;
-import fr.alchemy.editor.api.editor.FileEditor;
-import fr.alchemy.editor.api.editor.FileEditorRegistry;
+import fr.alchemy.editor.api.editor.EditorTool;
 import fr.alchemy.editor.api.editor.layout.EditorLayout;
 import fr.alchemy.editor.core.config.EditorConfig;
+import fr.alchemy.editor.core.event.AlchemyEditorEvent;
+import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
-import fr.alchemy.utilities.collections.dictionnary.ObjectDictionary;
-import fr.alchemy.utilities.file.FileUtils;
-import javafx.scene.control.Tab;
+import fr.alchemy.utilities.Instantiator;
+import fr.alchemy.utilities.event.EventBus;
+import fr.alchemy.utilities.event.EventType;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 
@@ -24,12 +27,7 @@ import javafx.scene.layout.Pane;
  * 
  * @author GnosticOccultist
  */
-public class EditorTabPane extends EditorLayout<TabPane> {
-	
-	/**
-	 * The table containing the opened editors.
-	 */
-	private final ObjectDictionary<Path, Tab> openedEditors = ObjectDictionary.ofType(Path.class, Tab.class);
+public class EditorTabPane extends EditorLayout<TabPane, EditorTool> {
 	
 	/**
 	 * Instantiates a new <code>EditorTabPane</code> with the provided name and scene.
@@ -39,6 +37,26 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	 */
 	public EditorTabPane(String name, AlchemyEditorScene scene) {
 		super(name, scene);
+		
+		EventBus.addListener(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, this);
+	}
+	
+	/**
+	 * Handles switching the workspace using {@link ChangedCurrentWorkspaceEvent}.
+	 */
+	protected void handleSwitchWorkspace() {
+		// Check if the workspace component is attached.
+		Optional<WorkspaceComponent> component = components.stream()
+				.filter(WorkspaceComponent.class::isInstance).map(WorkspaceComponent.class::cast).findFirst();
+		
+		// If the component is present just refresh it.
+		if(component.isPresent()) {
+			component.get().switchWorkspace();
+			return;
+		}
+		
+		// Else, construct the component from base.
+		constructComponent(WorkspaceComponent.class.getName());
 	}
 
 	/**
@@ -47,8 +65,8 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	 * @param component The component to add to the tab pane.
 	 * @return			The updated tab pane.
 	 */
-	public TabPane attach(EditorComponent component) {
-		Tab tab = new Tab(component.getName());
+	public TabPane attach(EditorTool component) {
+		DraggableTab tab = new DraggableTab(component.getName());
 		tab.setClosable(true);
 			
 		if(component instanceof Pane) {
@@ -57,38 +75,39 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 			tab.setOnCloseRequest(e -> detach(component));
 			pane.prefHeightProperty().bind(heightProperty());
 //			EditorConfig.config().addOpenedComponent(name, component.getClass().getName());
-		} else if(component instanceof FileEditor) {
-			FileEditor editor = (FileEditor) component;
-			tab.setContent(editor.getUIPage());
-			tab.setOnCloseRequest(e -> detach(component));
-			getContent().getSelectionModel().select(tab);
-			editor.dirtyProperty().addListener((observable, oldValue, newValue) -> {
-				String prefix = newValue == Boolean.TRUE ? "*" : "";
-				tab.setText(prefix + editor.getName());
-			});
-				
-				
-			editor.getUIPage().prefHeightProperty().bind(heightProperty());
-			//EditorConfig.config().addOpenedFile(name, editor.getFile().toString());
-			openedEditors.put(editor.getFile(), tab);
 		}
 		
 		components.add(component);
 		getContent().getTabs().add(tab);
+		
 		return content;
 	}
 	
 	@Override
-	protected TabPane detach(EditorComponent component) {
+	protected void constructComponent(String className) {
+		EditorTool component = null;
+		try {
+			component = Instantiator.fromName(className);
+		} catch (Exception e) {
+			component = Instantiator.fromNameWith(className, scene);
+		}
+		
+		((WorkspaceComponent) component).createContent();
+		attach(component);
+		component.finish();
+	}
+	
+	@Override
+	public void newEvent(EventType<AlchemyEditorEvent> type, AlchemyEditorEvent event) {
+		if(type.equals(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE)) {
+			handleSwitchWorkspace();
+		}
+	}
+	
+	@Override
+	protected TabPane detach(EditorTool component) {
 		components.remove(component);
 		EditorConfig.config().removeOpenedComponent(name, component.getClass().getName());
-		
-		if(component instanceof FileEditor) {
-			Path file = ((FileEditor) component).getFile();
-			
-			openedEditors.remove(file);
-			EditorConfig.config().removeOpenedFile(name, file.toString());
-		}
 		
 		return content;
 	}
@@ -100,42 +119,8 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 		List<String> componentClasses = config.getOpenedComponents(name);
 		componentClasses.clear();
 		
-		List<String> files = config.getOpenedFiles(name);
-		files.clear();
-		
 		components.forEach(c -> {
-			if(!(c instanceof FileEditor)) {
-				componentClasses.add(c.getClass().getName());
-			}
-		});
-		
-		openedEditors.keyArray(Path.class).forEach(p -> files.add(p.toString()));
-	}
-	
-	/**
-	 * Opens the provided file on this <code>EditorTabPane</code>.
-	 * 
-	 * @param file 	   The file which was requested for opening.
-	 * @param readOnly Whether the file to open should be readable only.
-	 */
-	@Override
-	protected void openFile(Path file, boolean readOnly) {
-		Tab tab = openedEditors.get(file);
-			
-		// If the file is already opened in this pane, select it.
-		if(tab != null) {
-			getContent().getSelectionModel().select(tab);
-			return;
-		}
-		
-		String ext = FileUtils.getExtension(file);
-		FileEditorRegistry.get().createFor(ext).ifPresent(editor -> {
-			editor.setReadOnly(readOnly);
-			editor.open(file);
-			attach(editor);
-			 
-			// Request the focus of the root.
-			editor.getRoot().requestFocus();
+			componentClasses.add(c.getClass().getName());
 		});
 	}
 
@@ -146,6 +131,6 @@ public class EditorTabPane extends EditorLayout<TabPane> {
 	 */
 	@Override
 	protected TabPane createLayout() {
-		return new TabPane();
+		return new DraggableTabPane(EditorTool.class::isInstance);
 	}
 }

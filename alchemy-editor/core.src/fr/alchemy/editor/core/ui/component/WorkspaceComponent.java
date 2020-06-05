@@ -2,7 +2,7 @@ package fr.alchemy.editor.core.ui.component;
 
 import java.nio.file.Path;
 
-import fr.alchemy.editor.api.editor.EditorComponent;
+import fr.alchemy.editor.api.editor.EditorTool;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.component.asset.tree.AssetTree;
 import fr.alchemy.utilities.Validator;
@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
  * 
  * @author GnosticOccultist
  */
-public class WorkspaceComponent extends VBox implements EditorComponent {
+public class WorkspaceComponent extends VBox implements EditorTool {
 	
 	/**
 	 * The asset tree representing the workspace folder.

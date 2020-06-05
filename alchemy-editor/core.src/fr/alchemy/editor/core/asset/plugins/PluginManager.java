@@ -53,9 +53,10 @@ public class PluginManager {
 			
 			URLClassLoader classLoader = new URLClassLoader(urls);
 			for(Path file : files) {
+				
 				try(JarInputStream jin = new JarInputStream(Files.newInputStream(file))) {
 					for(JarEntry entry = jin.getNextJarEntry(); entry != null; entry = jin.getNextJarEntry()) {
-						if(entry.isDirectory()) {
+						if(entry.isDirectory() || !FileUtils.getExtension(entry.getName()).equals("class")) {
 							continue;
 			            }
 						

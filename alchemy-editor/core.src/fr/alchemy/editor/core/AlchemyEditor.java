@@ -4,6 +4,8 @@ import fr.alchemy.editor.core.asset.AssetManager;
 import fr.alchemy.editor.core.asset.plugins.PluginManager;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
+import fr.alchemy.utilities.Version;
+import fr.alchemy.utilities.Version.DevelopmentStage;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -21,7 +23,7 @@ public class AlchemyEditor extends Application {
 	/**
 	 * The version of the editor displayed in the window's title.
 	 */
-	private static final String EDITOR_VERSION = "pre-alpha 0.1";
+	private static final Version EDITOR_VERSION = new Version(DevelopmentStage.PRE_ALPHA, "0.1.0");
 	
 	/**
 	 * The main method to launch the <code>AlchemyEditor</code> using the given arguments.
@@ -49,6 +51,8 @@ public class AlchemyEditor extends Application {
 		primaryStage.setResizable(true);
 		primaryStage.centerOnScreen();
 		
+		EditorManager.initialize(new AssetManager());
+		
 		AlchemyEditorScene scene = new AlchemyEditorScene();
 		scene.initialize(primaryStage.getWidth(), primaryStage.getHeight());
 		primaryStage.setScene(scene.getFXScene());
@@ -58,8 +62,6 @@ public class AlchemyEditor extends Application {
 					primaryStage.getHeight(), primaryStage.isMaximized());
 			scene.save();
 		});
-		
-		EditorManager.initialize(new AssetManager());
 		
 		// Look for potential editor plugins to load.
 		PluginManager.get().start();
