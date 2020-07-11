@@ -80,14 +80,43 @@ public final class Instantiator {
 	 * 
 	 * @see #fromName(String)
 	 * @see #fromNameWith(String, Object...)
+	 * @see #fromNameImplements(String, Class, Consumer, Object...)
+	 */
+	public static <T> T fromNameWith(String className, Consumer<T> action, Object... args) {
+		return fromNameImplements(className, null, action, args);
+	}
+	
+	/**
+	 * Creates a new instance of the class with the given name using reflection. The class 
+	 * must define a public or protected constructor with either no arguments or all the arguments 
+	 * of the given type in order to work correctly.
+	 * <p>
+	 * After the instance has been created the given {@link Consumer} is used on it and the 
+	 * instance is returned.
+	 * 
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param className The name of the class to instantiate (not null, not empty).
+	 * @param action    The action to perform on the new instance (not null).
+	 * @param type   	The type of class to implement or null for none.
+	 * @param args 		The arguments to use in the constructor, or null for none.
+	 * @return			A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromName(String)
+	 * @see #fromNameWith(String, Object...)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T fromNameWith(String className, Consumer<T> action, Object... args) {
+	public static <T> T fromNameImplements(String className, Class<T> type, Consumer<T> action, Object... args) {
 		Validator.nonEmpty(className, "The class name can't be empty or null!");
 		
 		T obj = null;
 		try {
 			Class<?> clazz = Class.forName(className);
+			if(type != null && !type.isAssignableFrom(clazz)) {
+				throw new IllegalArgumentException("The class '" + clazz.getName() + 
+						"' isn't implementing or extending '" + type.getName() + "'!");
+			}
+			
 			if(args != null && args.length > 0) {
 				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
 				obj = (T) clazz.getConstructor(argTypes.toArray(new Class[argTypes.size()])).newInstance(args);
@@ -96,16 +125,17 @@ public final class Instantiator {
 			}
 			
 		} catch (ClassNotFoundException ex) {
-			System.err.println("Unable to find the class: '" + className + "' !");
+			throw new IllegalArgumentException("Unable to find the class: '" + className + "' ! " + ex);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
 				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-			System.err.println("Instantiation failed for the component '" + className + 
-					"'! Make sure the constructor is empty.");
+			throw new RuntimeException("Instantiation failed for the component '" + className + 
+					"'! Make sure the constructor is empty. " + ex);
 		}
 		
 		if(obj != null && action != null) {
 			action.accept(obj);
 		}
+		
 		return obj;		
 	}
 	
