@@ -112,6 +112,7 @@ public class AlchemyFile {
     public URL acquireInternalURL() {
     	String name = path.startsWith("/") ? path : "/" + path;
 		URL url = AlchemyFile.class.getResource(name);
+		
         if(url == null) {
         	return null;
         }

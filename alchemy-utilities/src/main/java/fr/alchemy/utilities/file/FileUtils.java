@@ -24,6 +24,7 @@ import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.file.io.ProgressInputStream;
 import fr.alchemy.utilities.file.io.ProgressInputStream.ProgressListener;
 import fr.alchemy.utilities.task.actions.BiModifierAction;
+import fr.alchemy.utilities.task.actions.SafeModifierAction;
 import fr.alchemy.utilities.task.actions.SafeVoidAction;
 
 /**
@@ -115,11 +116,11 @@ public final class FileUtils {
 		if(endIndex <= 0) {
             return "";
         }
+		
 		int beginIndex = path.lastIndexOf("/");
-		if(beginIndex <= 0) {
-            return "";
-        }
-		return path.substring(beginIndex + 1, endIndex);
+		beginIndex = beginIndex == -1 ? 0 : beginIndex + 1;
+		
+		return path.substring(beginIndex, endIndex);
 	}
 	
 	/**
@@ -465,5 +466,24 @@ public final class FileUtils {
 			t.printStackTrace();
 		}
 		return object;
+	}
+	
+	/**
+	 * Performing safely the provided {@link SafeModifierAction} using the given object, without needing to 
+	 * catch potentially thrown {@link Throwable}.
+	 * 
+	 * @param object	 The object to perform an action safely with (not null).
+	 * @param safeAction The safe action to perform with the object (not null).
+	 * @return			 The returned object for chaining purposes (not null).
+	 */
+	public static <T, U> U safeApply(T object, SafeModifierAction<T, U> safeAction) {
+		Validator.nonNull(object, "The object can't be null!");
+		Validator.nonNull(safeAction, "The safe action can't be null!");
+		try {
+			return safeAction.modify(object);
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		return null;
 	}
 }

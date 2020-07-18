@@ -74,6 +74,15 @@ public class FastPool<E> {
     }
 	
 	/**
+	 * Return the size of the <code>FastPool</code>.
+	 * 
+	 * @return The count of pooled elements (&ge;0).
+	 */
+	public int size() {
+		return pool.size();
+	}
+	
+	/**
 	 * Retrieves the element instance at the end of the <code>FastPool</code>.
 	 * 
 	 * @return The element at the end of the pool, or null if none.

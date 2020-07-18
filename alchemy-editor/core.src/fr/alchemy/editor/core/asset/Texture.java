@@ -84,7 +84,7 @@ public class Texture extends ImageView implements IAsset {
 	 * 
 	 * @return The modified texture.
 	 */
-	public final Texture applyEffect(final ModifierAction<Color> modifier) {
+	public final Texture applyEffect(final ModifierAction<Color, Color> modifier) {
 		final int width = (int) getImage().getWidth();
 		final int height = (int) getImage().getHeight();
 		

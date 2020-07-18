@@ -3,6 +3,7 @@ package fr.alchemy.utilities.collections.pool;
 import java.util.function.Supplier;
 
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.task.actions.ModifierAction;
 
 /**
  * <code>FastReusablePool</code> is an implementation of {@link FastPool} designed for {@link Reusable} elements.
@@ -38,7 +39,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	}
 	
 	/**
-	 * Inject the given {@link Reusable} element instance at the end of the <code>FastPool</code>.
+	 * Inject the given {@link Reusable} element instance at the end of the <code>FastReusablePool</code>.
 	 * 
 	 * @param element The element to inject into the pool (not null).
 	 */
@@ -50,7 +51,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	}
 	
 	/**
-	 * Retrieves the {@link Reusable} element instance at the end of the <code>FastPool</code>.
+	 * Retrieves the {@link Reusable} element instance at the end of the <code>FastReusablePool</code>.
 	 * <p>
 	 * The element is prepared for reusability by calling {@link Reusable#reuse()} before being returned.
 	 * 
@@ -70,7 +71,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	}
 
 	/**
-	 * Retrieves the {@link Reusable} element instance at the end of the <code>FastPool</code> or instantiate
+	 * Retrieves the {@link Reusable} element instance at the end of the <code>FastReusablePool</code> or instantiate
 	 * a new one using the given factory if none.
 	 * <p>
 	 * The element is prepared for reusability by calling {@link Reusable#reuse()} before being returned.
@@ -84,5 +85,59 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 		Validator.nonNull(factory, "The factory can't be null!");
         E take = retrieve();
         return take != null ? take : factory.get();
+	}
+	
+	/**
+	 * Apply the given {@link ModifierAction} using a retrieved element from the <code>FastReusablePool</code>
+	 * and releasing it once finished.
+	 * 
+	 * @param action The action to apply with the retrieved element (not null).
+	 * @return		 The result of the modifier action.
+	 * 
+	 * @see #applyAndRelease(ModifierAction, Supplier)
+	 * @see #applyWithAndRelease(ModifierAction, Reusable)
+	 */
+	public <R> R applyAndRelease(ModifierAction<E, R> action) {
+		return applyWithAndRelease(action, null);
+	}
+	
+	/**
+	 * Apply the given {@link ModifierAction} using a previously retrieved element or a new one from the 
+	 * <code>FastReusablePool</code> and releasing it once finished.
+	 * 
+	 * @param action 	The action to apply with the retrieved element (not null).
+	 * @param retrieved The previously retrieved element to use, or null to retrieve one from the pool.
+	 * @return		 	The result of the modifier action.
+	 * 
+	 * @see #applyAndRelease(ModifierAction)
+	 * @see #applyAndRelease(ModifierAction, Supplier)
+	 */
+	public <R> R applyWithAndRelease(ModifierAction<E, R> action, E retrieved) {
+		Validator.nonNull(action, "The modifier action can't be null!");
+		
+		E store = retrieved == null ? retrieve() : retrieved;
+		R result = action.apply(store);
+		
+		store.release();
+		return result;
+	}
+	
+	/**
+	 * Apply the given {@link ModifierAction} using a retrieved element from the <code>FastReusablePool</code>, or
+	 * using the given {@link Supplier} to instantiate a new one, and releasing it once finished.
+	 * 
+	 * @param action  The action to apply with the retrieved element (not null).
+	 * @param factory The factory to instantiate a new element.
+	 * @return		  The result of the modifier action.
+	 * 
+	 * @see #applyAndRelease(ModifierAction)
+	 * @see #applyWithAndRelease(ModifierAction, Reusable)
+	 */
+	public <R> R applyAndRelease(ModifierAction<E, R> action, Supplier<E> factory) {
+		E element = retrieve(factory);
+		R result = action.apply(element);
+		
+		element.release();
+		return result;
 	}
 }

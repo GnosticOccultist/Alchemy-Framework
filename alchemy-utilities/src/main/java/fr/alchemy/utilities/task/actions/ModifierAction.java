@@ -11,18 +11,19 @@ import java.util.function.Function;
  * 
  * @author GnosticOccultist
  */
-public interface ModifierAction<T> extends Function<T, T> {
+@FunctionalInterface
+public interface ModifierAction<T, U> extends Function<T, U> {
 	
 	@Override
-	default T apply(T element) {
+	default U apply(T element) {
 		return modify(element);
 	}
 	
 	/**
 	 * Performs a modification to the provided element and return it.
 	 * 
-	 * @param element The element to modify
+	 * @param element The element to modify.
 	 * @return 		  The modified element.
 	 */
-	T modify(T element);
+	U modify(T element);
 }
