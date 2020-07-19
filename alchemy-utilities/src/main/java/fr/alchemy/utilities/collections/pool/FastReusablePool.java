@@ -6,7 +6,8 @@ import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.task.actions.ModifierAction;
 
 /**
- * <code>FastReusablePool</code> is an implementation of {@link FastPool} designed for {@link Reusable} elements.
+ * <code>FastReusablePool</code> is an implementation of {@link FastPool} designed for {@link Reusable} elements. 
+ * The pool can be grown dynamically by using the {@link #retrieve(Supplier)} method.
  * 
  * @param <E> The type of reusable element to store into the pool.
  * 
@@ -23,8 +24,21 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	 * 
 	 * @param type The type of element instances to contain (not null).
 	 */
-	public FastReusablePool(Class<? super E> type) {
+	public FastReusablePool(Class<E> type) {
 		super(type);
+	}
+	
+	/**
+	 * Instantiates a new <code>FastReusablePool</code> for the provided type of {@link Reusable} element 
+	 * to contain and with an initial size of 10 elements.
+	 * <p>
+	 * The given {@link Supplier} will be used to fill the pool with the requested 10 elements.
+	 * 
+	 * @param type    The type of element instances to contain (not null).
+	 * @param factory The factory to instantiate the starting elements (not null).
+	 */
+	public FastReusablePool(Class<E> type, Supplier<E> factory) {
+		super(type, factory);
 	}
 	
 	/**
@@ -34,8 +48,22 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> {
 	 * @param type The type of element instances to contain (not null).
 	 * @param size The size of the pool (&gt;0).
 	 */
-	public FastReusablePool(Class<? super E> type, int size) {
+	public FastReusablePool(Class<E> type, int size) {
 		super(type, size);
+	}
+	
+	/**
+	 * Instantiates a new <code>FastReusablePool</code> for the provided type of {@link Reusable} element
+	 * to contain and of the given initial size.
+	 * <p>
+	 * The given {@link Supplier} will be used to fill the pool with the requested count of elements.
+	 * 
+	 * @param type 	  The type of element instances to contain (not null).
+	 * @param factory The factory to instantiate the starting elements (not null).
+	 * @param size 	  The size of the pool in elements (&gt;0).
+	 */
+	public FastReusablePool(Class<E> type, Supplier<E> factory, int size) {
+		super(type, factory, size);
 	}
 	
 	/**

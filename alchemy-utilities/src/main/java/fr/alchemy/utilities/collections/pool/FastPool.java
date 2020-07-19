@@ -1,11 +1,15 @@
 package fr.alchemy.utilities.collections.pool;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import fr.alchemy.utilities.Instantiator;
+import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.collections.array.Array;
 
 /**
- * <code>FastPool</code> is wrapper around an {@link Array} to easily retrieve and re-inject element instances.
+ * <code>FastPool</code> is wrapper around an {@link Array} to easily retrieve and re-inject element instances. The
+ * pool can be grown dynamically by using the {@link #retrieve(Supplier)} method.
  * 
  * @param <E> The type of element to store into the pool.
  * 
@@ -19,6 +23,11 @@ import fr.alchemy.utilities.collections.array.Array;
 public class FastPool<E> {
 	
 	/**
+	 * The default count of elements in a FastPool.
+	 */
+	protected static final int DEFAULT_SIZE = 10;
+	
+	/**
 	 * The internal pool of objects.
 	 */
 	private final Array<E> pool;
@@ -29,8 +38,21 @@ public class FastPool<E> {
 	 * 
 	 * @param type The type of element instances to contain (not null).
 	 */
-	public FastPool(Class<? super E> type) {
-		this.pool = Array.ofType(type);
+	public FastPool(Class<E> type) {
+		this(type, DEFAULT_SIZE);
+	}
+	
+	/**
+	 * Instantiates a new <code>FastPool</code> for the provided type of element to contain
+	 * and with an initial size of 10 elements.
+	 * <p>
+	 * The given {@link Supplier} will be used to fill the pool with the requested 10 elements.
+	 * 
+	 * @param type    The type of element instances to contain (not null).
+	 * @param factory The factory to instantiate the starting elements (not null).
+	 */
+	public FastPool(Class<E> type, Supplier<E> factory) {
+		this(type, factory, DEFAULT_SIZE);
 	}
 	
 	/**
@@ -38,10 +60,32 @@ public class FastPool<E> {
 	 * and of the given initial size.
 	 * 
 	 * @param type The type of element instances to contain (not null).
-	 * @param size The size of the pool (&gt;0).
+	 * @param size The size of the pool in elements (&gt;0).
 	 */
-	public FastPool(Class<? super E> type, int size) {
+	public FastPool(Class<E> type, int size) {
 		this.pool = Array.ofType(type, size);
+		
+		for(int i = 0; i < size; i++) {
+			inject((E) Instantiator.fromClass(type));
+		}
+	}
+	
+	/**
+	 * Instantiates a new <code>FastPool</code> for the provided type of element to contain
+	 * and of the given initial size.
+	 * <p>
+	 * The given {@link Supplier} will be used to fill the pool with the requested count of elements.
+	 * 
+	 * @param type 	  The type of element instances to contain (not null).
+	 * @param factory The factory to instantiate the starting elements (not null).
+	 * @param size 	  The size of the pool in elements (&gt;0).
+	 */
+	public FastPool(Class<E> type, Supplier<E> factory, int size) {
+		this.pool = Array.ofType(type, size);
+		
+		for(int i = 0; i < size; i++) {
+			inject(factory.get());
+		}
 	}
 	
 	/**
@@ -110,6 +154,21 @@ public class FastPool<E> {
 	 */
 	public Optional<E> retrieveSafe() {
 		return Optional.ofNullable(retrieve());
+	}
+	
+	/**
+	 * Retrieves the element instance at the end of the <code>FastPool</code> or instantiate
+	 * a new one using the given factory if none.
+	 * 
+	 * @param factory The factory to instantiate a new element.
+	 * @return 		  The element at the end of the pool, or a new instance if none.
+	 * 
+	 * @see #remove(Object)
+	 */
+	public E retrieve(Supplier<E> factory) {
+		Validator.nonNull(factory, "The factory can't be null!");
+        E take = retrieve();
+        return take != null ? take : factory.get();
 	}
 	
 	@Override
