@@ -1,6 +1,7 @@
 package fr.alchemy.utilities.collections.pool;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import fr.alchemy.utilities.Instantiator;
@@ -160,7 +161,7 @@ public class FastPool<E> {
 	 * Retrieves the element instance at the end of the <code>FastPool</code> or instantiate
 	 * a new one using the given factory if none.
 	 * 
-	 * @param factory The factory to instantiate a new element.
+	 * @param factory The factory to instantiate a new element (not null).
 	 * @return 		  The element at the end of the pool, or a new instance if none.
 	 * 
 	 * @see #remove(Object)
@@ -169,6 +170,17 @@ public class FastPool<E> {
 		Validator.nonNull(factory, "The factory can't be null!");
         E take = retrieve();
         return take != null ? take : factory.get();
+	}
+	
+	/**
+	 * Performs the given {@link Consumer} for each element instances currently in the 
+	 * <code>FastPool</code>.
+	 * 
+	 * @param action The action to perform on each element (not null).
+	 */
+	public void forEach(Consumer<E> action) {
+		Validator.nonNull(action, "The action can't be null!");
+		pool.forEach(action);
 	}
 	
 	@Override

@@ -52,7 +52,7 @@ public final class LocalVars {
 	 * 
 	 * @param type The type of variables to store (not null).
 	 */
-	public <T> void register(Class<T> type) {
+	public <T extends Reusable> void register(Class<T> type) {
 		Validator.nonNull(type, "The type of variable can't be null!");
 		if(!buffers.containsKey(type)) {
 			buffers.put(type, new FastReusablePool<>(type));
