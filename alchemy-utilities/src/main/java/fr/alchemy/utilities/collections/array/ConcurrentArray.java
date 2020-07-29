@@ -1,5 +1,6 @@
 package fr.alchemy.utilities.collections.array;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -51,7 +52,7 @@ public interface ConcurrentArray<E> extends Array<E> {
 	/**
 	 * Performs the given {@link Consumer} under a read-lock block for each element in the <code>ConcurrentArray</code>.
 	 * 
-	 * @param consumer The consumer to perform (not null)
+	 * @param consumer The consumer to perform (not null).
 	 * @return		   The concurrent array for chaining purposes (not null).
 	 */
 	default ConcurrentArray<E> forEachInReadLock(Consumer<? super E> consumer) {
@@ -68,9 +69,51 @@ public interface ConcurrentArray<E> extends Array<E> {
 	}
 	
 	/**
+	 * Performs the given {@link BiConsumer} under a read-lock block using the provided argument and 
+	 * the <code>ConcurrentArray</code>.
+	 * 
+	 * @param arg	   The argument to use in the consumer.
+	 * @param consumer The consumer to perform (not null).
+	 * @return		   The concurrent array for chaining purposes (not null).
+	 */
+	default <F> ConcurrentArray<E> performInReadLock(F arg, BiConsumer<ConcurrentArray<E>, F> consumer) {
+		Validator.nonNull(consumer, "The consumer can't be null!");
+		
+		long stamp = readLock();
+		try {
+			consumer.accept(this, arg);
+		} finally {
+			readUnlock(stamp);
+		}
+		
+		return this;
+	}
+	
+	/**
+	 * Performs the given {@link BiConsumer} under a write-lock block using the provided argument and 
+	 * the <code>ConcurrentArray</code>.
+	 * 
+	 * @param arg	   The argument to use in the consumer.
+	 * @param consumer The consumer to perform (not null).
+	 * @return		   The concurrent array for chaining purposes (not null).
+	 */
+	default <F> ConcurrentArray<E> performInWriteLock(F arg, BiConsumer<ConcurrentArray<E>, F> consumer) {
+		Validator.nonNull(consumer, "The consumer can't be null!");
+		
+		long stamp = writeLock();
+		try {
+			consumer.accept(this, arg);
+		} finally {
+			writeUnlock(stamp);
+		}
+		
+		return this;
+	}
+	
+	/**
 	 * Applies the given {@link Function} under a read-lock block using the <code>ConcurrentArray</code>.
 	 * 
-	 * @param function The function to apply on the array (not null)
+	 * @param function The function to apply on the array (not null).
 	 * @return		   The result of the function.
 	 */
 	default <R> R applyInReadLock(Function<ConcurrentArray<E>, R> function) {
@@ -87,17 +130,17 @@ public interface ConcurrentArray<E> extends Array<E> {
 	/**
 	 * Applies the given {@link Function} under a write-lock block using the <code>ConcurrentArray</code>.
 	 * 
-	 * @param function The function to apply on the array (not null)
+	 * @param function The function to apply on the array (not null).
 	 * @return		   The result of the function.
 	 */
 	default <R> R applyInWriteLock(Function<ConcurrentArray<E>, R> function) {
 		Validator.nonNull(function, "The function can't be null!");
 		
-		long stamp = readLock();
+		long stamp = writeLock();
 		try {
 			return function.apply(this);
 		} finally {
-			readUnlock(stamp);
+			writeUnlock(stamp);
 		}
 	}
 }
