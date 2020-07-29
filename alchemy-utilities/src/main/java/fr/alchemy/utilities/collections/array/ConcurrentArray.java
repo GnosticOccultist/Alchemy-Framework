@@ -1,6 +1,7 @@
 package fr.alchemy.utilities.collections.array;
 
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -8,6 +9,14 @@ import fr.alchemy.utilities.Validator;
 
 /**
  * <code>ConcurrentArray</code> is an interface to implement an {@link Array} with thread-safe access.
+ * <p>
+ * In order to perform read or write safe actions, methods requiring functional interfaces or lambdas expressions can be used, because
+ * their execution occurs in a locked block.
+ * For example, to remove an element in a thread-safe manner:
+ * <pre>
+ * var toRemove = ...
+ * var result = applyInWriteLock(toRemove, ConcurrentArray::remove);
+ * </pre>
  * 
  * @param <E> The type of element contained in the array.
  * 
@@ -142,6 +151,42 @@ public interface ConcurrentArray<E> extends Array<E> {
 		long stamp = writeLock();
 		try {
 			return function.apply(this);
+		} finally {
+			writeUnlock(stamp);
+		}
+	}
+	
+	/**
+	 * Applies the given {@link BiFunction} under a read-lock block using the <code>ConcurrentArray</code>.
+	 * 
+	 * @param arg	   The argument to use in the function.
+	 * @param function The function to apply on the array (not null).
+	 * @return		   The result of the bi-function.
+	 */
+	default <F, R> R applyInReadLock(F arg, BiFunction<ConcurrentArray<E>, F, R> function) {
+		Validator.nonNull(function, "The function can't be null!");
+		
+		long stamp = readLock();
+		try {
+			return function.apply(this, arg);
+		} finally {
+			readUnlock(stamp);
+		}
+	}
+	
+	/**
+	 * Applies the given {@link BiFunction} under a write-lock block using the <code>ConcurrentArray</code>.
+	 * 
+	 * @param arg	   The argument to use in the function.
+	 * @param function The function to apply on the array (not null).
+	 * @return		   The result of the bi-function.
+	 */
+	default <F, R> R applyInWriteLock(F arg, BiFunction<ConcurrentArray<E>, F, R> function) {
+		Validator.nonNull(function, "The function can't be null!");
+		
+		long stamp = writeLock();
+		try {
+			return function.apply(this, arg);
 		} finally {
 			writeUnlock(stamp);
 		}

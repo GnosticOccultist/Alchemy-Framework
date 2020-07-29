@@ -35,11 +35,6 @@ public class ReadOnlyFastArray<E> extends FastArray<E> implements ReadOnlyArray<
 	}
 	
 	@Override
-	public boolean unsafeAdd(E object) {
-		throw new ReadOnlyException("The array is readable-only!");
-	}
-	
-	@Override
 	public boolean remove(Object object) {
 		throw new ReadOnlyException("The array is readable-only!");
 	}

@@ -1,11 +1,20 @@
 package fr.alchemy.utilities.collections.array;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import fr.alchemy.utilities.Validator;
 
+/**
+ * <code>FastArray</code> is a basic and fast implementation of {@link AbstractArray}. The array is <b>NOT</b> thread safe.
+ * 
+ * @param <E> The type of elements contained in the array.
+ * 
+ * @version 0.1.1
+ * @since 0.1.0
+ * 
+ * @author GnosticOccultist
+ */
 public class FastArray<E> extends AbstractArray<E> {
 	
 	private static final long serialVersionUID = -6711056773756527290L;
@@ -13,92 +22,103 @@ public class FastArray<E> extends AbstractArray<E> {
 	/**
 	 * The unsafe array.
 	 */
-	protected E[] array;
-	
+	protected volatile E[] array;
 	/**
-	 * The current size of this array.
+	 * The current size of the array.
 	 */
 	protected int size;
 	
+	/**
+	 * Instantiates a new empty <code>FastArray</code> of the provided type and with
+	 * an initial capacity of 10.
+	 * 
+	 * @param type The type of elements to contain (not null).
+	 */
 	public FastArray(Class<? super E> type) {
 		super(type);
 	}
 	
+	/**
+	 * Instantiates a new empty <code>FastArray</code> of the provided type and with
+	 * the given initial capacity.
+	 * 
+	 * @param type	   The type of elements to contain (not null).
+	 * @param capacity The initial capacity of the array (&ge;0).
+	 */
 	public FastArray(Class<? super E> type, int size) {
 		super(type, size);
 	}
 	
+	/**
+	 * Instantiates a new <code>FastArray</code> using the provided array to use
+	 * internally. The size is set accordingly to the array length.
+	 * 
+	 * @param array The internal array to use (not null).
+	 */
     public FastArray(E[] array) {
         super(array);
     }
     
+    /**
+     * Adds the provided element at the end of the <code>FastArray</code>, resizing the internal 
+     * array if need be.
+     * 
+     * @param element The element to add to the array (not null).
+     * @return		  Whether the array was changed.
+     */
     @Override
-    public boolean add(E object) {
+    public boolean add(E element) {
+    	Validator.nonNull(element, "The element to add can't be null!");
+    	
     	if(size == array.length) {
     		array = ArrayUtil.copyOf(array, Math.max(array.length >> 1, 1));
     	}
     	
-    	return unsafeAdd(object);
+    	array[size++] = element;
+    	return true;
     }
     
+    /**
+     * Adds all the elements contained in the provided collection at the end of the <code>FastArray</code>, 
+     * resizing the internal array if need be.
+     * 
+     * @param elements The collection of elements to add to the array (not null).
+     * @return 			 Whether the array was changed.
+     */
     @Override
-    public boolean addAll(Collection<? extends E> collection) {
-        if (collection.isEmpty()) {
+    public boolean addAll(Collection<? extends E> elements) {
+        if (elements.isEmpty()) {
             return false;
         }
 
         int current = array.length;
         int selfSize = size();
-        int targetSize = collection.size();
+        int targetSize = elements.size();
         int diff = selfSize + targetSize - current;
 
         if (diff > 0) {
             array = ArrayUtil.copyOf(array, Math.max(current >> 1, diff));
         }
 
-        for (E element : collection) {
-            unsafeAdd(element);
+        for (E element : elements) {
+        	array[size++] = element;
         }
 
         return true;
     }
     
-    public boolean unsafeAdd(E object) {
-		array[size++] = object;
-		return true;
-	}
-    
-    @Override
-    public final E get(int index) {
-    	Validator.inRange(index, 0, size());
-        return array[index];
-    }
-
-	@Override
-    public final E[] array() {
-    	return array;
-    }
-    
-    @Override
-    protected final void setArray(E[] array) {
-    	this.array = array;
-    }
-    
-    @Override
-    public final int size() {
-    	return size;
-    }
-    
-    @Override
-    protected final void setSize(int size) {
-    	this.size = size;
-    }
-
+    /**
+     * Removes the element at the given index in the <code>FastArray</code>.
+     * The last element replaces the removed element in the array.
+     * 
+     * @param index The index of the element to remove (&ge;0, &lt;size).
+     * @return 		The removed element or null if none.
+     * 
+     * @throws NoSuchElementException Thrown if the provided index is out of range.
+     */
 	@Override
 	public E fastRemove(int index) {
-        if (index < 0 || index >= size) {
-            throw new NoSuchElementException();
-        }
+		Validator.inRange(index, 0, size() - 1);
 
         size -= 1;
 
@@ -110,9 +130,16 @@ public class FastArray<E> extends AbstractArray<E> {
         return old;
 	}
 
+	/**
+     * Remove the element at the given index in the <code>FastArray</code>.
+     * The array is being entirely reordered.
+     * 
+     * @param index The index of the element to remove (&ge;0, &lt;size).
+     * @return		The removed element or null if none.
+     */
 	@Override
-	public E slowRemove(int index) {
-		Validator.inRange(index, 0, size());
+	public E remove(int index) {
+		Validator.inRange(index, 0, size() - 1);
 
         int numMoved = size - index - 1;
         E old = array[index];
@@ -126,37 +153,69 @@ public class FastArray<E> extends AbstractArray<E> {
 
         return old;
 	}
+    
+    /**
+     * Return the element at the specified index from the <code>FastArray</code>.
+     * 
+     * @param index The index of the element to retrieve (&ge;0, &lt;size).
+     * @return		The element at the index, or null.
+     */
+    @Override
+    public final E get(int index) {
+    	Validator.inRange(index, 0, size() - 1);
+        return array[index];
+    }
 
+    /**
+     * Return the internal unsafe array of the <code>FastArray</code>.
+     * 
+     * @return The internal array (not null).
+     */
 	@Override
-	public E set(int index, E element) {
-		if(index >= size || size == array.length) {
-    		array = ArrayUtil.copyOf(array, Math.max(array.length >> 1, 1));
-    		this.size = array.length;
-    	}
-		
-		if(index < 0 || index >= size) {
-			throw new ArrayIndexOutOfBoundsException();
-		}
-		
-		E previous = array[index];
-		if(previous != null) {
-			size -= 1;
-		}
-		
-		array[index] = element;
-		
-		size += 1;
-		
-		return previous;
-	}
+    public final E[] array() {
+    	return array;
+    }
+    
+	/**
+     * Sets the new internal array of the <code>FastArray</code>.
+     * 
+     * @param array The new internal array (not null).
+     */
+    @Override
+    protected final void setArray(E[] array) {
+    	Validator.nonNull(array, "The internal array can't be null!");
+    	this.array = array;
+    }
+    
+    /**
+     * Return the size of the <code>FastArray</code>.
+     * 
+     * @return The size of the array (&ge;0).
+     */
+    @Override
+    public final int size() {
+    	return size;
+    }
+    
+    /**
+     * Sets the new size of the <code>FastArray</code>.
+     * 
+     * @param size The new size of the array (&ge;0).
+     */
+    @Override
+    protected final void setSize(int size) {
+    	Validator.nonNegative(size, "The size can't be negative!");
+    	this.size = size;
+    }
 
+	/**
+	 * Returns an {@link ArrayIterator} to iterate over the elements of 
+	 * the <code>FastArray</code>.
+	 * 
+	 * @return An iterator implementation to iterate over the array (not null).
+	 */
 	@Override
-	public Iterator<E> iterator() {
+	public ArrayIterator<E> iterator() {
 		return new DefaultArrayIterator<>(this);
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> arg0) {
-		throw new UnsupportedOperationException();
 	}
 }
