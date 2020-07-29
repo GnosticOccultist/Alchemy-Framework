@@ -11,6 +11,9 @@ import fr.alchemy.utilities.ReadOnlyException;
  * 
  * @param <E> The type of element contained in the array.
  * 
+ * @version 0.1.1
+ * @since 0.1.0
+ * 
  * @author GnosticOccultist
  */
 public class ReadOnlyFastArray<E> extends FastArray<E> implements ReadOnlyArray<E> {

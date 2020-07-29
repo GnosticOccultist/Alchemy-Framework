@@ -11,6 +11,9 @@ import fr.alchemy.utilities.Validator;
  * 
  * @param <E> The type of element contained in the array.
  * 
+ * @version 0.2.0
+ * @since 0.2.0
+ * 
  * @author GnosticOccultist
  */
 public interface ConcurrentArray<E> extends Array<E> {

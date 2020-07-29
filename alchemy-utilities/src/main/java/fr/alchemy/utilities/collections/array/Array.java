@@ -20,7 +20,10 @@ import fr.alchemy.utilities.collections.pool.Reusable;
  * <p>
  * The most basic implementation of this interface is the {@link FastArray}.
  * 
- * @param <E> The type of element contained in the array.
+ * @param <E> The type of elements contained in the array.
+ * 
+ * @version 0.1.1
+ * @since 0.1.0
  * 
  * @author GnosticOccultist
  * 
@@ -39,9 +42,9 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	 * Instantiates a new {@link Array} which will contain the provided element's type
 	 * and with an initial capacity of 10 elements.
 	 * 
-	 * @param <T> The type of element contained in the array.
+	 * @param <T> The types of element contained in the array.
 	 * 
-	 * @param type The type of element to contain (not null).
+	 * @param type The type of elements to contain (not null).
 	 * @return	   A new array instance (not null).
 	 */
 	static <T> Array<T> ofType(Class<? super T> type) {
@@ -53,9 +56,9 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	 * Instantiates a new {@link Array} which will contain the provided element's type
 	 * and of the given initial capacity.
 	 * 
-	 * @param <T> The type of element contained in the array.
+	 * @param <T> The types of element contained in the array.
 	 * 
-	 * @param type 	   The type of element to contain (not null).
+	 * @param type 	   The type of elements to contain (not null).
 	 * @param capacity The initial capacity of the array (&ge;0).
 	 * @return	  	   A new array instance (not null).
 	 */
@@ -69,7 +72,7 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	 * Instantiates a new {@link ReadOnlyArray} which will contain the provided element.
 	 * The created array will be read-only.
 	 * 
-	 * @param <T> The type of element contained in the array.
+	 * @param <T> The type of elements contained in the array.
 	 * 
 	 * @param element The element to add to the array (not null).
 	 * @return		  A new read-only array containing the given element (not null).
@@ -429,7 +432,7 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
      * Copy the elements of the internal array of the <code>Array</code> into the provided
      * one if it's big enough, otherwise a new array is being allocated.
      * 
-     * @param <T> The type of element contained in the array.
+     * @param <T> The type of elements contained in the array.
      * 
      * @param newArray The new array to store the elements (only used if big enough).
      * @return 		   An array containing all elements (not null).
@@ -459,7 +462,7 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	 * Creates and return a copy of the internal array of the <code>Array</code> using the
 	 * provided type of elements.
 	 * 
-	 * @param <T> The type of element contained in the array.
+	 * @param <T> The type of elements contained in the array.
 	 * 
 	 * @param componentType The type of components in the new array (not null).
 	 * @return				An array containing all elements (not null).
