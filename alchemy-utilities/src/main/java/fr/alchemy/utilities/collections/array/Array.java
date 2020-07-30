@@ -130,6 +130,15 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
     }
     
     /**
+     * Adds all the elements contained in the provided array at the end of the <code>Array</code>, 
+     * resizing the internal array if need be.
+     * 
+     * @param elements The array of elements to add to the array (not null).
+     * @return 		   Whether the array was changed.
+     */
+    boolean addAll(E[] elements);
+    
+    /**
      * Return the internal unsafe array of the <code>Array</code>.
      * 
      * @return The internal array (not null).
@@ -210,7 +219,7 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
     	
     	int count = 0;
 
-        for (var element : elements) {
+        for (Object element : elements) {
             if (remove(element)) {
                 count++;
             }

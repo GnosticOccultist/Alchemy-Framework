@@ -103,7 +103,7 @@ public class StampedLockArray<E> extends AbstractArray<E> implements ConcurrentA
      * <code>StampedLockArray</code>, resizing the internal array if need be.
      * 
      * @param elements The collection of elements to add to the array (not null).
-     * @return 			 Whether the array was changed.
+     * @return 		   Whether the array was changed.
      */
 	@Override
 	public boolean addAll(Collection<? extends E> collection) {
@@ -124,6 +124,34 @@ public class StampedLockArray<E> extends AbstractArray<E> implements ConcurrentA
 
         return true;
 	}
+	
+	 /**
+     * Adds all the elements contained in the provided array at the end of the 
+     * <code>StampedLockArray</code>, resizing the internal array if need be.
+     * 
+     * @param elements The array of elements to add to the array (not null).
+     * @return 		   Whether the array was changed.
+     */
+	@Override
+	public boolean addAll(E[] elements) {
+		if (elements.length == 0) {
+            return false;
+        }
+
+		int current = array.length;
+		int selfSize = size();
+		int targetSize = elements.length;
+		int diff = selfSize + targetSize - current;
+
+        if (diff > 0) {
+            array = ArrayUtil.copyOf(array, Math.max(current >> 1, diff));
+        }
+
+        System.arraycopy(elements, 0, array, selfSize, targetSize);
+        size.set(selfSize + targetSize);
+
+        return true;
+	}
 
 	/**
      * Removes the element at the given index in the <code>StampedLockArray</code>.
@@ -138,8 +166,8 @@ public class StampedLockArray<E> extends AbstractArray<E> implements ConcurrentA
 	public E fastRemove(int index) {
 		Validator.inRange(index, 0, size() - 1);
 
-        var newSize = size.decrementAndGet();
-        var old = array[index];
+        int newSize = size.decrementAndGet();
+        E old = array[index];
 
         array[index] = array[newSize];
         array[newSize] = null;

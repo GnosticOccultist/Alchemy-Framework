@@ -83,7 +83,7 @@ public class FastArray<E> extends AbstractArray<E> {
      * resizing the internal array if need be.
      * 
      * @param elements The collection of elements to add to the array (not null).
-     * @return 			 Whether the array was changed.
+     * @return 		   Whether the array was changed.
      */
     @Override
     public boolean addAll(Collection<? extends E> elements) {
@@ -103,6 +103,34 @@ public class FastArray<E> extends AbstractArray<E> {
         for (E element : elements) {
         	array[size++] = element;
         }
+
+        return true;
+    }
+    
+    /**
+     * Adds all the elements contained in the provided array at the end of the <code>FastArray</code>, 
+     * resizing the internal array if need be.
+     * 
+     * @param elements The array of elements to add to the array (not null).
+     * @return 		   Whether the array was changed.
+     */
+    @Override
+    public boolean addAll(E[] elements) {
+    	if (elements.length == 0) {
+            return false;
+        }
+
+        int current = array.length;
+        int selfSize = size();
+        int targetSize = elements.length;
+        int diff = selfSize + targetSize - current;
+
+        if (diff > 0) {
+            array = ArrayUtil.copyOf(array, Math.max(current >> 1, diff));
+        }
+
+        System.arraycopy(elements, 0, array, selfSize, targetSize);
+        setSize(selfSize + targetSize);
 
         return true;
     }

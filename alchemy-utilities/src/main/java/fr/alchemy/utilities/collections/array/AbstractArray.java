@@ -102,7 +102,7 @@ public abstract class AbstractArray<E> implements Array<E> {
 		}
 		
 		Array<?> other = (Array<?>) obj;
-		return size() == other.size() && Arrays.equals(array(), 0, size(), other.array(), 0, other.size());
+		return size() == other.size() && Arrays.deepEquals(other.array(), array());
 	}
 	
 	@Override
