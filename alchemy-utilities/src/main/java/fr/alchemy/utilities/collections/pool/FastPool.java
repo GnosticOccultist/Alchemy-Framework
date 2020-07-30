@@ -6,32 +6,23 @@ import java.util.function.Supplier;
 
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.collections.array.FastArray;
 
 /**
- * <code>FastPool</code> is wrapper around an {@link Array} to easily retrieve and re-inject element instances. The
- * pool can be grown dynamically by using the {@link #retrieve(Supplier)} method.
+ * <code>FastPool</code> is an implementation of {@link AbstractPool} which uses a {@link FastArray} as its
+ * internal pool, the pool is therefore <b>NOT</b> thread safe.
  * 
  * @param <E> The type of element to store into the pool.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
+ * @see FastArray
  * @see FastReusablePool
  * 
  * @author GnosticOccultist
  */
-public class FastPool<E> {
-	
-	/**
-	 * The default count of elements in a FastPool.
-	 */
-	protected static final int DEFAULT_SIZE = 10;
-	
-	/**
-	 * The internal pool of objects.
-	 */
-	private final Array<E> pool;
+public class FastPool<E> extends AbstractPool<E, FastArray<E>> {
 	
 	/**
 	 * Instantiates a new <code>FastPool</code> for the provided type of element to contain
@@ -64,7 +55,7 @@ public class FastPool<E> {
 	 * @param size The size of the pool in elements (&gt;0).
 	 */
 	public FastPool(Class<E> type, int size) {
-		this.pool = Array.ofType(type, size);
+		super(type, size);
 		
 		for(int i = 0; i < size; i++) {
 			inject((E) Instantiator.fromClass(type));
@@ -82,7 +73,7 @@ public class FastPool<E> {
 	 * @param size 	  The size of the pool in elements (&gt;0).
 	 */
 	public FastPool(Class<E> type, Supplier<E> factory, int size) {
-		this.pool = Array.ofType(type, size);
+		super(type, size);
 		
 		for(int i = 0; i < size; i++) {
 			inject(factory.get());
@@ -90,10 +81,21 @@ public class FastPool<E> {
 	}
 	
 	/**
+	 * Creates a new {@link FastArray} to use internally by the <code>FastPool</code>.
+	 * 
+	 * @return A new array implementation for internal pooling (not null).
+	 */
+	@Override
+	protected FastArray<E> createPool(Class<? super E> type, int size) {
+		return new FastArray<>(type, size);
+	}
+	
+	/**
 	 * Inject the given element instance at the end of the <code>FastPool</code>.
 	 * 
 	 * @param element The element to inject into the pool (not null).
 	 */
+	@Override
 	public void inject(E element) {
 		pool.add(element);
 	}
@@ -105,26 +107,9 @@ public class FastPool<E> {
 	 *
 	 * @see #retrieve()
 	 */
+	@Override
 	public void remove(E element) {
 		pool.fastRemove(element);
-	}
-	
-	/**
-     * Return whether the <code>FastPool</code> is empty.
-     * 
-     * @return Whether the pool is empty.
-     */
-	public boolean isEmpty() {
-		return pool.isEmpty();
-    }
-	
-	/**
-	 * Return the size of the <code>FastPool</code>.
-	 * 
-	 * @return The count of pooled elements (&ge;0).
-	 */
-	public int size() {
-		return pool.size();
 	}
 	
 	/**
@@ -134,6 +119,7 @@ public class FastPool<E> {
 	 * 
 	 * @see #remove(Object)
 	 */
+	@Override
 	public E retrieve() {
 		E element = pool.pop();
 		
@@ -158,21 +144,6 @@ public class FastPool<E> {
 	}
 	
 	/**
-	 * Retrieves the element instance at the end of the <code>FastPool</code> or instantiate
-	 * a new one using the given factory if none.
-	 * 
-	 * @param factory The factory to instantiate a new element (not null).
-	 * @return 		  The element at the end of the pool, or a new instance if none.
-	 * 
-	 * @see #remove(Object)
-	 */
-	public E retrieve(Supplier<E> factory) {
-		Validator.nonNull(factory, "The factory can't be null!");
-        E take = retrieve();
-        return take != null ? take : factory.get();
-	}
-	
-	/**
 	 * Performs the given {@link Consumer} for each element instances currently in the 
 	 * <code>FastPool</code>.
 	 * 
@@ -181,10 +152,5 @@ public class FastPool<E> {
 	public void forEach(Consumer<E> action) {
 		Validator.nonNull(action, "The action can't be null!");
 		pool.forEach(action);
-	}
-	
-	@Override
-	public String toString() {
-		return pool.toString();
 	}
 }
