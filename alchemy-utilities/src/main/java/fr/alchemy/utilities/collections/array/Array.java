@@ -39,10 +39,27 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	int DEFAULT_CAPACITY = 10;
 	
 	/**
+	 * An empty read-only array.
+	 */
+	static ReadOnlyArray<?> EMPTY = new ReadOnlyFastArray<>(new Object[0]);
+	
+	/**
+	 * Return an empty {@link ReadOnlyArray}.
+	 * 
+	 * @param <T> The type of element contained in the array.
+	 * 
+	 * @return An empty read-only array (not null).
+	 */
+	@SuppressWarnings("unchecked")
+	static <T> ReadOnlyArray<T> empty() {
+		return (ReadOnlyArray<T>) EMPTY;
+	}
+	
+	/**
 	 * Instantiates a new {@link Array} which will contain the provided element's type
 	 * and with an initial capacity of 10 elements.
 	 * 
-	 * @param <T> The types of element contained in the array.
+	 * @param <T> The type of element contained in the array.
 	 * 
 	 * @param type The type of elements to contain (not null).
 	 * @return	   A new array instance (not null).
@@ -56,7 +73,7 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	 * Instantiates a new {@link Array} which will contain the provided element's type
 	 * and of the given initial capacity.
 	 * 
-	 * @param <T> The types of element contained in the array.
+	 * @param <T> The type of element contained in the array.
 	 * 
 	 * @param type 	   The type of elements to contain (not null).
 	 * @param capacity The initial capacity of the array (&ge;0).

@@ -19,7 +19,7 @@ import fr.alchemy.utilities.ReadOnlyException;
 public class ReadOnlyFastArray<E> extends FastArray<E> implements ReadOnlyArray<E> {
 
 	private static final long serialVersionUID = 3482397723734122659L;
-
+	
 	public ReadOnlyFastArray(E[] array) {
 		super(array);
 	}
