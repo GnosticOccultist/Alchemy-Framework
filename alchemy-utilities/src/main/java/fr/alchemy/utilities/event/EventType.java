@@ -6,12 +6,13 @@ package fr.alchemy.utilities.event;
  * 
  * @param <E> The class for the event.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist
  */
 public class EventType<E> {
+
 	/**
 	 * The name of the event type.
 	 */
@@ -20,59 +21,39 @@ public class EventType<E> {
 	 * The class for the event.
 	 */
 	private Class<E> eventClass;
+
 	/**
-	 * The super type of this event.
-	 */
-	private EventType<? super E> superType;
-	
-	/**
-	 * Protected constructor to inhibit instantiation of this class.
-	 * Use {@link #create(String, Class)} instead.
+	 * Protected constructor to inhibit instantiation of this class. Use
+	 * {@link #create(String, Class)} instead.
 	 */
 	protected EventType(String name, Class<E> eventClass) {
 		this.name = name;
 		this.eventClass = eventClass;
 	}
-	
+
 	/**
-	 * Protected constructor to inhibit instantiation of this class.
-	 * Use {@link #create(String, Class)} instead.
+	 * Protected constructor to inhibit instantiation of this class. Use
+	 * {@link #create(String, Class)} instead.
 	 */
 	protected EventType(String name, Class<E> eventClass, EventType<? super E> superType) {
 		this.name = name;
 		this.eventClass = eventClass;
-		this.superType = superType;
 	}
-	
+
 	/**
-	 * Creates a new <code>EventType</code> with the given name and for the 
+	 * Creates a new <code>EventType</code> with the given name and for the
 	 * specified event class.
 	 * 
 	 * @param <E> The event's type.
 	 * 
-	 * @param name		 The name of the event type.
+	 * @param name       The name of the event type.
 	 * @param eventClass The class of the event.
-	 * @return			 A new event type instance.
+	 * @return 			 A new event type instance.
 	 */
 	public static <E> EventType<E> create(String name, Class<E> eventClass) {
 		return new EventType<>(name, eventClass);
 	}
-	
-	/**
-	 * Creates a new <code>EventType</code> with the given name and for the 
-	 * specified event class.
-	 * 
-	 * @param <E> The event's type.
-	 * 
-	 * @param name		 The name of the event type.
-	 * @param eventClass The class of the event.
-	 * @param superType	 The super-type of the event.
-	 * @return			 A new event type instance.
-	 */
-	public static <E> EventType<E> create(String name, Class<E> eventClass, EventType<? super E> superType) {
-		return new EventType<>(name, eventClass, superType);
-	}
-	
+
 	/**
 	 * Return the name of the <code>EventType</code>.
 	 * 
@@ -81,7 +62,7 @@ public class EventType<E> {
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * Return the class of event for the <code>EventType</code>.
 	 * 
@@ -90,16 +71,43 @@ public class EventType<E> {
 	public Class<E> getEventClass() {
 		return eventClass;
 	}
-	
+
 	/**
-	 * Return the super-type for the <code>EventType</code>.
+	 * Return whether the <code>EventType</code>'s name is matching the provided name.
 	 * 
-	 * @return The super-type of the event, if any.
+	 * @param name The name to check equality (not null).
+	 * @return	   Whether the two names are equal.
 	 */
-	public EventType<? super E> getSuperType() {
-		return superType;
+	public boolean equals(String name) {
+		return this.name.equals(name);
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			/*
+			 * Since the event type are made to be singleton static instances, this should
+			 * handle most cases.
+			 */
+			return true;
+		}
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (obj instanceof String) {
+			return name.equals(obj);
+		}
+
+		if (getClass() == obj.getClass()) {
+			EventType<?> other = (EventType<?>) obj;
+			return name.equals(other.name) && eventClass.equals(other.eventClass);
+		}
+
+		return super.equals(obj);
+	}
+
 	@Override
 	public String toString() {
 		return name;

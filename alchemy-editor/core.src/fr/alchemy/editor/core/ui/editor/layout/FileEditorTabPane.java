@@ -13,8 +13,8 @@ import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.collections.dictionnary.ObjectDictionary;
-import fr.alchemy.utilities.event.EventBus;
 import fr.alchemy.utilities.event.EventType;
+import fr.alchemy.utilities.event.SingletonEventBus;
 import fr.alchemy.utilities.file.FileUtils;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -29,7 +29,7 @@ public class FileEditorTabPane extends EditorLayout<TabPane, FileEditor> {
 	public FileEditorTabPane(String name, AlchemyEditorScene scene) {
 		super(name, scene);
 		
-		EventBus.addListener(AlchemyEditorEvent.OPEN_FILE, this);
+		SingletonEventBus.addListener(AlchemyEditorEvent.OPEN_FILE, this);
 	}
 
 	@Override

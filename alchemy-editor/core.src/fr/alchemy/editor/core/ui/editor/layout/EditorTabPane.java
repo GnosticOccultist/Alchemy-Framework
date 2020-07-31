@@ -13,8 +13,8 @@ import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
-import fr.alchemy.utilities.event.EventBus;
 import fr.alchemy.utilities.event.EventType;
+import fr.alchemy.utilities.event.SingletonEventBus;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 
@@ -38,7 +38,7 @@ public class EditorTabPane extends EditorLayout<TabPane, EditorTool> {
 	public EditorTabPane(String name, AlchemyEditorScene scene) {
 		super(name, scene);
 		
-		EventBus.addListener(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, this);
+		SingletonEventBus.addListener(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, this);
 	}
 	
 	/**
