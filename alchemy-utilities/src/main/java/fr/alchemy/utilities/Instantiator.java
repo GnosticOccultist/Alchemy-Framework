@@ -117,11 +117,14 @@ public final class Instantiator {
 						"' isn't implementing or extending '" + type.getName() + "'!");
 			}
 			
+			Constructor<?> constructor = null;
 			if(args != null && args.length > 0) {
 				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
-				obj = (T) clazz.getConstructor(argTypes.toArray(new Class[argTypes.size()])).newInstance(args);
+				constructor = clazz.getDeclaredConstructor(argTypes.toArray(new Class[argTypes.size()]));
+				obj = (T) constructor.newInstance(args);
 			} else {
-				obj = (T) clazz.getConstructor().newInstance();
+				constructor = clazz.getDeclaredConstructor();
+				obj = (T) constructor.newInstance();
 			}
 			
 		} catch (ClassNotFoundException ex) {
@@ -188,12 +191,19 @@ public final class Instantiator {
 	 * @param clazz The class to instantiate (not null).
 	 * @return	    A new instance of the class or null if an error occured.
 	 */
-	public static <T> T fromClass(Class<T> clazz) {
+	public static <T> T fromClass(Class<T> clazz, Object... args) {
 		Validator.nonNull(clazz, "The class to instantiate can't be null!");
 		
 		T obj = null;
 		try {			
-			Constructor<T> constructor = clazz.getDeclaredConstructor();
+			Constructor<T> constructor = null;
+			if(args != null && args.length > 0) {
+				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
+				constructor = clazz.getDeclaredConstructor(argTypes.toArray(new Class[argTypes.size()]));
+			} else {
+				constructor = clazz.getDeclaredConstructor();
+			}
+			
 			if(Modifier.isProtected(constructor.getModifiers())) {
 				/*
 				 * Only access protected constructor not private ones for security. 
@@ -201,7 +211,11 @@ public final class Instantiator {
 				constructor.setAccessible(true);
 			}
 			
-			obj = (T) constructor.newInstance();
+			if(args != null && args.length > 0) {
+				obj = (T) constructor.newInstance(args);
+			} else {
+				obj = (T) constructor.newInstance();
+			}
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
 				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
