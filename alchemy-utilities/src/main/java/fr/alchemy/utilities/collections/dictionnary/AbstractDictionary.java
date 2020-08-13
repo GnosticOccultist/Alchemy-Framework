@@ -61,7 +61,7 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
 	@SuppressWarnings("unchecked")
 	protected AbstractDictionary(float loadFactor, int initialCapacity) {
 		this.loadFactor = loadFactor;
-		this.entryPool = new FastReusablePool<>(getEntryType());
+		this.entryPool = new FastReusablePool<>((Class<E>) getEntryType());
 		setEntries((E[]) ArrayUtil.create(getEntryType(), initialCapacity));
 		setThreshold((int) (initialCapacity * loadFactor)); 
 		setSize(0);

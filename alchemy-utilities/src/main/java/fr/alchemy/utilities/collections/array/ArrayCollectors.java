@@ -88,7 +88,7 @@ public final class ArrayCollectors {
 	 * @return	   A new collector which collects elements in encounter order into a read-only array (not null).
 	 */
 	public static <T, A extends Array<T>> Collector<T, A, ReadOnlyArray<T>> toReadOnlyArray(Class<? super T> type) {
-		return new Collector<>() {
+		return new Collector<T, A, ReadOnlyArray<T>>() {
 			
 			@Override
 			@SuppressWarnings("unchecked")
@@ -131,7 +131,7 @@ public final class ArrayCollectors {
 	 * @return	   A new collector which collects elements in encounter order into a concurrent array (not null).
 	 */
 	public static <T, A extends ConcurrentArray<T>> Collector<T, A, A> toConcurrentArray(Class<? super T> type) {
-		return new Collector<>() {
+		return new Collector<T, A, A>() {
 			
 			@Override
 			@SuppressWarnings("unchecked")
