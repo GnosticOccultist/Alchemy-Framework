@@ -117,6 +117,10 @@ public final class Instantiator {
 						"' isn't implementing or extending '" + type.getName() + "'!");
 			}
 			
+			if(Enum.class.isAssignableFrom(clazz) && args.length == 1) {
+				return (T) fromClassAsEnum((Class<Enum<?>>) clazz, args[0]);
+			}
+			
 			Constructor<?> constructor = null;
 			if(args != null && args.length > 0) {
 				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
@@ -191,11 +195,17 @@ public final class Instantiator {
 	 * @param clazz The class to instantiate (not null).
 	 * @return	    A new instance of the class or null if an error occured.
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> T fromClass(Class<T> clazz, Object... args) {
 		Validator.nonNull(clazz, "The class to instantiate can't be null!");
 		
 		T obj = null;
-		try {			
+		try {
+			
+			if(Enum.class.isAssignableFrom(clazz) && args.length == 1) {
+				return (T) fromClassAsEnum((Class<Enum<?>>) clazz, args[0]);
+			}
+			
 			Constructor<T> constructor = null;
 			if(args != null && args.length > 0) {
 				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
@@ -226,6 +236,51 @@ public final class Instantiator {
 		return obj;
 	}
 	
+	/**
+	 * Returns an {@link Enum} constant of the provided type using the provided argument. The argument
+	 * must be either defining the enum constant directly, its name or its ordinal.
+	 * 
+	 * @param <T> The type of enum constant to instantiate.
+	 * 
+	 * @param enumType The class of enum to instantiate (not null).
+	 * @param arg	   The argument to know what enum constant to return, either its value, 
+	 * 				   name or ordinal (not null).
+	 * @return	       An enum constant matching the provided argument.
+	 * 
+	 * @throws IllegalArgumentException Thrown if the argument isn't representing a valid enum 
+	 * 									constant, name or ordinal.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends Enum> T fromClassAsEnum(Class<T> enumType, Object arg) {
+		final Enum[] enums = enumType.getEnumConstants();
+		for(Enum e : enums) {
+			// First case, the argument represent the enum constant.
+			if(arg instanceof Enum) {
+				Enum value = (Enum) arg;
+				if(e.equals(value)) {
+					return (T) e;
+				}
+			}
+			// Second case, the argument represent the name of the enum constant.
+			else if(arg instanceof String) {
+				String name = (String) arg;
+				if(e.name().equals(name)) {
+					return (T) e;
+				}
+			} 
+			// Third case, the argument represent the ordinal of the enum constant.
+			else if(arg instanceof Integer) {
+				Integer ordinal = (Integer) arg;
+				if(e.ordinal() == ordinal) {
+					return (T) e;
+				}
+			}
+		}
+		
+		throw new IllegalArgumentException("The argument " + arg + " of type " + arg.getClass().getName() + 
+				" must either represent the enum constant, the enum name or the enum ordinal!");
+	}
+
 	/**
 	 * Creates a new instance with the provided {@link ClassLoader} and {@link JarEntry} and execute the given
 	 * {@link Predicate} on the new instance before returning it.

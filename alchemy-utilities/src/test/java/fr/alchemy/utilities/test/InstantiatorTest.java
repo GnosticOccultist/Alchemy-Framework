@@ -20,6 +20,29 @@ public class InstantiatorTest {
 		DummyClass instance = Instantiator.fromClass(DummyClass.class);
 		
 		Assertions.assertNotNull(instance);
+		
+		DummyEnum value = Instantiator.fromClass(DummyEnum.class, "DUMMY_1");
+		
+		Assertions.assertNotNull(value);
+		Assertions.assertEquals(DummyEnum.DUMMY_1, value);
+	}
+	
+	@Test
+	void testFromEnum() {
+		DummyEnum value1 = Instantiator.fromClassAsEnum(DummyEnum.class, DummyEnum.DUMMY_1);
+		
+		Assertions.assertNotNull(value1);
+		Assertions.assertEquals(DummyEnum.DUMMY_1, value1);
+		
+		DummyEnum value2 = Instantiator.fromClassAsEnum(DummyEnum.class, "DUMMY_2");
+		
+		Assertions.assertNotNull(value2);
+		Assertions.assertEquals(DummyEnum.DUMMY_2, value2);
+		
+		DummyEnum value3 = Instantiator.fromClassAsEnum(DummyEnum.class, 2);
+		
+		Assertions.assertNotNull(value3);
+		Assertions.assertEquals(DummyEnum.DUMMY_3, value3);
 	}
 	
 	@Test
@@ -48,5 +71,25 @@ public class InstantiatorTest {
 		 * @param arg An argument to check correct invokation of the method.
 		 */
 		public void dummyMethod(String arg) {}
+	}
+	
+	/**
+	 * <code>DummyEnum</code> enumerates dummy constants for testing purposes.
+	 * 
+	 * @author GnosticOccultist
+	 */
+	public enum DummyEnum {
+		/**
+		 * The first dummy enum.
+		 */
+		DUMMY_1,
+		/**
+		 * The second dummy enum.
+		 */
+		DUMMY_2,
+		/**
+		 * The third dummy enum.
+		 */
+		DUMMY_3;
 	}
 }
