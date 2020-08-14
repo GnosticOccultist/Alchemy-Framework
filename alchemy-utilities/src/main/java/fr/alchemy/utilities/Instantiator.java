@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
 import fr.alchemy.utilities.collections.array.ArrayUtil;
 
 /**
- * <code>Instantiator</code> is a utility class designed to create an instance of a class easily and without handling the exceptions.
+ * <code>Instantiator</code> is a utility class designed to create an instance of a class or invoking a method using reflection easily
+ * and without having to handle the exceptions.
  * 
  * @version 0.1.1
  * @since 0.1.0
@@ -32,6 +33,10 @@ public final class Instantiator {
 	/**
 	 * Creates a new instance of the class with the given name using reflection. The class 
 	 * must define a public or protected empty constructor.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * 
 	 * @param <T> The type of object to instantiate.
 	 * 
@@ -40,6 +45,7 @@ public final class Instantiator {
 	 * 
 	 * @see #fromNameWith(String, Object...)
 	 * @see #fromNameWith(String, Consumer, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	public static <T> T fromName(String className) {
 		return fromNameWith(className, null, ArrayUtil.EMPTY_OBJECT_ARRAY);
@@ -49,6 +55,10 @@ public final class Instantiator {
 	 * Creates a new instance of the class with the given name using reflection. The class 
 	 * must define a public or protected constructor with either no arguments or all the arguments 
 	 * of the given type in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * 
 	 * @param <T> The type of object to instantiate.
 	 * 
@@ -58,6 +68,7 @@ public final class Instantiator {
 	 * 
 	 * @see #fromName(String)
 	 * @see #fromNameWith(String, Consumer, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	public static <T> T fromNameWith(String className, Object... args) {
 		return fromNameWith(className, null, args);
@@ -67,6 +78,10 @@ public final class Instantiator {
 	 * Creates a new instance of the class with the given name using reflection. The class 
 	 * must define a public or protected constructor with either no arguments or all the arguments 
 	 * of the given type in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * <p>
 	 * After the instance has been created the given {@link Consumer} is used on it and the 
 	 * instance is returned.
@@ -81,6 +96,7 @@ public final class Instantiator {
 	 * @see #fromName(String)
 	 * @see #fromNameWith(String, Object...)
 	 * @see #fromNameImplements(String, Class, Consumer, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	public static <T> T fromNameWith(String className, Consumer<T> action, Object... args) {
 		return fromNameImplements(className, null, action, args);
@@ -90,6 +106,10 @@ public final class Instantiator {
 	 * Creates a new instance of the class with the given name using reflection. The class 
 	 * must define a public or protected constructor with either no arguments or all the arguments 
 	 * of the given type in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * <p>
 	 * After the instance has been created the given {@link Consumer} is used on it and the 
 	 * instance is returned.
@@ -104,6 +124,7 @@ public final class Instantiator {
 	 * 
 	 * @see #fromName(String)
 	 * @see #fromNameWith(String, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T fromNameImplements(String className, Class<T> type, Consumer<T> action, Object... args) {
@@ -150,6 +171,10 @@ public final class Instantiator {
 	 * Creates a new instance of the provided class using reflection. The class must define
 	 * a public or protected empty constructor in order to work correctly.
 	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
+	 * <p>
 	 * After the instance has been created the given {@link Consumer} is used on it and the 
 	 * instance is returned.
 	 * 
@@ -168,6 +193,10 @@ public final class Instantiator {
 	/**
 	 * Creates a new instance of the provided class using reflection. The class must define
 	 * a public or protected empty constructor in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * <p>
 	 * After the instance has been created the given mapping {@link Function} is used on it
 	 * and the result is returned.
@@ -189,11 +218,17 @@ public final class Instantiator {
 	/**
 	 * Creates a new instance of the provided class using reflection. The class must define
 	 * a public or protected empty constructor in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * 
 	 * @param <T> The type of object to instantiate.
 	 * 
 	 * @param clazz The class to instantiate (not null).
 	 * @return	    A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T fromClass(Class<T> clazz, Object... args) {
