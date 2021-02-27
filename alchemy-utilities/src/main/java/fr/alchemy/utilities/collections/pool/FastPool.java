@@ -30,7 +30,7 @@ public class FastPool<E> extends AbstractPool<E, FastArray<E>> {
 	 * 
 	 * @param type The type of element instances to contain (not null).
 	 */
-	public FastPool(Class<E> type) {
+	public FastPool(Class<? super E> type) {
 		this(type, DEFAULT_SIZE);
 	}
 	
@@ -43,7 +43,7 @@ public class FastPool<E> extends AbstractPool<E, FastArray<E>> {
 	 * @param type    The type of element instances to contain (not null).
 	 * @param factory The factory to instantiate the starting elements (not null).
 	 */
-	public FastPool(Class<E> type, Supplier<E> factory) {
+	public FastPool(Class<? super E> type, Supplier<? super E> factory) {
 		this(type, factory, DEFAULT_SIZE);
 	}
 	
@@ -54,7 +54,8 @@ public class FastPool<E> extends AbstractPool<E, FastArray<E>> {
 	 * @param type The type of element instances to contain (not null).
 	 * @param size The size of the pool in elements (&gt;0).
 	 */
-	public FastPool(Class<E> type, int size) {
+	@SuppressWarnings("unchecked")
+	public FastPool(Class<? super E> type, int size) {
 		super(type, size);
 		
 		for(int i = 0; i < size; i++) {
@@ -72,11 +73,12 @@ public class FastPool<E> extends AbstractPool<E, FastArray<E>> {
 	 * @param factory The factory to instantiate the starting elements (not null).
 	 * @param size 	  The size of the pool in elements (&gt;0).
 	 */
-	public FastPool(Class<E> type, Supplier<E> factory, int size) {
+	@SuppressWarnings("unchecked")
+	public FastPool(Class<? super E> type, Supplier<? super E> factory, int size) {
 		super(type, size);
 		
 		for(int i = 0; i < size; i++) {
-			inject(factory.get());
+			inject((E) factory.get());
 		}
 	}
 	

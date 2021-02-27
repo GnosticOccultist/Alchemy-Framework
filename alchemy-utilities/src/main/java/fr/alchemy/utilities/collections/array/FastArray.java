@@ -193,6 +193,19 @@ public class FastArray<E> extends AbstractArray<E> {
     	Validator.inRange(index, 0, size() - 1);
         return array[index];
     }
+    
+    /**
+     * Sets the element at the given index in the <code>FastArray</code> to the provided one.
+     * 
+     * @param index   The index to set the element to.
+     * @param element The element to set, or null to remove any previous element.
+     */
+    @Override
+    public void set(int index, E element) {
+    	Validator.inRange(index, 0, size() - 1);
+    	
+    	array[index] = element;
+    }
 
     /**
      * Return the internal unsafe array of the <code>FastArray</code>.

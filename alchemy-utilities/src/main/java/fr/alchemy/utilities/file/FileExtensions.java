@@ -109,6 +109,10 @@ public interface FileExtensions {
 	 */
 	String BLENDER_MODEL_FORMAT = "blend";
 	/**
+	 * The blender model format.
+	 */
+	String GLTF_MODEL_FORMAT = "gltf";
+	/**
 	 * The maya model format encoded in ASCII.
 	 */
 	String MAYA_MODEL_FORMAT_ASCII = "ma";

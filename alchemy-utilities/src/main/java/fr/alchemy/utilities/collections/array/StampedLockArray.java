@@ -212,6 +212,19 @@ public class StampedLockArray<E> extends AbstractArray<E> implements ConcurrentA
 	}
 	
 	/**
+     * Sets the element at the given index in the <code>StampedLockArray</code> to the provided one.
+     * 
+     * @param index   The index to set the element to.
+     * @param element The element to set, or null to remove any previous element.
+     */
+	@Override
+	public void set(int index, E element) {
+		Validator.inRange(index, 0, size() - 1);
+    	
+    	array[index] = element;
+	}
+	
+	/**
 	 * Acquires the {@link StampedLock} to perform a reading action with the <code>StampedLockArray</code>.
 	 * 
 	 * @return The stamp to use for unlocking the lock.

@@ -23,7 +23,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> implements
 	 * 
 	 * @param type The type of element instances to contain (not null).
 	 */
-	public FastReusablePool(Class<E> type) {
+	public FastReusablePool(Class<? super E> type) {
 		super(type);
 	}
 	
@@ -36,7 +36,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> implements
 	 * @param type    The type of element instances to contain (not null).
 	 * @param factory The factory to instantiate the starting elements (not null).
 	 */
-	public FastReusablePool(Class<E> type, Supplier<E> factory) {
+	public FastReusablePool(Class<? super E> type, Supplier<E> factory) {
 		super(type, factory);
 	}
 	
@@ -47,7 +47,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> implements
 	 * @param type The type of element instances to contain (not null).
 	 * @param size The size of the pool (&gt;0).
 	 */
-	public FastReusablePool(Class<E> type, int size) {
+	public FastReusablePool(Class<? super E> type, int size) {
 		super(type, size);
 	}
 	
@@ -61,7 +61,7 @@ public class FastReusablePool<E extends Reusable> extends FastPool<E> implements
 	 * @param factory The factory to instantiate the starting elements (not null).
 	 * @param size 	  The size of the pool in elements (&gt;0).
 	 */
-	public FastReusablePool(Class<E> type, Supplier<E> factory, int size) {
+	public FastReusablePool(Class<? super E> type, Supplier<E> factory, int size) {
 		super(type, factory, size);
 	}
 	

@@ -118,6 +118,21 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 		Validator.nonEmpty(elements, "The elements can't be null or empty!");
 		return (ReadOnlyArray<T>) new ReadOnlyFastArray(ArrayUtil.copyOf(elements, 0));
 	}
+	
+	/**
+	 * Instantiates a new {@link ReadOnlyArray} which will contain the provided {@link Array} of elements.
+	 * The created array will be read-only.
+	 * 
+	 * @param <T> The type of element contained in the array.
+	 * 
+	 * @param elements The elements to add to the array (not null, not empty).
+	 * @return		   A new read-only array containing the given elements (not null).
+	 */
+	@SuppressWarnings("unchecked")
+	static <T> ReadOnlyArray<T> of(Array<T> elements) {
+    	Validator.nonEmpty(elements, "The elements can't be null or empty!");
+        return new ReadOnlyFastArray(Arrays.copyOfRange(elements.array(), 0, elements.size()));
+    }
     
 	/**
 	 * Instantiates a new {@link ReadOnlyArray} which will contain the provided collection of elements.
@@ -262,11 +277,11 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
     default int indexOf(Object object) {
     	Validator.nonNull(object, "The element can't be null!");
     	
-        int index = 0;
+    	int index = 0;
         for (E element : array()) {
             if (element == null) {
                 break;
-            } else if (Objects.equals(element, element)) {
+            } else if (Objects.equals(object, element)) {
                 return index;
             }
 
@@ -403,6 +418,14 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 
         return get(0);
     }
+    
+    /**
+     * Sets the element at the given index in the <code>Array</code> to the provided one.
+     * 
+     * @param index   The index to set the element to.
+     * @param element The element to set, or null to remove any previous element.
+     */
+    void set(int index, E element);
     
     /**
      * Return whether the <code>Array</code> is empty.
