@@ -153,6 +153,12 @@ public final class JSONParser {
 			case 'n':
 				readNull();
 				break;
+			case 't':
+				readTrue();
+				break;
+			case 'f':
+		        readFalse();
+		        break;
 			case '"':
 				readString();
 				break;
@@ -347,6 +353,23 @@ public final class JSONParser {
 			}
 		}
 		value = new JSONNumber(endCapture());
+	}
+	
+	private void readTrue() throws IOException {
+		read();
+		readRequiredChar('r');
+		readRequiredChar('u');
+		readRequiredChar('e');
+		value = AlchemyJSON.TRUE;
+	}
+
+	private void readFalse() throws IOException {
+		read();
+		readRequiredChar('a');
+		readRequiredChar('l');
+		readRequiredChar('s');
+		readRequiredChar('e');
+		value = AlchemyJSON.FALSE;
 	}
 	
 	private void startCapture() {

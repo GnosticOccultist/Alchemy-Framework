@@ -254,7 +254,7 @@ public final class FileUtils {
 	 */
 	public static BufferedReader readBuffered(String path) {
 		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
-		return new BufferedReader(readStream(path));
+		return readBuffered(openStream(path));
 	}
 
 	/**
@@ -267,7 +267,33 @@ public final class FileUtils {
 	 */
 	public static InputStreamReader readStream(String path) {
 		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
-		return new InputStreamReader(openStream(path));
+		return readStream(openStream(path));
+	}
+	
+	/**
+	 * Open a {@link BufferedReader} from the provided path of a file.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param is The input stream to open the reader from.
+	 * @return	 The buffered reader from the file.
+	 */
+	public static BufferedReader readBuffered(InputStream is) {
+		Validator.nonNull(is, "The input stream for the file cannot be null!");
+		return new BufferedReader(readStream(is));
+	}
+	
+	/**
+	 * Open a {@link InputStreamReader} from the provided path of a file.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param is The input stream to open the reader from.
+	 * @return	 The input stream reader from the file.
+	 */
+	public static InputStreamReader readStream(InputStream is) {
+		Validator.nonNull(is, "The input stream for the file cannot be null!");
+		return new InputStreamReader(is);
 	}
 	
 	/**
@@ -284,6 +310,19 @@ public final class FileUtils {
 	}
 	
 	/**
+	 * Open a {@link ReadableByteChannel} from the provided {@link InputStream} of a file.
+	 * <p>
+	 * The input stream cannot be null.
+	 * 
+	 * @param is The input stream of the file to get the readable byte channel.
+	 * @return	 The readable byte channel from the file.
+	 */
+	public static ReadableByteChannel readByteChannel(InputStream is) {
+		Validator.nonNull(is, "The input stream for the file cannot be null!");
+		return Channels.newChannel(is);
+	}
+	
+	/**
 	 * Open an {@link InputStream} from the provided path of a file.
 	 * <p>
 	 * The path cannot be null or empty.
@@ -294,6 +333,27 @@ public final class FileUtils {
 	public static InputStream openStream(String path) {
 		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
 		return updateInternalFile(path).openStream();
+	}
+	
+	/**
+	 * Open an {@link InputStream} from the provided path of a file.
+	 * <p>
+	 * The path cannot be null or empty.
+	 * 
+	 * @param path The path of the file to get an input stream.
+	 * @return	   The input stream to the file.
+	 */
+	public static InputStream openStream(Path path) {
+		Validator.nonNull(path, "The path for the file cannot be null!");
+		InputStream is = null;
+		try {
+			is = Files.newInputStream(path);
+		} catch (IOException ex) {
+			System.err.println("Failed to open stream from path '" + path + "'!");
+			ex.printStackTrace();
+		}
+		
+		return is;
 	}
 	
 	/**
@@ -334,8 +394,34 @@ public final class FileUtils {
 	 * @return			   The filled byte buffer.
 	 */
 	public static ByteBuffer toByteBuffer(String resource, ByteBuffer buffer, BiModifierAction<ByteBuffer, Integer> resizeAction) {
+		return toByteBuffer(openStream(resource), buffer, resizeAction);
+    }
+	
+	/**
+	 * Converts the provided file into the provided {@link ByteBuffer}. If the buffer is too small, it will execute the 
+	 * given resizing action.
+	 * 
+	 * @param path     	   The path to convert into a byte buffer.
+	 * @param buffer	   The buffer to fill with the resource.
+	 * @param resizeAction The buffer resizing action.
+	 * @return			   The filled byte buffer.
+	 */
+	public static ByteBuffer toByteBuffer(Path path, ByteBuffer buffer, BiModifierAction<ByteBuffer, Integer> resizeAction) {
+		return toByteBuffer(openStream(path), buffer, resizeAction);
+    }
+	
+	/**
+	 * Converts the provided {@link InputStream} into the provided {@link ByteBuffer}. If the buffer is too small, it will execute the 
+	 * given resizing action.
+	 * 
+	 * @param is     	   The input stream to convert into a byte buffer.
+	 * @param buffer	   The buffer to fill with the resource.
+	 * @param resizeAction The buffer resizing action.
+	 * @return			   The filled byte buffer.
+	 */
+	public static ByteBuffer toByteBuffer(InputStream is, ByteBuffer buffer, BiModifierAction<ByteBuffer, Integer> resizeAction) {
 		
-		try (ReadableByteChannel channel = readByteChannel(resource)) {
+		try (ReadableByteChannel channel = readByteChannel(is)) {
             	
 			while (true) {
 				int bytes = channel.read(buffer);
@@ -347,7 +433,7 @@ public final class FileUtils {
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Failed to read byte channel for file: " + resource);
+			System.err.println("Failed to read byte channel from input stream: " + is);
 			e.printStackTrace();
 		}
         

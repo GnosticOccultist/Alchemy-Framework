@@ -265,7 +265,47 @@ public final class Instantiator {
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
 				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
 			System.err.println("Instantiation failed for the component '" + clazz.getName() + 
-					"'! Make sure the constructor is empty.");
+					"'! Make sure the constructor is empty. " + ex.getMessage());
+		}
+		
+		return obj;
+	}
+	
+	/**
+	 * Creates a new instance of the provided class using reflection. The class must define
+	 * a public or protected empty constructor in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
+	 * 
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param clazz The class to instantiate (not null).
+	 * @return	    A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromClassAsEnum(Class, Object)
+	 */
+	public static <T> T fromClass(Class<T> clazz, Class<?> argType, Object arg) {
+		Validator.nonNull(clazz, "The class to instantiate can't be null!");
+		
+		T obj = null;
+		try {
+			Constructor<T> constructor = clazz.getDeclaredConstructor(argType);
+			
+			if(Modifier.isProtected(constructor.getModifiers())) {
+				/*
+				 * Only access protected constructor not private ones for security. 
+				 */
+				constructor.setAccessible(true);
+			}
+			
+			obj = (T) constructor.newInstance(arg);
+			
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
+				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+			System.err.println("Instantiation failed for the component '" + clazz.getName() + 
+					"'! Make sure the constructor is empty. " + ex.getMessage());
 		}
 		
 		return obj;

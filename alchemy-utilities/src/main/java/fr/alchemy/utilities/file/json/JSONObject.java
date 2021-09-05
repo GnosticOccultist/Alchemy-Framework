@@ -1,11 +1,14 @@
 package fr.alchemy.utilities.file.json;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.file.json.JSONObject.JSONPair;
 
 /**
  * <code>JSONObject</code> represents a JSON object, a set of name/value pairs, where the names are strings and the values
@@ -16,7 +19,7 @@ import fr.alchemy.utilities.Validator;
  * 
  * @author GnosticOccultist
  */
-public class JSONObject extends JSONValue {
+public class JSONObject extends JSONValue implements Iterable<JSONPair> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -40,6 +43,27 @@ public class JSONObject extends JSONValue {
 		names = new ArrayList<String>();
 		values = new ArrayList<JSONValue>();
 		table = new HashIndexTable();
+	}
+	
+	@Override
+	void write(JSONWriter writer) throws IOException {
+		writer.writeObjectOpen();
+		Iterator<String> namesIterator = names.iterator();
+	    Iterator<JSONValue> valuesIterator = values.iterator();
+	    if(namesIterator.hasNext()) {
+	    	writer.writeMemberName(namesIterator.next());
+	        writer.writeMemberSeparator();
+	        valuesIterator.next().write(writer);
+	        
+	        while (namesIterator.hasNext()) {
+	        	writer.writeObjectSeparator();
+	            writer.writeMemberName(namesIterator.next());
+	            writer.writeMemberSeparator();
+	            valuesIterator.next().write(writer);
+	        }
+	    }
+	    
+	    writer.writeObjectClose();
 	}
 	
 	/**
@@ -127,6 +151,11 @@ public class JSONObject extends JSONValue {
 	    return index != -1 ? Optional.ofNullable(values.get(index)) : Optional.empty();
 	}
 	
+	public JSONPair getPair(int index) {
+		Validator.nonNegative(index, "The index can't be negative!");
+		return new JSONPair(names.get(index), values.get(index));
+	}
+	
 	/**
 	 * Checks if a specified member is present as a child of this <code>JSONObject</code>. 
 	 * This will not test if this object contains the literal <code>null</code>, {@link JSONValue#isNull()}
@@ -184,6 +213,28 @@ public class JSONObject extends JSONValue {
 	}
 	
 	@Override
+	public Iterator<JSONPair> iterator() {
+		final Iterator<String> namesIterator = names.iterator();
+	    final Iterator<JSONValue> valuesIterator = values.iterator();
+	    return new Iterator<JSONPair>() {
+	    	
+	    	public boolean hasNext() {
+	    		return namesIterator.hasNext();
+	    	}
+
+	    	public JSONPair next() {
+	    		String name = namesIterator.next();
+	    		JSONValue value = valuesIterator.next();
+	    		return new JSONPair(name, value);
+	    	}
+
+	    	public void remove() {
+	    		throw new UnsupportedOperationException();
+	    	}
+	    };
+	}
+	
+	@Override
 	public int hashCode() {
 		int result = 1;
 	    result = 31 * result + names.hashCode();
@@ -204,6 +255,26 @@ public class JSONObject extends JSONValue {
 	    }
 	    JSONObject other = (JSONObject) o;
 	    return names.equals(other.names) && values.equals(other.values);
+	}
+	
+	public static class JSONPair {
+		
+		private final String name;
+		
+		private final JSONValue value;
+		
+		public JSONPair(String name, JSONValue value) {
+			this.name = name;
+			this.value = value;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public JSONValue getValue() {
+			return value;
+		}
 	}
 	
 	static class HashIndexTable {

@@ -114,7 +114,13 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 	 * @return		   A new read-only array containing the given elements (not null).
 	 */
 	@SuppressWarnings("unchecked")
-	static <T> ReadOnlyArray<T> of(T[] elements) {
+	static <T> ReadOnlyArray<T> ofArray(T[] elements) {
+		Validator.nonEmpty(elements, "The elements can't be null or empty!");
+		return (ReadOnlyArray<T>) new ReadOnlyFastArray(ArrayUtil.copyOf(elements, 0));
+	}
+	
+	@SuppressWarnings("unchecked")
+	static <T> ReadOnlyArray<T> of(T... elements) {
 		Validator.nonEmpty(elements, "The elements can't be null or empty!");
 		return (ReadOnlyArray<T>) new ReadOnlyFastArray(ArrayUtil.copyOf(elements, 0));
 	}
@@ -462,7 +468,7 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
      * @return A new read-only array containing its elements (not null).
      */
     default ReadOnlyArray<E> readOnly() {
-    	return Array.of(array());
+    	return Array.ofArray(array());
     }
     
     /**

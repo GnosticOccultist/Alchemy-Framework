@@ -1,5 +1,7 @@
 package fr.alchemy.utilities.file.json;
 
+import java.io.IOException;
+
 import fr.alchemy.utilities.Validator;
 
 /**
@@ -18,8 +20,13 @@ class JSONString extends JSONValue {
 	private final String value;
 	
 	JSONString(String value) {
-		Validator.nonNull(value);
+		Validator.nonEmpty(value, "The string value can't be null or empty!");
 		this.value = value;
+	}
+	
+	@Override
+	void write(JSONWriter writer) throws IOException {
+		writer.writeString(value);
 	}
 	
 	@Override
