@@ -6,7 +6,7 @@ import java.io.PrintStream;
  * <code>Logger</code> represents an interface to implement a logging device for an application.
  * A logger is capable of printing message at different {@link LoggerLevel} to a console using a {@link PrintStream} for example.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

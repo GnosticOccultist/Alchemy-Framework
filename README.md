@@ -9,12 +9,12 @@ Alchemy Utilities is a library containing various utility methods concerning col
 ```groovy
 repositories {
     maven {
-        url  "https://dl.bintray.com/gnosticoccultist/maven" 
+        url  "https://gnosticocculitst.jfrog.io/artifactory/default-maven-virtual/" 
     }
 }
 
 dependencies {
-    compile 'com.github.gnosticoccultist:alchemy-utilities:0.1.1'
+    compile 'com.github.gnosticoccultist:alchemy-utilities:0.2.0'
 }
 ```
 
@@ -23,16 +23,16 @@ dependencies {
 ```xml
 <repositories>
 	<repository>
-		<id>bintray-gnosticoccultist-maven</id>
-		<name>bintray</name>
-		<url>https://dl.bintray.com/gnosticoccultist/maven</url>
+		<id>default-maven-virtual</id>
+		<name>default-maven-virtual</name>
+		<url>https://gnosticocculitst.jfrog.io/artifactory/default-maven-virtual/</url>
 	</repository>
 </repositories>
 
 <dependency>
 	<groupId>com.github.gnosticoccultist</groupId>
 	<artifactId>alchemy-utilities</artifactId>
-	<version>0.1.1</version>
+	<version>0.2.0</version>
 	<type>pom</type>
 </dependency>
 

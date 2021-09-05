@@ -11,7 +11,7 @@ import fr.alchemy.utilities.Validator;
 /**
  * <code>ArrayUtil</code> provides utility functions to manipulate or instantiates {@link Collection} and {@link Array}.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

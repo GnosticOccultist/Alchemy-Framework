@@ -9,7 +9,7 @@ import java.util.Objects;
  * The methods are intended for checking arguments for <code>public</code>/<code>protected</code>
  * methods. For <code>private</code>/<code>package</code>, you should use assertions instead.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

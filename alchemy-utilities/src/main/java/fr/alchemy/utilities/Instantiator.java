@@ -18,7 +18,7 @@ import fr.alchemy.utilities.collections.array.ArrayUtil;
  * <code>Instantiator</code> is a utility class designed to create an instance of a class or invoking a method using reflection easily
  * and without having to handle the exceptions.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

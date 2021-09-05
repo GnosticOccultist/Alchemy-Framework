@@ -4,7 +4,7 @@ package fr.alchemy.utilities.file;
  * <code>FileExtensions</code> is an interface containing all the useful file format described by
  * their extension.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

@@ -4,7 +4,7 @@ package fr.alchemy.utilities.task.actions;
  * A functional interface allowing the user to perform a specific action safely with the 
  * invoked element by throwing potential {@link Exception} and returning a boolean value.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.1
  * 
  * @author GnosticOccultist

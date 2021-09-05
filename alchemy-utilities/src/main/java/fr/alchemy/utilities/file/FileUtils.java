@@ -30,7 +30,7 @@ import fr.alchemy.utilities.task.actions.SafeVoidAction;
 /**
  * <code>FileUtils</code> provides utilities functions concerning files and directories.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

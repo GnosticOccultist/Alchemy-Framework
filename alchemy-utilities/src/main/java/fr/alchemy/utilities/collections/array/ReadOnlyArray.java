@@ -8,7 +8,7 @@ import java.util.Collection;
  * 
  * @param <E> The type of element contained in the array.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

@@ -7,7 +7,7 @@ package fr.alchemy.utilities.collections.pool;
  * The main usage of this interface reside in a pool where it can be retrieved and re-injected when needed for 
  * some temporary computations.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist
