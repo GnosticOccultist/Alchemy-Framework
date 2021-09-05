@@ -11,12 +11,15 @@ import fr.alchemy.utilities.ReadOnlyException;
  * 
  * @param <E> The type of element contained in the array.
  * 
+ * @version 0.2.0
+ * @since 0.1.0
+ * 
  * @author GnosticOccultist
  */
 public class ReadOnlyFastArray<E> extends FastArray<E> implements ReadOnlyArray<E> {
 
 	private static final long serialVersionUID = 3482397723734122659L;
-
+	
 	public ReadOnlyFastArray(E[] array) {
 		super(array);
 	}
@@ -28,11 +31,6 @@ public class ReadOnlyFastArray<E> extends FastArray<E> implements ReadOnlyArray<
 	
 	@Override
 	public boolean addAll(Collection<? extends E> collection) {
-		throw new ReadOnlyException("The array is readable-only!");
-	}
-	
-	@Override
-	public boolean unsafeAdd(E object) {
 		throw new ReadOnlyException("The array is readable-only!");
 	}
 	

@@ -1,50 +1,45 @@
 package fr.alchemy.utilities.file.json;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.collections.array.ReadOnlyArray;
 
+/**
+ * <code>JSONArray</code> is an implementation of {@link JSONValue} to represent a JSON array containing
+ * an ordered collection of JSON values.
+ * 
+ * @author GnosticOccultist
+ */
 public class JSONArray extends JSONValue implements Iterable<JSONValue> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final List<JSONValue> values;
+	/**
+	 * The values contained in the array.
+	 */
+	private final Array<JSONValue> values;
 	
 	/**
 	 * Creates a new empty JsonArray.
 	 */
 	public JSONArray() {
-		values = new ArrayList<JSONValue>();
+		values = Array.ofType(JSONValue.class);
 	}
 	
 	/**
 	 * Appends the specified JSON value to the end of this <code>JSONArray</code>.
 	 * 
-	 * @param value The JSON value to add to the array.
+	 * @param value The JSON value to add to the array (not null).
 	 * @return 		The array itself, to enable method chaining.
 	 */
 	public JSONArray add(JSONValue value) {
-		Validator.nonNull(value);
+		Validator.nonNull(value, "The JSON value to add can't be null!");
 		values.add(value);
-		return this;
-	}
-	
-	/**
-	 * Replaces the element at the specified position in this <code>JSONArray</code>.
-	 * with the specified JSON value.
-	 * 
-	 * @param index	The index of the array element to replace.
-	 * @param value	The value to be stored at the specified position.
-	 * @return		The array itself, to enable method chaining.
-	 * 
-	 * @throws IndexOutOfBoundsException Thrown if the index is out of range (&lt;0 or &gt;size).
-	 */
-	public JSONArray set(int index, JSONValue value) {
-		Validator.nonNull(value);
-		values.set(index, value);
 		return this;
 	}
 	
@@ -92,14 +87,28 @@ public class JSONArray extends JSONValue implements Iterable<JSONValue> {
 	}
 	
 	/**
-	 * Returns a list of the values in this <code>JSONArray</code> in document order. The returned 
-	 * list is backed by this array and will reflect subsequent changes. It cannot be used to modify 
-	 * this array. Attempts to modify the returned list will result in an exception.
+	 * Returns a {@link ReadOnlyArray} of the values in this <code>JSONArray</code> in document order.
+	 * <p>
+	 * It cannot be used to modify this array. Attempts to modify the returned array will result in an exception
+	 * as it is read-only.
 	 * 
-	 * @return A read-only list of the values in this array.
+	 * @return A read-only array of the values in this array (not null).
 	 */
-	public List<JSONValue> values() {
-		return Collections.unmodifiableList(values);
+	public ReadOnlyArray<JSONValue> values() {
+		return Array.of(values);
+	}
+	
+	/**
+	 * Returns a {@link Collection} of the values in this <code>JSONArray</code> in document order. 
+	 * The returned array is backed by this array and will reflect subsequent changes. 
+	 * <p>
+	 * It cannot be used to modify this array. Attempts to modify the returned collection will result in an 
+	 * exception as it is read-only.
+	 * 
+	 * @return An unmodifiable collection of the values in this array (not null).
+	 */
+	public Collection<JSONValue> collection() {
+		return Collections.unmodifiableCollection(values);
 	}
 	
 	@Override
@@ -111,10 +120,41 @@ public class JSONArray extends JSONValue implements Iterable<JSONValue> {
 	public JSONArray asArray() {
 		return this;
 	}
+	
+	@Override
+	void write(JSONWriter writer) throws IOException {
+		writer.writeArrayOpen();
+	    Iterator<JSONValue> iterator = iterator();
+	    if(iterator.hasNext()) {
+	    	iterator.next().write(writer);
+	    	while (iterator.hasNext()) {
+	    		writer.writeArraySeparator();
+	    		iterator.next().write(writer);
+	    	}
+	    }
+	    writer.writeArrayClose();
+	}
 
 	@Override
 	public Iterator<JSONValue> iterator() {
-		return null;
+		final Iterator<JSONValue> it = values.iterator();
+		return new Iterator<JSONValue>() {
+
+			@Override
+			public boolean hasNext() {
+				return it.hasNext();
+			}
+
+			@Override
+			public JSONValue next() {
+				return it.next();
+			}
+			
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 	
 	@Override
@@ -124,15 +164,14 @@ public class JSONArray extends JSONValue implements Iterable<JSONValue> {
 	
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
+		if(this == o) {
 			return true;
 		}
-		if (o == null) {
+		
+		if(o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		if (getClass() != o.getClass()) {
-			return false;
-		}
+		
 		JSONArray other = (JSONArray) o;
 		return values.equals(other.values);
 	}

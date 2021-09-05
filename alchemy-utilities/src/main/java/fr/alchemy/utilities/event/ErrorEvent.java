@@ -7,7 +7,7 @@ import fr.alchemy.utilities.Validator;
  * events across the {@link EventBus}. Optional information about the "original event" is included for
  * event dispatch errors.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

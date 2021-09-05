@@ -15,7 +15,7 @@ import fr.alchemy.editor.core.event.AlchemyEditorEvent;
 import fr.alchemy.editor.core.ui.component.asset.tree.AssetTree;
 import fr.alchemy.editor.core.ui.component.asset.tree.elements.AssetElement;
 import fr.alchemy.utilities.Validator;
-import fr.alchemy.utilities.event.EventBus;
+import fr.alchemy.utilities.event.SingletonEventBus;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 
@@ -73,7 +73,7 @@ public class ExternalFileBrowserDialog extends AlchemyDialog {
 	}
 	
 	private void openWorkspace(AssetElement element) {
-		EventBus.publish(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, 
+		SingletonEventBus.publish(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, 
 				AlchemyEditorEvent.newChangedCurrentWorkspaceEvent(element.getFile()));
 		processClose();
 	}

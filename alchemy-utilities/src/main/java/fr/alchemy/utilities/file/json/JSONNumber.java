@@ -1,10 +1,11 @@
 package fr.alchemy.utilities.file.json;
 
+import java.io.IOException;
+
 import fr.alchemy.utilities.Validator;
 
 /**
- * <code>JSONNumber</code> is an implementation of {@link JSONValue} for
- * numbers.
+ * <code>JSONNumber</code> is an implementation of {@link JSONValue} for numbers.
  * 
  * @author GnosticOccultist
  */
@@ -18,8 +19,13 @@ class JSONNumber extends JSONValue {
 	private final String value;
 	
 	JSONNumber(String value) {
-		Validator.nonNull(value);
+		Validator.nonEmpty(value, "The number value can't be null or empty!");
 		this.value = value;
+	}
+	
+	@Override
+	void write(JSONWriter writer) throws IOException {
+		writer.writeNumber(value);
 	}
 	
 	@Override

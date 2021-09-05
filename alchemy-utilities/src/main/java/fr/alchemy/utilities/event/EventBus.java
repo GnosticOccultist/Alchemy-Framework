@@ -3,13 +3,17 @@ package fr.alchemy.utilities.event;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import fr.alchemy.utilities.Validator;
+import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.collections.array.StampedLockArray;
 import fr.alchemy.utilities.logging.FactoryLogger;
 import fr.alchemy.utilities.logging.Logger;
 
@@ -25,7 +29,7 @@ import fr.alchemy.utilities.logging.Logger;
  * methods (similar to Guava's event bus).
  * </ul>
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @see #addEventListener(EventType, EventListener)
@@ -33,16 +37,12 @@ import fr.alchemy.utilities.logging.Logger;
  * 
  * @author GnosticOccultist
  */
-public final class EventBus {
+public class EventBus {
 	
 	/**
 	 * The logger for homonculus events.
 	 */
 	private static final Logger logger = FactoryLogger.getLogger("alchemy.events");
-	/**
-	 * The single-instance of this event bus.
-	 */
-	private static final EventBus INSTANCE = new EventBus();
 	
 	/**
 	 * The registered listeners list.
@@ -55,37 +55,12 @@ public final class EventBus {
 	/**
 	 * The table containing the listeners ranged by their type.
 	 */
-	private final Map<EventType, Listeners> listenerMap = new ConcurrentHashMap<>(); 
+	private final Map<EventType, Listeners> listenerMap = Collections.synchronizedMap(new ConcurrentHashMap<>());
 	
 	/**
-	 * Return the single instance of <code>EventBus</code>.
-	 * 
-	 * @return The singleton event bus.
+	 * Instantiates a new <code>EventBus</code> with no listeners.
 	 */
-	public static EventBus getInstance() {
-		return INSTANCE;
-	}
-	
-	/**
-	 * Private constructor to inhibit instantiation of <code>EventBus</code>.
-	 */
-	private EventBus() {}
-	
-	/**
-	 * Publishes the specified event to the <code>EventBus</code>, delivering it 
-	 * to all listeners registered for the particular {@link EventType}.
-	 * <p>
-	 * This is the same as calling {@link EventBus#publishEvent(EventType, Object)}, 
-	 * except it first get the singleton-instance of the event bus.
-	 * 
-	 * @param <E> The event's type.
-	 * 
-	 * @param type	The type of event to be delivered.
-	 * @param event The event to publish.
-	 */
-	public static <E> void publish(EventType<E> type, E event) {
-		getInstance().publishEvent(type, event);
-	}
+	public EventBus() {}
 	
 	/**
 	 * Publishes the specified event to the <code>EventBus</code>, delivering it 
@@ -112,19 +87,29 @@ public final class EventBus {
 	}
 	
 	/**
-	 * Adds an {@link EventListener} object that will be notified about events of the
-	 * specified {@link EventType}.
+	 * Publishes the specified event to the <code>EventBus</code>, delivering it asynchronously
+	 * to all listeners registered for the particular {@link EventType}.
 	 * <p>
-	 * This is the same as calling {@link #addEventListener(EventType, EventListener)},
-	 * except it first get the singleton-instance of the event bus.
+	 * The method uses the {@link ForkJoinPool#commonPool()} to deliver the event asynchronously.
 	 * 
 	 * @param <E> The event's type.
 	 * 
-	 * @param type	   The type of event.
-	 * @param listener The event listener to register.
+	 * @param type  The type of event to be delivered asynchronously.
+	 * @param event The event to publish asynchronously.
 	 */
-	public static <E> void addListener(EventType<E> type, EventListener<E> listener) {
-		getInstance().addEventListener(type, listener);
+	public <E> void publishAsyncEvent(EventType<E> type, E event) {
+		logger.debug("Published event [ type= " + type + ", event= " + event + "]");
+		
+		// Deliver to any global listeners first and we don't factor
+		// them into the delivery check. The global list is usually used
+		// for thing like lifecycle logging and not actual event handling.
+		deliverAsync(null, event, all);
+		
+		boolean delivered = deliverAsync(type, event, getListeners(type));
+		
+		if(!delivered) {
+			logger.debug("Undelivered event type:" + type + " Event:" + event);
+		}
 	}
 	
 	/**
@@ -136,36 +121,20 @@ public final class EventBus {
 	 * @param type	   The type of event.
 	 * @param listener The event listener to register.
 	 */
-	public <E> void addEventListener(EventType<E> type, EventListener<E> listener) {
+	public <E> void addEventListener(EventType<E> type, EventListener<? super E> listener) {
 		getListeners(type).add(listener);
 	}
 	
 	/**
 	 * Removes the {@link EventListener} object that will be notified about events of the
 	 * specified {@link EventType}.
-	 * <p>
-	 * This is the same as calling {@link #removeEventListener(EventType, EventListener)},
-	 * except it first get the singleton-instance of the event bus.
 	 * 
 	 * @param <E> The event's type.
 	 * 
 	 * @param type	   The type of event.
 	 * @param listener The event listener to unregister.
 	 */
-	public static <E> void removeListener(EventType<E> type, EventListener<E> listener) {
-		getInstance().removeEventListener(type, listener);
-	}
-	
-	/**
-	 * Removes the {@link EventListener} object that will be notified about events of the
-	 * specified {@link EventType}.
-	 * 
-	 * @param <E> The event's type.
-	 * 
-	 * @param type	   The type of event.
-	 * @param listener The event listener to unregister.
-	 */
-	public <E> void removeEventListener(EventType<E> type, EventListener<E> listener) {
+	public <E> void removeEventListener(EventType<E> type, EventListener<? super E> listener) {
 		getListeners(type).remove(listener);
 	}
 	
@@ -197,6 +166,7 @@ public final class EventBus {
 	 * 
 	 * @throws IllegalArgumentException Thrown if any of the dispatch methods is missing.
 	 */
+	@SuppressWarnings("deprecation")
 	public void addListenerMethods(Object listener, EventType...types) {
 		Class clazz = listener.getClass();
 		for(EventType type : types) {
@@ -236,12 +206,7 @@ public final class EventBus {
 		}
 	}
 	
-	/**
-	 * 
-	 * TODO: Testing.
-	 */
-	@SuppressWarnings("unused")
-	private void addListenerAnnotatedMethods(Object listener, EventType...types) {
+	public void addListenerAnnotatedMethods(Object listener, EventType...types) {
 		for(Method method : listener.getClass().getDeclaredMethods()) {
 			
 			// The compiler sometimes creates synthetic bridge methods as part of the
@@ -267,11 +232,9 @@ public final class EventBus {
 							+ "annotation to handle " + typeNames.length + " event types!");
 				}
 				
-				for(String name : typeNames) {
-					for(int i = 0; i < types.length; i++) {
-						if(name == types[i].getName()) {
-							getListeners(types[i]).add(new MethodDispatcher(listener, method));
-						}
+				for(int i = 0; i < types.length; i++) {
+					if(types[i].equals(typeNames[i])) {
+						getListeners(types[i]).add(new MethodDispatcher(listener, method));
 					}
 				}
 			}
@@ -298,25 +261,66 @@ public final class EventBus {
 		all.remove(listener);
 	}
 	
+	/**
+	 * Delivers the provided {@link EventType} to all the given listeners.
+	 * 
+	 * @param type		The type of event.
+	 * @param event		The event to deliver.
+	 * @param listeners The listeners to deliver the event to.
+	 * @return			Whether the event has been delivered to at least one listeners.
+	 */
 	@SuppressWarnings("unchecked")
 	protected <E> boolean deliver(EventType<E> type, E event, Listeners listeners) {
         if(listeners.isEmpty()) {
             return false;
         }
-    
-        boolean delivered = false;
+        
         for(EventListener listener : listeners.getArray()) {
-            try {
-                listener.newEvent(type, event);
-                delivered = true;
-            } catch(Throwable t) {
-                logger.error("Error handling event:" + event + " for type:" + type + "  in handler:" + listener, t);
-                if(type != ErrorEvent.DISPATCH_ERROR) {
-                	publishEvent(ErrorEvent.DISPATCH_ERROR, new ErrorEvent(t, type, event));
-                }
+        	notify(type, event, listener);
+        }
+        
+        return true;
+	}
+	
+	/**
+	 * Delivers the provided {@link EventType} to all the given listeners asynchronously.
+	 * 
+	 * @param type		The type of event.
+	 * @param event		The event to deliver asynchronously.
+	 * @param listeners The listeners to deliver the event to.
+	 * @return			Whether the event has been delivered to at least one listeners.
+	 */
+	@SuppressWarnings("unchecked")
+	protected <E> boolean deliverAsync(EventType<E> type, E event, Listeners listeners) {
+        if(listeners.isEmpty()) {
+            return false;
+        }
+        
+        for(EventListener listener : listeners.getArray()) {
+        	ForkJoinPool.commonPool().execute(() -> notify(type, event, listener));
+        }
+        
+        return true;
+	}
+	
+	/**
+	 * Notify the provided {@link EventType} to the given {@link EventListener} safely.
+	 * If an error occurs during the invokation of the delivery method, an {@link ErrorEvent} of type 
+	 * {@link ErrorEvent#DISPATCH_ERROR} will be published.
+	 * 
+	 * @param type 	   The type of event.
+	 * @param event	   The event to deliver asynchronously.
+	 * @param listener The listener to deliver the event to.
+	 */
+	private <E> void notify(EventType<E> type, E event, EventListener<E> listener) {
+		try {
+            listener.newEvent(type, event);
+        } catch(Throwable t) {
+            logger.error("Error handling event:" + event + " for type:" + type + "  in handler:" + listener, t);
+            if(type != ErrorEvent.DISPATCH_ERROR) {
+            	publishEvent(ErrorEvent.DISPATCH_ERROR, new ErrorEvent(t, type, event));
             }
         }
-        return delivered;
 	}
 	
 	/**
@@ -401,6 +405,301 @@ public final class EventBus {
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
 				throw new RuntimeException("Error while calling: " + method + " for event: " + event, ex);
 			}
+		}
+	}
+	
+	/**
+	 * <code>RunnableDispatcher</code> is an implementation of {@link EventListener} that needs to receive one or
+	 * multiple events asynchronously before executing a set of {@link Runnable}.
+	 * <p>
+	 * To create a dispatcher, please refer to one of the two builder classes: {@link SingleEventDispatcherBuilder} and
+	 * {@link CombinedEventDispatcherBuilder}.
+	 * 
+	 * @author GnosticOccultist
+	 * 
+	 * @see SingleEventDispatcherBuilder
+	 * @see CombinedEventDispatcherBuilder
+	 */
+	private static class RunnableDispatcher implements EventListener {
+
+		/**
+		 * The event bus to which the dispatcher is listening.
+		 */
+		private final EventBus eventBus;
+		/**
+		 * The event types that needs to be received by the listeners.
+		 */
+		private final StampedLockArray<EventType<?>> eventTypes;
+		/**
+		 * A copy of the event types to unregister the listener.
+		 */
+		private final Array<EventType<?>> eventTypesSet;
+		/**
+		 * The array of handlers to run when all events have been received.
+		 */
+		private final Array<Runnable> handlers;
+		
+		RunnableDispatcher(EventBus eventBus, Array<EventType<?>> eventTypes, Array<Runnable> handlers) {
+			this.eventBus = eventBus;
+            this.eventTypes = new StampedLockArray<>(EventType.class);
+            this.eventTypes.addAll(eventTypes);
+            this.eventTypesSet = Array.ofType(EventType.class);
+            this.eventTypesSet.addAll(eventTypes);
+            this.handlers = handlers;
+        }
+		
+		@Override
+		@SuppressWarnings("unchecked")
+		public void newEvent(EventType type, Object event) {
+
+			logger.debug(this + " received event '" + type + "'.");
+			
+			eventTypes.applyInWriteLock(type, Array::remove);
+			
+			if(!eventTypes.isEmpty()) {
+				logger.debug(this + " has still " + eventTypes);
+				return;
+			}
+			
+			handlers.forEach(Runnable::run);
+			
+			logger.debug("Successfully runned handlers for " + this + ".");
+			
+			eventTypesSet.forEach(eventType ->
+            	eventBus.removeEventListener(eventType, this));
+		}
+		
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			eventTypesSet.forEach(type -> {
+				sb.append(type.getName());
+				sb.append(" ");
+			});
+			return getClass().getSimpleName() + " [ " + sb.toString() + "]";
+		}
+	}
+	
+	/**
+	 * <code>CombinedEventDispatcherBuilder</code> is a builder class to build and register {@link RunnableDispatcher}
+	 * to the {@link EventBus}.
+	 * <p>
+	 * The created dispatcher will have to listen asynchronously to multiple {@link EventType} before executing a defined handler.
+	 * 
+	 * @author GnosticOccultist
+	 */
+	public static class CombinedEventDispatcherBuilder {
+		
+		/**
+         * Instantiates a new <code>CombinedEventDispatcherBuilder</code> which will execute 
+         * the provided {@link Runnable}.
+         * <p>
+         * The event will be registered to the {@link SingletonEventBus}.
+         *
+         * @param handler The handler of the events.
+         * @return 		  A new builder for the handler (not null).
+         * 
+         * @see #of(EventBus, Runnable)
+         */
+        public static CombinedEventDispatcherBuilder of(Runnable handler) {
+            return new CombinedEventDispatcherBuilder(SingletonEventBus.getInstance(), handler);
+        }
+
+        /**
+         * Instantiates a new <code>CombinedEventDispatcherBuilder</code> which will execute 
+         * the provided {@link Runnable}.
+         *
+         * @param eventBus The event bus to register the event to (not null).
+         * @param handler  The handler of the events.
+         * @return 		   A new builder for the handler (not null).
+         * 
+         * @see #of(Runnable)
+         */
+        public static CombinedEventDispatcherBuilder of(EventBus eventBus, Runnable handler) {
+            return new CombinedEventDispatcherBuilder(eventBus, handler);
+        }
+
+        /**
+		 * The event bus to register the listener to.
+		 */
+		private final EventBus eventBus;
+        /**
+         * The array of listened event types.
+         */
+        private final Array<EventType<?>> eventTypes;
+        /**
+         * The result handler for the events.
+         */
+        private final Runnable handler;
+
+        /**
+         * Private constructor to inhibit instantiation of <code>CombinedEventDispatcherBuilder</code>.
+         * Please use {@link #of(Runnable)} or {@link #of(EventBus, Runnable)}.
+         */
+        private CombinedEventDispatcherBuilder(EventBus eventBus, Runnable handler) {
+        	Validator.nonNull(eventBus, "The event bus can't be null!");
+        	Validator.nonNull(handler, "The handler can't be null!");
+        	this.eventBus = eventBus;
+            this.handler = handler;
+            this.eventTypes = Array.ofType(EventType.class);
+        }
+
+        /**
+         * Add the provided {@link EventType} for the dispatcher to listen to once before executing 
+         * its handler.
+         *
+         * @param eventType The additional event type to listen (not null).
+         * @return			The builder for chaining purposes (not null).
+         */
+        public CombinedEventDispatcherBuilder add(EventType<?> eventType) {
+            return add(eventType, 1);
+        }
+
+        /**
+         * Add the provided {@link EventType} for the dispatcher to listen to a certain number of times 
+         * before executing its handler.
+         *
+         * @param eventType The additional event type to listen (not null).
+         * @param count		The number of times the event type has to be listen (&ge;1).
+         * @return			The builder for chaining purposes (not null).
+         */
+        public CombinedEventDispatcherBuilder add(EventType<?> eventType, int count) {
+        	Validator.nonNull(eventType, "The event type can't be null!");
+        	Validator.inRange(count, 1, Integer.MAX_VALUE);
+        	
+            for (int i = 0; i < count; i++) {
+                eventTypes.add(eventType);
+            }
+
+            return this;
+        }
+        
+        /**
+         * Add the provided {@link EventType} for the dispatcher to listen to once before executing 
+         * its handler.
+         *
+         * @param types The additional event types to listen (not null).
+         * @return		The builder for chaining purposes (not null).
+         */
+        public CombinedEventDispatcherBuilder addAll(EventType<?>... types) {
+        	this.eventTypes.addAll(types);
+        	return this;
+        }
+
+        /**
+         * Creates and register a corresponding {@link RunnableDispatcher} to the {@link EventBus}.
+         */
+        @SuppressWarnings("unchecked")
+		public void register() {
+
+            if (eventTypes.isEmpty()) {
+                throw new IllegalStateException("The list of listened events should not be empty.");
+            }
+
+            RunnableDispatcher resultHandler = new RunnableDispatcher(eventBus, eventTypes, Array.of(handler));
+
+            Array<EventType<?>> eventTypesSet = resultHandler.eventTypesSet;
+            eventTypesSet.forEach(eventType ->
+                    eventBus.addEventListener(eventType, resultHandler));
+        }
+    }
+	
+	public static class SingleEventDispatcherBuilder {
+		
+		/**
+         * Instantiates a new <code>SingleEventDispatcherBuilder</code> which will execute 
+         * some registered {@link Runnable} after listening to the provided {@link EventType}.
+         * <p>
+         * The event will be registered to the {@link SingletonEventBus}.
+         *
+         * @param handler The event type to listen to (not null).
+         * @return 		  A new builder for the event type (not null).
+         * 
+         * @see #of(EventBus, EventType)
+         */
+		public static SingleEventDispatcherBuilder of(EventType<?> eventType) {
+			return of(SingletonEventBus.getInstance(), eventType);
+		}
+		
+		/**
+         * Instantiates a new <code>SingleEventDispatcherBuilder</code> which will execute 
+         * some registered {@link Runnable} after listening to the provided {@link EventType}.
+         *
+         * @param eventBus The event bus to register the event to (not null).
+         * @param handler  The event type to listen to (not null).
+         * @return 		   A new builder for the event type (not null).
+         * 
+         * @see #of(EventType)
+         */
+		public static SingleEventDispatcherBuilder of(EventBus eventBus, EventType<?> eventType) {
+			return new SingleEventDispatcherBuilder(eventBus, eventType);
+		}
+		
+		/**
+		 * The event bus to register the listener to.
+		 */
+		private final EventBus eventBus;
+		/**
+		 * The listened event type.
+		 */
+		private final EventType<?> eventType;
+		/**
+		 * The array of result handlers to execute.
+		 */
+		private final Array<Runnable> handlers;
+		
+		/**
+         * Private constructor to inhibit instantiation of <code>SingleEventDispatcherBuilder</code>.
+         * Please use {@link #of(EventType)} or {@link #of(EventBus, EventType)}.
+         */
+		private SingleEventDispatcherBuilder(EventBus eventBus, EventType<?> eventType) {
+			Validator.nonNull(eventBus, "The event bus can't be null!");
+			Validator.nonNull(eventType, "The event type can't be null!");
+			this.eventBus = eventBus;
+            this.handlers = Array.ofType(Runnable.class);
+            this.eventType = eventType;
+        }
+		
+		/**
+		 * Add the provided {@link Runnable} for the dispatcher to executed after listening
+		 * to the {@link EventType}.
+		 * 
+		 * @param handler The additional handler to execute (not null).
+		 * @return		  The builder for chaining purposes (not null).
+		 */
+		public SingleEventDispatcherBuilder add(Runnable handler) {
+			Validator.nonNull(handler, "The handler can't be null!");
+			handlers.add(handler);
+			return this;
+		}
+		
+		/**
+		 * Add the provided {@link Runnable} for the dispatcher to executed after listening
+		 * to the {@link EventType}.
+		 * 
+		 * @param handler The additional handler to execute (not null).
+		 * @return		  The builder for chaining purposes (not null).
+		 */
+		public SingleEventDispatcherBuilder addAll(Runnable... handler) {
+			Validator.nonNull(handler, "The handlers can't be null!");
+			handlers.addAll(handler);
+			return this;
+		}
+		
+		/**
+         * Creates and register a corresponding {@link RunnableDispatcher} to the {@link EventBus}.
+         */
+		@SuppressWarnings("unchecked")
+		public void register() {
+			if(handlers.isEmpty()) {
+				throw new IllegalStateException("The list of handlers should not be empty.");
+			}
+			
+			RunnableDispatcher resultHandler = new RunnableDispatcher(eventBus, Array.of(eventType), handlers);
+			
+			resultHandler.eventTypesSet.forEach(eventType -> {
+				eventBus.addEventListener(eventType, resultHandler);
+			});
 		}
 	}
 	

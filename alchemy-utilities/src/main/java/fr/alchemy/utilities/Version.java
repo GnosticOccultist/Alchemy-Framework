@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  * <p>
  * However there is no limitation in how much identifier numbers can be append, it is usually up to 3 or 2 if there is no patch. 
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.1
  * 
  * @author GnosticOccultist

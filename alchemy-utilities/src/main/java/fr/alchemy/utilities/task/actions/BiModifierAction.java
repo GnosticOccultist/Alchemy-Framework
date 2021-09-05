@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
  * A functional interface allowing the user to perform a certain type of action to the first invoked object
  * with the second one and return the modified object.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist

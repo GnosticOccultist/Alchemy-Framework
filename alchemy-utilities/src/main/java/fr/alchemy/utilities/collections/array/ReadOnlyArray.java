@@ -8,6 +8,9 @@ import java.util.Collection;
  * 
  * @param <E> The type of element contained in the array.
  * 
+ * @version 0.2.0
+ * @since 0.1.0
+ * 
  * @author GnosticOccultist
  */
 public interface ReadOnlyArray<E> extends Array<E> {
@@ -34,11 +37,7 @@ public interface ReadOnlyArray<E> extends Array<E> {
 	
 	@Override
 	@Deprecated
-	E slowRemove(int index);
-	
-	@Override
-	@Deprecated
-	boolean slowRemove(Object object);
+	E remove(int index);
 	
 	@Override
 	@Deprecated

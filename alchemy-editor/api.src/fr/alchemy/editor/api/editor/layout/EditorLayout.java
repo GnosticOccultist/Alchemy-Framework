@@ -1,24 +1,19 @@
 package fr.alchemy.editor.api.editor.layout;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 import fr.alchemy.editor.api.editor.EditorComponent;
 import fr.alchemy.editor.core.config.EditorConfig;
 import fr.alchemy.editor.core.event.AlchemyEditorEvent;
-import fr.alchemy.editor.core.ui.component.WorkspaceComponent;
 import fr.alchemy.editor.core.ui.editor.scene.AlchemyEditorScene;
 import fr.alchemy.utilities.Instantiator;
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.collections.array.Array;
-import fr.alchemy.utilities.event.EventBus;
 import fr.alchemy.utilities.event.EventListener;
-import fr.alchemy.utilities.event.EventType;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.layout.Region;
 
-public abstract class EditorLayout<T extends Region> implements EventListener<AlchemyEditorEvent> {
+public abstract class EditorLayout<T extends Region, E extends EditorComponent> implements EventListener<AlchemyEditorEvent> {
 	
 	/**
 	 * The name of the editor layout.
@@ -51,13 +46,6 @@ public abstract class EditorLayout<T extends Region> implements EventListener<Al
 		this.scene = scene;
 		this.content = createLayout();
 		this.components = Array.ofType(EditorComponent.class);
-		
-		// TODO: Add a better support to filter the components/editors supported by the layout.
-		if(name.contains("components")) {
-			EventBus.addListener(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE, this);
-		} else if(name.contains("editors")) {
-			EventBus.addListener(AlchemyEditorEvent.OPEN_FILE, this);
-		}
 	}
 	
 	/**
@@ -69,38 +57,6 @@ public abstract class EditorLayout<T extends Region> implements EventListener<Al
 		for(int i = 0; i < components.size(); i++) {
 			constructComponent(components.get(i));
 		}
-//			
-//		List<String> files = EditorConfig.config().getOpenedFiles(name);
-//		for(int i = 0; i < files.size(); i++) {
-//			openFile(Paths.get(files.get(i)));
-//		}
-	}
-	
-	@Override
-	public void newEvent(EventType<AlchemyEditorEvent> type, AlchemyEditorEvent event) {
-		if(type.equals(AlchemyEditorEvent.CHANGED_CURRENT_WORKSPACE)) {
-			handleSwitchWorkspace();
-		} else if(type.equals(AlchemyEditorEvent.OPEN_FILE)) {
-			openFile(event.getPath("file"), event.getBoolean("readOnly"));
-		}
-	}
-	
-	/**
-	 * Handles switching the workspace using {@link ChangedCurrentWorkspaceEvent}.
-	 */
-	protected void handleSwitchWorkspace() {
-		// Check if the workspace component is attached.
-		Optional<WorkspaceComponent> component = components.stream()
-				.filter(WorkspaceComponent.class::isInstance).map(WorkspaceComponent.class::cast).findFirst();
-		
-		// If the component is present just refresh it.
-		if(component.isPresent()) {
-			component.get().switchWorkspace();
-			return;
-		}
-		
-		// Else, construct the component from base.
-		constructComponent(WorkspaceComponent.class.getName());
 	}
 	
 	/**
@@ -110,14 +66,13 @@ public abstract class EditorLayout<T extends Region> implements EventListener<Al
 	 */
 	protected void constructComponent(String className) {
 		
-		EditorComponent component = null;
+		E component = null;
 		try {
 			component = Instantiator.fromName(className);
 		} catch (Exception e) {
 			component = Instantiator.fromNameWith(className, scene);
 		}
 		
-		((WorkspaceComponent) component).createContent();
 		attach(component);
 		component.finish();
 	}
@@ -136,15 +91,7 @@ public abstract class EditorLayout<T extends Region> implements EventListener<Al
 	 * @param component The component to add to the layout.
 	 * @return			The updated layout.
 	 */
-	protected abstract T attach(EditorComponent component);
-	
-	/**
-	 * Opens the provided file on this <code>EditorLayout</code>.
-	 * 
-	 * @param file 	   The file which was requested for opening.
-	 * @param readOnly Whether the file to open should be readable only.
-	 */
-	protected abstract void openFile(Path file, boolean readOnly);
+	protected abstract T attach(E component);
 	
 	/**
 	 * Detaches the provided {@link EditorComponent} to the <code>EditorLayout</code>.
@@ -152,7 +99,7 @@ public abstract class EditorLayout<T extends Region> implements EventListener<Al
 	 * @param component The component to remove from the layout.	
 	 * @return			The updated layout.
 	 */
-	protected abstract T detach(EditorComponent component);
+	protected abstract T detach(E component);
 	
 	/**
 	 * Return the action to create the layout for the editor.

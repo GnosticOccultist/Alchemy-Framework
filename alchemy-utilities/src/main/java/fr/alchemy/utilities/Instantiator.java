@@ -15,9 +15,10 @@ import java.util.stream.Collectors;
 import fr.alchemy.utilities.collections.array.ArrayUtil;
 
 /**
- * <code>Instantiator</code> is a utility class designed to create an instance of a class easily and without handling the exceptions.
+ * <code>Instantiator</code> is a utility class designed to create an instance of a class or invoking a method using reflection easily
+ * and without having to handle the exceptions.
  * 
- * @version 0.1.1
+ * @version 0.2.0
  * @since 0.1.0
  * 
  * @author GnosticOccultist
@@ -32,6 +33,10 @@ public final class Instantiator {
 	/**
 	 * Creates a new instance of the class with the given name using reflection. The class 
 	 * must define a public or protected empty constructor.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * 
 	 * @param <T> The type of object to instantiate.
 	 * 
@@ -40,6 +45,7 @@ public final class Instantiator {
 	 * 
 	 * @see #fromNameWith(String, Object...)
 	 * @see #fromNameWith(String, Consumer, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	public static <T> T fromName(String className) {
 		return fromNameWith(className, null, ArrayUtil.EMPTY_OBJECT_ARRAY);
@@ -49,6 +55,10 @@ public final class Instantiator {
 	 * Creates a new instance of the class with the given name using reflection. The class 
 	 * must define a public or protected constructor with either no arguments or all the arguments 
 	 * of the given type in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * 
 	 * @param <T> The type of object to instantiate.
 	 * 
@@ -58,6 +68,7 @@ public final class Instantiator {
 	 * 
 	 * @see #fromName(String)
 	 * @see #fromNameWith(String, Consumer, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	public static <T> T fromNameWith(String className, Object... args) {
 		return fromNameWith(className, null, args);
@@ -67,6 +78,10 @@ public final class Instantiator {
 	 * Creates a new instance of the class with the given name using reflection. The class 
 	 * must define a public or protected constructor with either no arguments or all the arguments 
 	 * of the given type in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * <p>
 	 * After the instance has been created the given {@link Consumer} is used on it and the 
 	 * instance is returned.
@@ -80,38 +95,85 @@ public final class Instantiator {
 	 * 
 	 * @see #fromName(String)
 	 * @see #fromNameWith(String, Object...)
+	 * @see #fromNameImplements(String, Class, Consumer, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
+	 */
+	public static <T> T fromNameWith(String className, Consumer<T> action, Object... args) {
+		return fromNameImplements(className, null, action, args);
+	}
+	
+	/**
+	 * Creates a new instance of the class with the given name using reflection. The class 
+	 * must define a public or protected constructor with either no arguments or all the arguments 
+	 * of the given type in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
+	 * <p>
+	 * After the instance has been created the given {@link Consumer} is used on it and the 
+	 * instance is returned.
+	 * 
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param className The name of the class to instantiate (not null, not empty).
+	 * @param action    The action to perform on the new instance (not null).
+	 * @param type   	The type of class to implement or null for none.
+	 * @param args 		The arguments to use in the constructor, or null for none.
+	 * @return			A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromName(String)
+	 * @see #fromNameWith(String, Object...)
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T fromNameWith(String className, Consumer<T> action, Object... args) {
+	public static <T> T fromNameImplements(String className, Class<T> type, Consumer<T> action, Object... args) {
 		Validator.nonEmpty(className, "The class name can't be empty or null!");
 		
 		T obj = null;
 		try {
 			Class<?> clazz = Class.forName(className);
+			if(type != null && !type.isAssignableFrom(clazz)) {
+				throw new IllegalArgumentException("The class '" + clazz.getName() + 
+						"' isn't implementing or extending '" + type.getName() + "'!");
+			}
+			
+			if(Enum.class.isAssignableFrom(clazz) && args.length == 1) {
+				return (T) fromClassAsEnum((Class<Enum<?>>) clazz, args[0]);
+			}
+			
+			Constructor<?> constructor = null;
 			if(args != null && args.length > 0) {
 				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
-				obj = (T) clazz.getConstructor(argTypes.toArray(new Class[argTypes.size()])).newInstance(args);
+				constructor = clazz.getDeclaredConstructor(argTypes.toArray(new Class[argTypes.size()]));
+				obj = (T) constructor.newInstance(args);
 			} else {
-				obj = (T) clazz.getConstructor().newInstance();
+				constructor = clazz.getDeclaredConstructor();
+				obj = (T) constructor.newInstance();
 			}
 			
 		} catch (ClassNotFoundException ex) {
-			System.err.println("Unable to find the class: '" + className + "' !");
+			throw new IllegalArgumentException("Unable to find the class: '" + className + "' ! " + ex);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
 				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-			System.err.println("Instantiation failed for the component '" + className + 
-					"'! Make sure the constructor is empty.");
+			throw new RuntimeException("Instantiation failed for the component '" + className + 
+					"'! Make sure the constructor is empty. " + ex);
 		}
 		
 		if(obj != null && action != null) {
 			action.accept(obj);
 		}
+		
 		return obj;		
 	}
 	
 	/**
 	 * Creates a new instance of the provided class using reflection. The class must define
 	 * a public or protected empty constructor in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * <p>
 	 * After the instance has been created the given {@link Consumer} is used on it and the 
 	 * instance is returned.
@@ -131,6 +193,10 @@ public final class Instantiator {
 	/**
 	 * Creates a new instance of the provided class using reflection. The class must define
 	 * a public or protected empty constructor in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * <p>
 	 * After the instance has been created the given mapping {@link Function} is used on it
 	 * and the result is returned.
@@ -152,18 +218,37 @@ public final class Instantiator {
 	/**
 	 * Creates a new instance of the provided class using reflection. The class must define
 	 * a public or protected empty constructor in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
 	 * 
 	 * @param <T> The type of object to instantiate.
 	 * 
 	 * @param clazz The class to instantiate (not null).
 	 * @return	    A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromClassAsEnum(Class, Object)
 	 */
-	public static <T> T fromClass(Class<T> clazz) {
+	@SuppressWarnings("unchecked")
+	public static <T> T fromClass(Class<T> clazz, Object... args) {
 		Validator.nonNull(clazz, "The class to instantiate can't be null!");
 		
 		T obj = null;
-		try {			
-			Constructor<T> constructor = clazz.getDeclaredConstructor();
+		try {
+			
+			if(Enum.class.isAssignableFrom(clazz) && args.length == 1) {
+				return (T) fromClassAsEnum((Class<Enum<?>>) clazz, args[0]);
+			}
+			
+			Constructor<T> constructor = null;
+			if(args != null && args.length > 0) {
+				List<Class<?>> argTypes = Arrays.asList(args).stream().map(Object::getClass).collect(Collectors.toList());
+				constructor = clazz.getDeclaredConstructor(argTypes.toArray(new Class[argTypes.size()]));
+			} else {
+				constructor = clazz.getDeclaredConstructor();
+			}
+			
 			if(Modifier.isProtected(constructor.getModifiers())) {
 				/*
 				 * Only access protected constructor not private ones for security. 
@@ -171,17 +256,106 @@ public final class Instantiator {
 				constructor.setAccessible(true);
 			}
 			
-			obj = (T) constructor.newInstance();
+			if(args != null && args.length > 0) {
+				obj = (T) constructor.newInstance(args);
+			} else {
+				obj = (T) constructor.newInstance();
+			}
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
 				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
 			System.err.println("Instantiation failed for the component '" + clazz.getName() + 
-					"'! Make sure the constructor is empty.");
+					"'! Make sure the constructor is empty. " + ex.getMessage());
 		}
 		
 		return obj;
 	}
 	
+	/**
+	 * Creates a new instance of the provided class using reflection. The class must define
+	 * a public or protected empty constructor in order to work correctly.
+	 * <p>
+	 * The class can also be an {@link Enum} implementation, in this case the given arguments must either
+	 * be the enum value, name or ordinal, in order for the method {@link #fromClassAsEnum(Class, Object)} 
+	 * to return an enum constant.
+	 * 
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param clazz The class to instantiate (not null).
+	 * @return	    A new instance of the class or null if an error occured.
+	 * 
+	 * @see #fromClassAsEnum(Class, Object)
+	 */
+	public static <T> T fromClass(Class<T> clazz, Class<?> argType, Object arg) {
+		Validator.nonNull(clazz, "The class to instantiate can't be null!");
+		
+		T obj = null;
+		try {
+			Constructor<T> constructor = clazz.getDeclaredConstructor(argType);
+			
+			if(Modifier.isProtected(constructor.getModifiers())) {
+				/*
+				 * Only access protected constructor not private ones for security. 
+				 */
+				constructor.setAccessible(true);
+			}
+			
+			obj = (T) constructor.newInstance(arg);
+			
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | 
+				InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+			System.err.println("Instantiation failed for the component '" + clazz.getName() + 
+					"'! Make sure the constructor is empty. " + ex.getMessage());
+		}
+		
+		return obj;
+	}
+	
+	/**
+	 * Returns an {@link Enum} constant of the provided type using the provided argument. The argument
+	 * must be either defining the enum constant directly, its name or its ordinal.
+	 * 
+	 * @param <T> The type of enum constant to instantiate.
+	 * 
+	 * @param enumType The class of enum to instantiate (not null).
+	 * @param arg	   The argument to know what enum constant to return, either its value, 
+	 * 				   name or ordinal (not null).
+	 * @return	       An enum constant matching the provided argument.
+	 * 
+	 * @throws IllegalArgumentException Thrown if the argument isn't representing a valid enum 
+	 * 									constant, name or ordinal.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends Enum> T fromClassAsEnum(Class<T> enumType, Object arg) {
+		final Enum[] enums = enumType.getEnumConstants();
+		for(Enum e : enums) {
+			// First case, the argument represent the enum constant.
+			if(arg instanceof Enum) {
+				Enum value = (Enum) arg;
+				if(e.equals(value)) {
+					return (T) e;
+				}
+			}
+			// Second case, the argument represent the name of the enum constant.
+			else if(arg instanceof String) {
+				String name = (String) arg;
+				if(e.name().equals(name)) {
+					return (T) e;
+				}
+			} 
+			// Third case, the argument represent the ordinal of the enum constant.
+			else if(arg instanceof Integer) {
+				Integer ordinal = (Integer) arg;
+				if(e.ordinal() == ordinal) {
+					return (T) e;
+				}
+			}
+		}
+		
+		throw new IllegalArgumentException("The argument " + arg + " of type " + arg.getClass().getName() + 
+				" must either represent the enum constant, the enum name or the enum ordinal!");
+	}
+
 	/**
 	 * Creates a new instance with the provided {@link ClassLoader} and {@link JarEntry} and execute the given
 	 * {@link Predicate} on the new instance before returning it.
