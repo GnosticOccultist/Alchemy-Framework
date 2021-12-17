@@ -74,8 +74,7 @@ public class FastArray<E> extends AbstractArray<E> {
     		array = ArrayUtil.copyOf(array, Math.max(array.length >> 1, 1));
     	}
     	
-    	array[size++] = element;
-    	return true;
+    	return unsafeAdd(element);
     }
     
     /**
@@ -101,7 +100,7 @@ public class FastArray<E> extends AbstractArray<E> {
         }
 
         for (E element : elements) {
-        	array[size++] = element;
+        	unsafeAdd(element);
         }
 
         return true;
@@ -133,6 +132,17 @@ public class FastArray<E> extends AbstractArray<E> {
         setSize(selfSize + targetSize);
 
         return true;
+    }
+    
+    /**
+     * Unsafe method used internally to add an element to the <code>FastArray</code>.
+     * 
+     * @param element The element to add to the array (not null).
+     * @return		  Whether the array was changed.
+     */
+    protected boolean unsafeAdd(E element) {
+    	array[size++] = element;
+    	return true;
     }
     
     /**
@@ -258,5 +268,17 @@ public class FastArray<E> extends AbstractArray<E> {
 	@Override
 	public ArrayIterator<E> iterator() {
 		return new DefaultArrayIterator<>(this);
+	}
+	
+	@Override
+	protected FastArray<E> clone() {
+		try {
+			FastArray<E> result = (FastArray<E>) super.clone();
+			result.array = ArrayUtil.copyOf(array, size());
+			result.setSize(size());
+			return result;
+		} catch (CloneNotSupportedException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 }

@@ -30,6 +30,8 @@ import fr.alchemy.utilities.collections.pool.Reusable;
  * @see ConcurrentArray
  * @see ReadOnlyArray
  * @see FastArray
+ * 
+ * @see SortedArray
  */
 public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneable, RandomAccess {
 	
