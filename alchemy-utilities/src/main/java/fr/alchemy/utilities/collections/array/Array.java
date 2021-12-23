@@ -169,6 +169,19 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
         return new ReadOnlyFastArray(elements.toArray(newArray));
     }
     
+	/**
+	 * Add the provided element in the <code>Array</code> at the given index. If an
+	 * element is already present at this index, the array is shifted by one.
+	 * 
+	 * @param index   The index at which to add the element (&ge;0, &lt;size).
+	 * @param element The element to add to the array.
+	 * @return Whether the array was changed.
+	 * 
+	 * @see #add(Object)
+	 * @see #set(int, Object)
+	 */
+    boolean add(int index, E element);
+    
     /**
      * Adds all the elements contained in the provided array at the end of the <code>Array</code>, 
      * resizing the internal array if need be.
@@ -177,6 +190,16 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
      * @return 		   Whether the array was changed.
      */
     boolean addAll(E[] elements);
+    
+    /**
+     * Sets the element at the given index in the <code>Array</code> to the provided one.
+     * 
+     * @param index   The index at which to set the element (&ge;0, &lt;size).
+     * @param element The element to set, or null to remove any previous element.
+     * 
+     * @see #add(int, Object)
+     */
+    void set(int index, E element);
     
     /**
      * Return the internal unsafe array of the <code>Array</code>.
@@ -267,6 +290,13 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 
         return count == elements.size();
     }
+    
+    /**
+     * Trims the <code>Array</code> to the specified size.
+     * 
+     * @param size The upper limit in size of the array (&ge;0).
+     */
+    void trim(int size);
     
     /**
      * Return the element at the specified index from the <code>Array</code>.
@@ -426,14 +456,6 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
 
         return get(0);
     }
-    
-    /**
-     * Sets the element at the given index in the <code>Array</code> to the provided one.
-     * 
-     * @param index   The index to set the element to.
-     * @param element The element to set, or null to remove any previous element.
-     */
-    void set(int index, E element);
     
     /**
      * Return whether the <code>Array</code> is empty.

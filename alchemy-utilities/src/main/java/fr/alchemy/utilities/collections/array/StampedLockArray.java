@@ -97,6 +97,12 @@ public class StampedLockArray<E> extends AbstractArray<E> implements ConcurrentA
 		array[size.getAndIncrement()] = element;
         return true;
 	}
+    
+    @Override
+	public boolean add(int index, E element) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
     /**
      * Adds all the elements contained in the provided collection at the end of the 
@@ -197,6 +203,16 @@ public class StampedLockArray<E> extends AbstractArray<E> implements ConcurrentA
 
         array[size.decrementAndGet()] = null;
         return old;
+	}
+	
+	 /**
+     * Trims the <code>StampedLockArray</code> to the specified size.
+     * 
+     * @param size The upper limit in size of the array (&ge;0).
+     */
+	@Override
+	public void trim(int size) {
+		
 	}
 
 	/**
