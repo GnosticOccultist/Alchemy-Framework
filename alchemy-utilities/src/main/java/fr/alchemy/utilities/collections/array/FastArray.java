@@ -80,7 +80,8 @@ public class FastArray<E> extends AbstractArray<E> {
 
 	/**
 	 * Add the provided element in the <code>Array</code> at the given index. If an
-	 * element is already present at this index, the array is shifted by one.
+	 * element is already present at that position, the array is shifted by one to the right,
+	 * incrementing the indices of subsequent elements by one.
 	 * 
 	 * @param index   The index at which to add the element (&ge;0).
 	 * @param element The element to add to the array.
@@ -92,15 +93,13 @@ public class FastArray<E> extends AbstractArray<E> {
 	@Override
 	public boolean add(int index, E element) {
 		Validator.nonNull(element, "The element to add can't be null!");
+		Validator.inRange(index, 0, size() - 1);
 		
-		int current = array.length;
-		if (index >= current) {
-			array = ArrayUtil.copyOf(array, Math.max(current >> 1, index + 1));
+		if (size == array.length) {
+			array = ArrayUtil.copyOf(array, Math.max(array.length >> 1, 1));
 		}
 		
-		if (index < size) {
-			System.arraycopy(array, index, array, index + 1, size - index);
-		}
+		System.arraycopy(array, index, array, index + 1, size - index);
 
 		array[index] = element;
 		size++;
