@@ -3,6 +3,7 @@ package fr.alchemy.utilities.collections.array;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -493,6 +494,17 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
      */
     default ReadOnlyArray<E> readOnly() {
     	return Array.ofArray(array());
+    }
+    
+    /**
+     * Sort the <code>Array</code> using the given {@link Comparator}.
+     * 
+     * @param comparator The comparator to use for sorting (not null).
+     * @return			 The sorted array (not null).
+     */
+    default Array<E> sort(Comparator<E> comparator) {
+    	java.util.Arrays.sort(array(), 0, size(), comparator);
+    	return this;
     }
     
     /**

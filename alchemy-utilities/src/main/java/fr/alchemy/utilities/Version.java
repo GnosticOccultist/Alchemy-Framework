@@ -45,7 +45,9 @@ public final class Version implements Comparable<Version>, Cloneable, Serializab
 	 * @param version The version string to parse (not null, not empty).
 	 */
 	public Version(String version) {
-		this(DevelopmentStage.STABLE, version);
+		String[] parts = version.split(" - ");
+		this.qualifier = parseQualifier(parts[0]);
+		this.identifiers = parse(parts[1]);
 	}
 	
 	/**
@@ -95,6 +97,19 @@ public final class Version implements Comparable<Version>, Cloneable, Serializab
 		Validator.nonEmpty(version, "The version string can't be empty or null!");
 		return Stream.of(version.split("\\."))
 				.mapToInt(Integer::parseInt).toArray();
+	}
+	
+	/**
+	 * Parses the given string qualifier to an enum value, {@link DevelopmentStage} of the <code>Version</code>.
+	 * 
+	 * @param version The qualifier string to parse (not null, not empty).
+	 * @return		  An enum value representing the developement stage (not null).
+	 */
+	private DevelopmentStage parseQualifier(String qualifier) {
+		Validator.nonEmpty(qualifier, "The qualifier string can't be empty or null!");
+		qualifier = qualifier.replace('-', '_').toUpperCase();
+		DevelopmentStage dev = DevelopmentStage.valueOf(qualifier);
+		return dev == null ? DevelopmentStage.STABLE : dev;
 	}
 	
 	/**

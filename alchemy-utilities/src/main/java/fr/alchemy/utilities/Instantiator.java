@@ -368,6 +368,36 @@ public final class Instantiator {
 	 * @return	     A new instance of the class corresponding to the JAR entry or null if failed.
 	 */
 	@SuppressWarnings("unchecked")
+	public static <T> T fromJarEntry(ClassLoader loader, JarEntry entry, Class<?> argType, Object arg, Predicate<Class<?>> test) {
+		Validator.nonNull(entry, "The JAR entry to load class from can't be null!");
+		Validator.check(entry.getName().endsWith(".class"), "The JAR entry must be a class file!");
+		
+		String translatedName = asReadableClassName(entry.getName());
+		try {
+			Class<?> clazz = loader.loadClass(translatedName);
+			if(test.test(clazz)) {
+				return (T) Instantiator.fromClass(clazz, argType, arg);
+			}
+		} catch (ClassNotFoundException ex) {
+			System.err.println("Instantiation failed, impossible to found class '" + translatedName + "'!");
+			ex.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Creates a new instance with the provided {@link ClassLoader} and {@link JarEntry} and execute the given
+	 * {@link Predicate} on the new instance before returning it.
+	 * 
+	 * @param <T> The type of object to instantiate.
+	 * 
+	 * @param loader The class loader to load the class from a name (not null).
+	 * @param entry  The JAR entry corresponding to the class file to instantiate.
+	 * @param test	 The predicate to execute on the new instance.
+	 * @return	     A new instance of the class corresponding to the JAR entry or null if failed.
+	 */
+	@SuppressWarnings("unchecked")
 	public static <T> T fromJarEntry(ClassLoader loader, JarEntry entry, Predicate<Class<?>> test) {
 		Validator.nonNull(entry, "The JAR entry to load class from can't be null!");
 		Validator.check(entry.getName().endsWith(".class"), "The JAR entry must be a class file!");

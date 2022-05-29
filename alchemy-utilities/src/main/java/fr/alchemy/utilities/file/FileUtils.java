@@ -144,7 +144,7 @@ public final class FileUtils {
 	 */
 	public static Array<Path> getFiles(Path directory, boolean root, boolean folders) {
         Array<Path> result = Array.ofType(Path.class);
-        addFilesTo(result, directory, FileExtensions.UNIVERSAL_EXTENSION, root, folders);
+        addFilesTo(result, directory, Array.of(FileExtensions.UNIVERSAL_EXTENSION), root, folders);
         
         return result;
 	}
@@ -158,24 +158,36 @@ public final class FileUtils {
 	 * @return			A new array containing all files of the same extension.
 	 */
 	public static Array<Path> getFiles(Path directory, String extension) {
+        return getFiles(directory, Array.of(extension));
+	}
+	
+	/**
+	 * Return all the files from the specified directory matching the given extension.
+	 * In order to accept any extensions, use {@link FileExtensions#UNIVERSAL_EXTENSION} as the argument.
+	 * 
+	 * @param directory The directory to retrieve files from.
+	 * @param extension The extension of files to retrieve (not null, not empty).
+	 * @return			A new array containing all files of the same extension.
+	 */
+	public static Array<Path> getFiles(Path directory, Array<String> extensions) {
         Array<Path> result = Array.ofType(Path.class);
-        addFilesTo(result, directory, extension, false, false);
+        addFilesTo(result, directory, extensions, false, false);
 
         return result;
 	}
 	
 	/**
-	 * Add recursively all files matching the given extension from the specified directory to the provided store.
+	 * Add recursively all files matching the given extensions from the specified directory to the provided store.
 	 * In order to accept any extensions, use {@link FileExtensions#UNIVERSAL_EXTENSION} as the argument.
 	 * 
-	 * @param store		The array to store the files in.
-	 * @param directory	The directory to start adding.
-	 * @param extension The extension of files to retrieve (not null, not empty).
-	 * @param root		Whether to add the root directory.
-	 * @param folders	Whether to add folders.
+	 * @param store		 The array to store the files in.
+	 * @param directory	 The directory to start adding.
+	 * @param extensions The extensions of files to retrieve (not null, not empty).
+	 * @param root		 Whether to add the root directory.
+	 * @param folders	 Whether to add folders.
 	 */
-	public static void addFilesTo(Array<Path> store, Path directory, String extension, boolean root, boolean folders) {
-		Validator.nonEmpty(extension, "The extension to search for can't be null!");
+	public static void addFilesTo(Array<Path> store, Path directory, Array<String> extensions, boolean root, boolean folders) {
+		Validator.nonEmpty(extensions, "The extensions to search for can't be null!");
 		if(Files.isDirectory(directory) && folders && root) {
 			store.add(directory);
 		}
@@ -188,9 +200,13 @@ public final class FileUtils {
 		try(DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
 			for(Path path : stream) {
 				if(Files.isDirectory(path)) {
-					addFilesTo(store, path, extension, true, folders);
-				} else if(FileExtensions.UNIVERSAL_EXTENSION.equals(extension) || getExtension(path).equals(extension)) {
-					store.add(path);
+					addFilesTo(store, path, extensions, true, folders);
+				} else {
+					for (String extension : extensions) {
+						if(FileExtensions.UNIVERSAL_EXTENSION.equals(extension) || getExtension(path).equals(extension)) {
+							store.add(path);
+						}
+					}
 				}
 			}
 		} catch (IOException ex) {
