@@ -5,21 +5,29 @@ import java.util.function.Consumer;
 
 import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.collections.array.ArrayUtil;
+import fr.alchemy.utilities.collections.dictionnary.entry.Entry;
 import fr.alchemy.utilities.collections.pool.FastReusablePool;
 
 public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements Dictionary<K, V> {
 	
+	/**
+	 * The default initial capacity of the dictionary.
+	 */
 	protected static final int DEFAULT_INITIAL_CAPACITY = 16;
-	
+	/**
+	 * The maximum capacity before reaching maximum threshold value.
+	 */
 	protected static final int DEFAULT_MAXIMUM_CAPACITY = 1 << 30;
-	
+	/**
+	 * The load factor before resizing the dictionary.
+	 */
 	protected static final float DEFAULT_LOAD_FACTOR = 0.75f;
 	
     /**
-     * Calculate a hash of the hashcode.
+     * Calculate a hash value for the provided hashcode.
      *
-     * @param hashcode the hashcode.
-     * @return the hash.
+     * @param hashcode The hashcode.
+     * @return 		   The calculated hash value.
      */
     protected static int hash(int hashcode) {
         hashcode ^= hashcode >>> 20 ^ hashcode >>> 12;
@@ -27,10 +35,10 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
     }
 
     /**
-     * Calculate a hash of the long key.
+     * Calculate a hash value for the provided long key.
      *
-     * @param key the long key.
-     * @return the hash.
+     * @param key The long key.
+     * @return    The calculated hash value.
      */
     protected static int hash(long key) {
         int hash = (int) (key ^ key >>> 32);
@@ -39,11 +47,11 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
     }
 
     /**
-     * Get an index of table in the {@link Dictionary}.
+     * Return an index array in the {@link Dictionary}.
      *
-     * @param hash   the hash of a key.
-     * @param length the length of a table in the {@link Dictionary}.
-     * @return the index in the table.
+     * @param hash   The hash value of a key.
+     * @param length The length of an array.
+     * @return 		 The index in the array.
      */
     protected static int indexFor(int hash, int length) {
         return hash & length - 1;
@@ -94,6 +102,7 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
             if (entry == null) {
                 continue;
             }
+            
             do {
                 E next = entry.getNext();
                 int i = indexFor(entry.getHash(), newCapacity);
@@ -120,7 +129,7 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
     
     @Override
     public void forEach(Consumer<? super V> consumer) {
-        for(Entry<E, V> entry : entries()) {
+        for (Entry<E, V> entry : entries()) {
             while (entry != null) {
                 consumer.accept(entry.getValue());
                 entry = entry.getNext();
@@ -130,7 +139,6 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
     
     @Override
     public void clear() {
-    	
     	E[] entries = entries();
         E next;
         for(E entry : entries) {
@@ -140,6 +148,7 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
                 entry = next;
             }
         }
+        
         ArrayUtil.clear(entries);
         setSize(0);
     }
@@ -156,7 +165,7 @@ public abstract class AbstractDictionary<K, V, E extends Entry<E, V>> implements
     }
 	
 	/**
-	 * Return the {@link Entry} type.
+	 * Return the {@link Entry} type of the <code>AbstractDictionary</code>.
 	 * 
 	 * @return The entries type.
 	 */

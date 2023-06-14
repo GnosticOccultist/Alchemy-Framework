@@ -4,6 +4,15 @@ import fr.alchemy.utilities.collections.array.Array;
 import fr.alchemy.utilities.collections.array.FastArray;
 import fr.alchemy.utilities.collections.pool.Reusable;
 
+/**
+ * <code>Dictionary</code> is an interface to implement a key-value dictionary.
+ * 
+ * 
+ * @author GnosticOccultist
+ *
+ * @param <K>
+ * @param <V>
+ */
 public interface Dictionary<K, V> extends Iterable<V>, Reusable {
 	
 	/**

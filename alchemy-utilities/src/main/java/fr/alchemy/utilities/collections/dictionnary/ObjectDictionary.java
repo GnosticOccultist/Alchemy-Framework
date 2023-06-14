@@ -21,14 +21,6 @@ public interface ObjectDictionary<K, V> extends Dictionary<K, V> {
         return (ObjectDictionary<K, V>) new FastObjectDictionary();
     }
 	
-	static <K, V> PoolDictionary emptyPool() {
-        return new PoolDictionary();
-    }
-	
-	static <K, V> PoolDictionary poolOf(Class<? super K> poolType) {
-        return new PoolDictionary();
-    }
-	
     /**
      * Return true if this dictionary contains a mapping for the specified key.
      *

@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.collections.array.Array;
+import fr.alchemy.utilities.collections.dictionnary.entry.ObjectEntry;
 
 public abstract class AbstractObjectDictionary<K, V> extends AbstractDictionary<K, V, ObjectEntry<K, V>> implements ObjectDictionary<K, V> {
 

@@ -331,6 +331,35 @@ public interface Array<E> extends Collection<E>, Serializable, Reusable, Cloneab
     }
     
     /**
+     * Find the index of the provided element in the <code>Array</code>, starting
+     * from the provided index. If it hasn't found any elements in the range [from, size[,
+     * it will automatically search in [0, from[.
+     * 
+     * @param object    The element to find (not null).
+     * @param fromIndex The starting index for the search.
+     * @return		    The index of the element or -1 if not found.
+     */
+    default int indexOf(Object object, int fromIndex) {
+    	Validator.nonNull(object, "The element can't be null!");
+    	
+    	if (fromIndex >= size()) {
+    		return -1;
+    	}
+    	
+    	int from = fromIndex < 0 ? 0 : fromIndex; 
+        for (int i = from; i < size(); ++i) {
+        	E element = get(i);
+            if (element == null) {
+                break;
+            } else if (Objects.equals(object, element)) {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+    
+    /**
      * Returns whether the <code>Array</code> contains at least one instance of the provided element.
      * 
      * @param object The element to check presence of (not null).

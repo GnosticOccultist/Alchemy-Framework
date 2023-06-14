@@ -1,4 +1,4 @@
-package fr.alchemy.utilities.collections.dictionnary;
+package fr.alchemy.utilities.collections.dictionnary.entry;
 
 import fr.alchemy.utilities.collections.pool.Reusable;
 

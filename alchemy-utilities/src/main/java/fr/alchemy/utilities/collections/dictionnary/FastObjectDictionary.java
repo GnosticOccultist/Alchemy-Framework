@@ -1,5 +1,7 @@
 package fr.alchemy.utilities.collections.dictionnary;
 
+import fr.alchemy.utilities.collections.dictionnary.entry.ObjectEntry;
+
 public class FastObjectDictionary<K, V> extends AbstractObjectDictionary<K, V> {
 
 	/**
