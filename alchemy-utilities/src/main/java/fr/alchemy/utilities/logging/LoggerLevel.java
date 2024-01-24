@@ -1,9 +1,10 @@
 package fr.alchemy.utilities.logging;
 
 /**
- * <code>LoggerLevel</code> enumerates all the existent logging levels, from  which the log trace is visible.
+ * <code>LoggerLevel</code> enumerates all the existent logging levels, from
+ * which the log trace is visible.
  * 
- * @version 0.2.0
+ * @version 0.2.1
  * @since 0.1.0
  * 
  * @author GnosticOccultist
@@ -29,16 +30,16 @@ public enum LoggerLevel {
 	 * Error level.
 	 */
 	ERROR(true);
-	
+
 	/**
 	 * Whether the level is active.
 	 */
 	private boolean active;
-	
+
 	private LoggerLevel(boolean active) {
 		this.active = active;
 	}
-	
+
 	/**
 	 * Return whether the <code>LoggerLevel</code> is active.
 	 * 
@@ -47,7 +48,7 @@ public enum LoggerLevel {
 	public boolean isActive() {
 		return active;
 	}
-	
+
 	/**
 	 * Sets whether the <code>LoggerLevel</code> is active.
 	 * 
@@ -56,7 +57,7 @@ public enum LoggerLevel {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
-	
+
 	@Override
 	public String toString() {
 		return name();
