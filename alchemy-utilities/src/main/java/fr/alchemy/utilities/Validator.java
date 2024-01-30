@@ -511,6 +511,35 @@ public final class Validator {
 	}
 	
 	/**
+	 * Validate a positive double-precision value as a method argument.
+	 * 
+	 * @param value The value to validate (&gt;0).
+	 * @return		The double-precision value validated.
+	 * 
+	 * @throws IllegalArgumentException If the value isn't positive.
+	 */
+	public static double positive(double value) {
+		return positive(value, DEFAULT_POSITIVE_MESSAGE);
+	}
+	
+	/**
+	 * Validate a positive double-precision value as a method argument.
+	 * 
+	 * @param value   The value to validate (&gt;0).
+	 * @param message The message to be thrown with the exception.
+	 * @return		  The double-precision value validated.
+	 * 
+	 * @throws IllegalArgumentException If the value isn't positive, with the specified message.
+	 */
+	public static double positive(double value, String message) {
+		if(!(value > 0f)) {
+			throw new IllegalArgumentException(message);
+		}
+		
+		return value;
+	}
+	
+	/**
 	 * Validate a positive integer value as a method argument.
 	 * 
 	 * @param value The value to validate (&gt;0).

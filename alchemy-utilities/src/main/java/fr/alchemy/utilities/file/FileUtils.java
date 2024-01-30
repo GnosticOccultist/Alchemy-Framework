@@ -12,12 +12,14 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Scanner;
 
 import fr.alchemy.utilities.Validator;
 import fr.alchemy.utilities.collections.array.Array;
@@ -438,6 +440,26 @@ public final class FileUtils {
 	public static ProgressInputStream openProgressStream(String path, ProgressListener listener) {
 		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
 		return updateInternalFile(path).openProgressStream(listener);
+	}
+
+	/**
+	 * Reads the text from the provided resource path, using the given
+	 * {@link Charset} and delimiting pattern.
+	 * 
+	 * @param path    The path of the resources to read (not null, not empty).
+	 * @param charset The charset used for converting bytes to characters (not
+	 *                null).
+	 * @param pattern The delimiting pattern (not null, not empty).
+	 * @return The text with one or multiple lines (not null).
+	 */
+	public static String readAsString(String path, Charset charset, String pattern) {
+		Validator.nonEmpty(path, "The path for the file cannot be null or empty!");
+		Validator.nonNull(charset, "The charset cannot be null!");
+		Validator.nonEmpty(pattern, "The delimiting pattern cannot be null or empty!");
+		try (Scanner scanner = new Scanner(openStream(path), charset.name())) {
+			String result = scanner.useDelimiter(pattern).next();
+			return result;
+		}
 	}
 
 	/**
